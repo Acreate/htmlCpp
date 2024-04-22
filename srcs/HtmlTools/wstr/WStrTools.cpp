@@ -1,18 +1,21 @@
 ﻿#include "WStrTools.h"
 
 #include <cwctype>
+#include <string>
+#include <codecvt>
+#include <locale>
 using namespace HtmlTools;
 bool WStrTools::isJumpSpace( wchar_t currentChar ) {
 	return iswspace( currentChar ) || iswcntrl( currentChar ) || iswcntrl( currentChar );
 }
 bool WStrTools::jimpSace( const wchar_t *foreachWCStr, size_t foreachMaxIndex, size_t *startIndex ) {
-	for( ; *startIndex < foreachMaxIndex ; ++( *startIndex ) )
+	for( ; *startIndex < foreachMaxIndex; ++( *startIndex ) )
 		if( !isJumpSpace( foreachWCStr[ *startIndex ] ) )
 			return true;
 	return false;
 }
 bool WStrTools::findNextWCharPotion( const wchar_t *w_c_ptr, size_t maxIndex, const wchar_t find_w_c_char, size_t *startIndex ) {
-	for( ; *startIndex < maxIndex ; ++( *startIndex ) )
+	for( ; *startIndex < maxIndex; ++( *startIndex ) )
 		if( w_c_ptr[ *startIndex ] == find_w_c_char )
 			return true;
 	return false;
@@ -26,7 +29,7 @@ bool WStrTools::findNextWStringPotion( const wchar_t *w_c_ptr, size_t src_w_c_st
 	size_t leftIndex = startIndex;
 	size_t rightIndex = 0;
 	wchar_t leftChar, rightChar;
-	for( ; leftIndex < maxIndex ; ++leftIndex ) {
+	for( ; leftIndex < maxIndex; ++leftIndex ) {
 		leftChar = w_c_ptr[ leftIndex ];
 		rightChar = find_w_c_string[ rightIndex ];
 		do {
@@ -45,4 +48,9 @@ bool WStrTools::findNextWStringPotion( const wchar_t *w_c_ptr, size_t src_w_c_st
 		}
 	}
 	return false;
+}
+
+std::string WStrTools::wstringConverString( const std::wstring &wstr ) {
+	std::wstring_convert< std::codecvt_utf8_utf16< wchar_t > > converter;
+	return converter.to_bytes( wstr );
 }

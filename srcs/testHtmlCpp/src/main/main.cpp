@@ -8,6 +8,8 @@
 #include <sstream>
 #include <string>
 
+#include "wstr/WStrTools.h"
+
 
 int main( int argc, char *argv[ ] ) {
 	std::string fString( u8"%s/%s/%s" );
@@ -31,7 +33,7 @@ int main( int argc, char *argv[ ] ) {
 	} while( true );
 
 	std::shared_ptr< std::wstring > htmlContent( new std::wstring( stringstream.str( ) ) );
-	//std::wcout << *htmlContent << std::endl;
+	std::cout << HtmlTools::WStrTools::wstringConverString( *htmlContent ) << std::endl;
 
 	ifstream.close( );
 	// 写入文件
