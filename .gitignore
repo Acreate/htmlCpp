@@ -12,3 +12,6 @@ _deps
 /.vs
 builder
 out
+/srcs/testHtmlCpp/src/macro/cmake_to_c_cpp_header_env.h
+/srcs/HtmlTools/macro/cmake_to_c_cpp_header_env.h
+/srcs/HtmlTools/export/HtmlTools_export.h

@@ -1,4 +1,4 @@
-#include <codecvt>
+ï»¿#include <codecvt>
 
 #include "../macro/cmake_to_c_cpp_header_env.h"
 #include <fstream>
@@ -34,7 +34,7 @@ int main( int argc, char *argv[ ] ) {
 	//std::wcout << *htmlContent << std::endl;
 
 	ifstream.close( );
-	// Ð´ÈëÎÄ¼þ
+	// å†™å…¥æ–‡ä»¶
 	len = snprintf( path, sizeof( path ), fString.c_str( ), std::string( Cache_Path_Dir ).c_str( ), u8"", u8"www.121ds.cc.txt" );
 	if( len == 0 )
 		return -1;
@@ -44,7 +44,7 @@ int main( int argc, char *argv[ ] ) {
 	ofstream << stringstream.str( );
 	ofstream.close( );
 
-	// ²âÊÔµ÷ÓÃ
+	// æµ‹è¯•è°ƒç”¨
 	size_t endIndex = htmlContent->size( ), startIndex = 0;
 	auto htmlDoc = HtmlTools::HtmlDoc::parse( htmlContent, endIndex, startIndex );
 	htmlDoc.analysisBrotherNode( );
