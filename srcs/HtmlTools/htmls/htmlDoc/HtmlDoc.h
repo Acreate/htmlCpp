@@ -94,7 +94,7 @@ namespace HtmlTools {
 		/// <param name="end_index">结束下标</param>
 		/// <param name="start_index">开始下标，最终下标</param>
 		/// <returns>解析后的列表</returns>
-		static HtmlDoc parse( const std::shared_ptr< std::wstring > std_c_w_string, size_t &end_index, size_t &start_index );
+		static HtmlDoc_Shared parse( const std::shared_ptr< std::wstring > std_c_w_string, size_t &end_index, size_t &start_index );
 	private: // 核心成员
 		/// <summary>
 		/// 引用的 html 内容
@@ -132,12 +132,18 @@ namespace HtmlTools {
 	public:
 		virtual ~HtmlDoc( );
 	public: // 功能转换
-	
+
 		/// <summary>
 		/// 本对象关联的节点解析兄弟关系
 		/// </summary>
 		/// <returns>解析完成的节点列表</returns>
 		Vector_HtmlNodeSPtr_Shared analysisBrotherNode( );
+		/// <summary>
+		/// 解析属性
+		/// </summary>
+		/// <returns>解析完毕的列表</returns>
+		Vector_HtmlNodeSPtr_Shared analysisAttributesNode( );
+		
 	};
 }
 

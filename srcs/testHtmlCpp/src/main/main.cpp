@@ -49,11 +49,12 @@ int main( int argc, char *argv[ ] ) {
 	// 测试调用
 	size_t endIndex = htmlContent->size( ), startIndex = 0;
 	auto htmlDoc = HtmlTools::HtmlDoc::parse( htmlContent, endIndex, startIndex );
-	htmlDoc.analysisBrotherNode( );
-	htmlDoc.getNodes( [&]( auto node ) {
-		auto nodePath = *node->getPath( );
-		std::wcout << nodePath << std::endl;
+	htmlDoc->getNodes( [&]( auto node ) {
+		auto wsNode = node->getWSNode( );
+
 		return false;
 	} );
+	htmlDoc->analysisBrotherNode( );
+	htmlDoc->analysisAttributesNode( );
 	return 0;
 }

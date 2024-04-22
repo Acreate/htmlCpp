@@ -16,6 +16,7 @@ namespace HtmlTools {
 	static constexpr wchar_t nodeEndChar = L'>'; // 节点结束
 	static constexpr wchar_t forwardSlash = L'/'; // 斜杠路径符。节点类型判定(单元素节点/双元素节点)
 	static constexpr wchar_t backSlash = L'\\'; // 反斜杠路径符
+	static constexpr wchar_t euq = L'='; // 等号
 	class HTMLTOOLS_EXPORT RefWStr;
 	// html 文档
 	class HTMLTOOLS_EXPORT HtmlDoc;

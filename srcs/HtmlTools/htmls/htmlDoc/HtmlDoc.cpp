@@ -273,10 +273,10 @@ Vector_HtmlNodeSPtr_Shared HtmlDoc::analysisDoubleNode( HtmlNode_Shared html_nod
 	return result;
 }
 
-HtmlDoc HtmlDoc::parse( const std::shared_ptr< std::wstring > std_c_w_string, size_t &end_index, size_t &start_index ) {
-	HtmlDoc result;
-	result.htmlWCStr = std::make_shared< std::wstring >( std_c_w_string->c_str( ) + start_index, end_index - start_index );
-	auto stdCWString = result.htmlWCStr;
+HtmlDoc_Shared HtmlDoc::parse( const std::shared_ptr< std::wstring > std_c_w_string, size_t &end_index, size_t &start_index ) {
+	HtmlDoc_Shared result( new HtmlDoc );
+	result->htmlWCStr = std::make_shared< std::wstring >( std_c_w_string->c_str( ) + start_index, end_index - start_index );
+	auto stdCWString = result->htmlWCStr;
 	size_t count;
 	auto resultHtml = HtmlNode::parseHtmlNodeCharPair( stdCWString, 0, end_index, count );
 	auto htmlNodeCharPairs = resultHtml.get( );
@@ -286,7 +286,7 @@ HtmlDoc HtmlDoc::parse( const std::shared_ptr< std::wstring > std_c_w_string, si
 	for( ; index < maxSize; ++index ) {
 		auto htmlDocCharPair = htmlNodeCharPairs->at( index );
 		auto hasPtr = false;
-		for( auto ptr : *result.htmlDocNode )
+		for( auto ptr : *result->htmlDocNode )
 			if( htmlDocCharPair == ptr || ( htmlDocCharPair->nodeType == Html_Node_Type::DoubleNode && htmlDocCharPair->endNode == ptr ) ) {
 				hasPtr = true;
 				break;
@@ -298,14 +298,14 @@ HtmlDoc HtmlDoc::parse( const std::shared_ptr< std::wstring > std_c_w_string, si
 		bool nodeType = isAnnotation( stdCWString, left, right );
 		if( nodeType && left < right ) {
 			htmlDocCharPair->nodeType = Html_Node_Type::AnnotationNode;
-			result.htmlDocNode->emplace_back( htmlDocCharPair );
+			result->htmlDocNode->emplace_back( htmlDocCharPair );
 		} else {
 			left = htmlDocCharPair.get( )->ptrOffset;
 			right = htmlDocCharPair.get( )->ptrCWtrLen + left;
 			nodeType = isSingelNode( stdCWString, left, right );
 			if( nodeType ) {
 				htmlDocCharPair->nodeType = Html_Node_Type::SingleNode;
-				result.htmlDocNode->emplace_back( htmlDocCharPair );
+				result->htmlDocNode->emplace_back( htmlDocCharPair );
 			} else {
 				left = htmlDocCharPair.get( )->ptrOffset;
 				size_t endLeft = left;
@@ -317,24 +317,23 @@ HtmlDoc HtmlDoc::parse( const std::shared_ptr< std::wstring > std_c_w_string, si
 					auto htmlNode = vectorHtmlXPathSPtrShared->begin( );
 					auto endNode = vectorHtmlXPathSPtrShared->end( );
 					for( ; htmlNode != endNode; ++htmlNode )
-						result.htmlDocNode->emplace_back( *htmlNode );
+						result->htmlDocNode->emplace_back( *htmlNode );
 				} else if( isEndNode( stdCWString, endLeft, right ) )
 					continue;
 				else
-					result.htmlDocNode->emplace_back( htmlDocCharPair );
+					result->htmlDocNode->emplace_back( htmlDocCharPair );
 			}
 		}
 		if( index == 0 )
 			start_index = htmlDocCharPair.get( )->ptrOffset;
 	}
-	size_t size = result.htmlDocNode->size(  );
+	size_t size = result->htmlDocNode->size( );
 	return result;
 }
 HtmlNode_Shared HtmlDoc::getNodeFromName( const std::wstring &nodeName ) const {
 	for( auto node : *htmlDocNode.get( ) )
 		if( *node->getNodeWSName( ) == nodeName )
 			return node;
-
 	return nullptr;
 }
 HtmlNode_Shared HtmlDoc::getNodeFromName( const std::function< bool( const std::wstring &nodeName, Html_Node_Type htmlNodeType ) > &callFun ) const {
@@ -424,5 +423,17 @@ Vector_HtmlNodeSPtr_Shared HtmlDoc::analysisBrotherNode( ) {
 			if( htmlNodeSPtr.get( ) != brotherNode.get( ) )
 				htmlNodeSPtr->brother->emplace_back( brotherNode );
 	}
+	return analysisOver;
+}
+Vector_HtmlNodeSPtr_Shared HtmlDoc::analysisAttributesNode( ) {
+	Vector_HtmlNodeSPtr_Shared analysisOver( new Vector_HtmlNodeSPtr );
+
+	auto &vector = *htmlDocNode.get( );
+	for( auto nodePtr : vector ) {
+		auto &node = *nodePtr;
+		node.analysisAttribute( );
+		analysisOver->emplace_back( nodePtr );
+	}
+
 	return analysisOver;
 }
