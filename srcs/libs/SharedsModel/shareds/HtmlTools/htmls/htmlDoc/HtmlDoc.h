@@ -120,6 +120,12 @@ namespace HtmlTools {
 		/// <param name="callFun">校验函数</param>
 		/// <returns>节点，失败返回 nullptr</returns>
 		HtmlNode_Shared getNodeFromName( const std::function< bool( const std::wstring &nodeName, Html_Node_Type htmlNodeType ) > &callFun ) const;
+		/// <summary>
+		/// 遍历获取节点<br/>
+		/// 节点传递到 callFun 调用参数当中，当需要存储时，返回 true。直到结束
+		/// </summary>
+		/// <param name="callFun">校验函数</param>
+		/// <returns>返回列表</returns>
 		Vector_HtmlNodeSPtr_Shared getNodes( const std::function< bool( const HtmlNode_Shared &node ) > &callFun );
 	private: // 无法使用个构造函数
 		HtmlDoc( );
