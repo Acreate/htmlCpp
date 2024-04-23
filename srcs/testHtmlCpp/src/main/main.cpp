@@ -7,11 +7,12 @@
 #include <iostream>
 #include <sstream>
 #include <string>
-
+#include <windows.h>
 #include "wstr/WStrTools.h"
 
 
 int main( int argc, char *argv[ ] ) {
+	SetConsoleOutputCP( CP_UTF8 );
 	std::string fString( u8"%s/%s/%s" );
 	char path[ 4096 ]{ 0 };
 	int len = snprintf( path, sizeof( path ), fString.c_str( ), std::string( Project_Run_bin ).c_str( ), u8"writeFile", u8"www.121ds.cc.html" );
@@ -31,7 +32,6 @@ int main( int argc, char *argv[ ] ) {
 			stringstream << getStr;
 		stringstream << L'\n';
 	} while( true );
-
 	std::shared_ptr< std::wstring > htmlContent( new std::wstring( stringstream.str( ) ) );
 	std::cout << HtmlTools::WStrTools::wstringConverString( *htmlContent ) << std::endl;
 
@@ -49,9 +49,31 @@ int main( int argc, char *argv[ ] ) {
 	// 测试调用
 	size_t endIndex = htmlContent->size( ), startIndex = 0;
 	auto htmlDoc = HtmlTools::HtmlDoc::parse( htmlContent, endIndex, startIndex );
-	htmlDoc->getNodes( [&]( auto node ) {
-		auto wsNode = node->getWSNode( );
+	htmlDoc->getNodes( [&]( auto node ) ->bool {
+		auto wsNode = *htmlDoc->getWSNode( node );
+		if( htmlDoc->getNodeType( node ) == HtmlTools::Html_Node_Type::DoubleNode && htmlDoc->getEndNode( node ).get( ) != node.get( ) ) {
+			auto wsNodeText = *htmlDoc->getNodeText( node );
+			std::wstringstream ss;
+			ss << L"================" << std::endl;
+			ss << wsNodeText << std::endl;
+			ss << L"----------------" << std::endl;
+			ss << *htmlDoc->getPath( node ) << std::endl;
+			ss << L"================" << std::endl;
 
+			std::string converString = HtmlTools::WStrTools::wstringConverString( ss.str( ) );
+			std::cout << converString << std::endl;
+			std::cout.flush( );
+			std::cout.clear( );
+			len = snprintf( path, sizeof( path ), fString.c_str( ), std::string( Cache_Path_Dir ).c_str( ), u8"", u8"www.121ds.cc.txt.node.write.txt" );
+			if( len == 0 )
+				return false;
+			std::wofstream ofstream( path, std::ios::binary | std::ios::out | std::ios::trunc );
+			if( !ofstream.is_open( ) )
+				return false;
+			ofstream << ss.str( );
+			ofstream.close( );
+			return false;
+		}
 		return false;
 	} );
 	htmlDoc->analysisBrotherNode( );

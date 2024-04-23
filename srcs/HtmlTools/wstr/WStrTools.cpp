@@ -49,8 +49,12 @@ bool WStrTools::findNextWStringPotion( const wchar_t *w_c_ptr, size_t src_w_c_st
 	}
 	return false;
 }
-
+std::wstring WStrTools::stringConverWString( const std::string &str ) {
+	std::wstring_convert< std::codecvt_utf8< wchar_t > > converter;
+	return converter.from_bytes( str );
+}
 std::string WStrTools::wstringConverString( const std::wstring &wstr ) {
-	std::wstring_convert< std::codecvt_utf8_utf16< wchar_t > > converter;
+
+	std::wstring_convert< std::codecvt_utf8< wchar_t > > converter;
 	return converter.to_bytes( wstr );
 }

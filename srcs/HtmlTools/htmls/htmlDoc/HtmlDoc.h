@@ -80,12 +80,13 @@ namespace HtmlTools {
 		/// <summary>
 		/// 解析双节点，匹配第一个指向的节点。
 		/// </summary>
+		/// <param name="html_doc_shared">引用节点</param>
 		/// <param name="html_node">匹配的双节点</param>
 		/// <param name="html_node_char_pairs">节点列表</param>
 		/// <param name="start_index">开始的节点列表下标</param>
 		/// <param name="end_index">结束的节点列表下标</param>
 		/// <returns>匹配的节点列表</returns>
-		static Vector_HtmlNodeSPtr_Shared analysisDoubleNode( HtmlNode_Shared html_node, Vector_HtmlNodeSPtr_Shared html_node_char_pairs, size_t &start_index, size_t &end_index );
+		static Vector_HtmlNodeSPtr_Shared analysisDoubleNode( HtmlDoc_Shared html_doc_shared, HtmlNode_Shared html_node, Vector_HtmlNodeSPtr_Shared html_node_char_pairs, size_t &start_index, size_t &end_index );
 	public: // 静态对象生成器
 		/// <summary>
 		/// 根据字符串内容生成节点列表
@@ -143,7 +144,61 @@ namespace HtmlTools {
 		/// </summary>
 		/// <returns>解析完毕的列表</returns>
 		Vector_HtmlNodeSPtr_Shared analysisAttributesNode( );
-		
+	public: // 节点获取属性
+
+		/// <summary>
+		/// 获取整个节点
+		/// </summary>
+		std::shared_ptr< std::wstring > getWSNode( const HtmlNode_Shared node_shared ) const;
+		/// <summary>
+		/// 获取节点名称
+		/// </summary>
+		std::shared_ptr< std::wstring > getNodeWSName( const HtmlNode_Shared node_shared ) const;
+		/// <summary>
+		/// 获取节点类型
+		/// </summary>
+		Html_Node_Type getNodeType( const HtmlNode_Shared node_shared ) const;
+		/// <summary>
+		/// 如果是双节点，那么返回开始节点
+		/// </summary>
+		std::shared_ptr< HtmlNode > getStartNode( const HtmlNode_Shared node_shared ) const;
+		/// <summary>
+		/// 如果是双节点，那么返回结束节点
+		/// </summary>
+		std::shared_ptr< HtmlNode > getEndNode( const HtmlNode_Shared node_shared ) const;
+		/// <summary>
+		/// 获取节点大小
+		/// </summary>
+		size_t nodeSize( const HtmlNode_Shared node_shared ) const;
+		/// <summary>
+		/// 获取节点基于字符串的偏移
+		/// </summary>
+		size_t getPtrOffset( const HtmlNode_Shared node_shared ) const;
+		/// <summary>
+		/// 获取节点的字符串长度<br/>
+		/// 它只会返回基于 < 到 > 的长度。并不会返回双节点中的结束节点之间的内容
+		/// </summary>
+		size_t getPtrCWtrLen( const HtmlNode_Shared node_shared ) const;
+		/// <summary>
+		/// 获取的内容
+		/// </summary>
+		StdWString_Shared getContent( const HtmlNode_Shared node_shared ) const;
+		/// <summary>
+		/// 获取节点的路径
+		/// </summary>
+		StdWString_Shared getPath( const HtmlNode_Shared node_shared ) const;
+		/// <summary>
+		/// 获取节点当中文本内容<br/>
+		/// 节点之间的内容会相对应的转换
+		/// </summary>
+		StdWString_Shared getNodeText( const HtmlNode_Shared node_shared ) const;
+		/// <summary>
+		/// 查找节点属性<br/>
+		/// 查找过程需要调用校验函数，当校验函数返回true时，则判断该节点可命中
+		/// </summary>
+		/// <param name="callFunction">校验函数</param>
+		/// <returns>校验函数是否命中</returns>
+		bool findAttribute( const HtmlNode_Shared node_shared, const std::function< bool( const WStringPairUnorderMap_Shared node_attribute_map_shred ) > callFunction ) const;
 	};
 }
 

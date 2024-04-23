@@ -2,6 +2,8 @@
 #define WSTRTOOLS_H_H_HEAD__FILE__
 #pragma once
 
+#include <locale>
+
 #include "../nameSpace/HtmlTools.h"
 namespace HtmlTools {
 	class HTMLTOOLS_EXPORT WStrTools {
@@ -50,6 +52,7 @@ namespace HtmlTools {
 		/// <param name="wstr">被转换的字符串</param>
 		/// <returns>实现转换而的字符串</returns>
 		static std::string wstringConverString( const std::wstring &wstr );
+		static std::wstring stringConverWString( const std::string &str );
 	};
 
 }

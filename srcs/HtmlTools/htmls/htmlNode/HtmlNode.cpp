@@ -11,61 +11,6 @@ HtmlNode::HtmlNode( ) : parent( nullptr ), subChildren( new Vector_HtmlNodeSPtr 
 }
 HtmlNode::~HtmlNode( ) {
 }
-std::shared_ptr< std::wstring > HtmlNode::getWSNode( ) const {
-	auto c_w_str_star_ptr = czWStr->c_str( ) + ptrOffset;
-	std::shared_ptr< std::wstring > result( new std::wstring( c_w_str_star_ptr, ptrCWtrLen ) );
-	return result;
-}
-std::shared_ptr< std::wstring > HtmlNode::getNodeWSName( ) const {
-	wchar_t currentChar = L'\0'; // 临时字符
-	auto c_w_str = czWStr->c_str( ) + ptrOffset; // 字符串指向坐标
-	size_t index = 0;
-	for( ; index < ptrCWtrLen; ++index ) { // 找到 < 后面的非空
-		currentChar = c_w_str[ index ];
-		if( currentChar == nodeStartChar || WStrTools::isJumpSpace( currentChar ) )
-			continue;
-		break;
-	}
-	c_w_str = c_w_str + index; // 指向第一个非空字符
-	auto ptrCStrLen = ptrCWtrLen - index; // 缩减长度
-	for( index = 0; index < ptrCStrLen; ++index ) { // 找到第一个空或者 / > 等字符
-		currentChar = c_w_str[ index ];
-		if( WStrTools::isJumpSpace( currentChar ) || currentChar == nodeEndChar || currentChar == forwardSlash )
-			break;
-	}
-	if( currentChar == forwardSlash ) { // 如果碰到斜杠 /(节点是尾节点)
-		for( ; index < ptrCStrLen; ++index ) { // 找到第一个非空或者 > 等字符
-			currentChar = c_w_str[ index ];
-			if( !WStrTools::isJumpSpace( currentChar ) ) {
-				++index;
-				c_w_str = c_w_str + index;
-				for( index = 0; index < ptrCStrLen; ++index ) { // 找到第一个空或者 > 等字符
-					currentChar = c_w_str[ index ];
-					if( WStrTools::isJumpSpace( currentChar ) || currentChar == nodeEndChar )
-						break;
-				}
-				break;
-			}
-		}
-	}
-	std::shared_ptr< std::wstring > result( new std::wstring( c_w_str, index ) );
-	return result;
-}
-
-StdWString_Shared HtmlNode::getContent( ) {
-	return std::make_shared< std::wstring >( czWStr->c_str( ), ptrOffset, nodeSize( ) );
-}
-StdWString_Shared HtmlNode::getPath( ) {
-	StdWString_Shared result( new std::wstring( L"/" + *getNodeWSName( ) ) );
-
-	HtmlNode_Shared parent = this->parent;
-	while( parent ) {
-		*result = L"/" + *parent->getNodeWSName( ) + *result;
-		parent = parent->parent;
-	}
-
-	return result;
-}
 
 WStringPairUnorderMap_Shared HtmlNode::analysisAttribute( ) {
 	if( nodeType == Html_Node_Type::DoubleNode && endNode.get( ) == this ) {
@@ -204,14 +149,18 @@ Vector_HtmlNodeSPtr_Shared HtmlNode::parseHtmlNodeCharPair( std::shared_ptr< std
 }
 
 void HtmlNode::setParent( HtmlNode_Shared child, HtmlNode_Shared parent ) {
-	if( child->parent.get( ) ) {
-		auto vectorHtmlXPathSPtrShared = child->parent->subChildren;
+
+	auto parentPtr = child->parent.get( );
+	if( parentPtr ) {
+		auto vectorHtmlXPathSPtrShared = parentPtr->subChildren;
 		auto iterator = vectorHtmlXPathSPtrShared->begin( ), end = vectorHtmlXPathSPtrShared->end( );
-		for( ; iterator != end; ++iterator )
-			if( iterator->get( ) == child.get( ) ) {
+		for( ; iterator != end; ++iterator ) {
+			auto removeExtent = iterator->get( );
+			if( removeExtent == child.get( ) ) {
 				vectorHtmlXPathSPtrShared.get( )->erase( iterator );
 				break;
 			}
+		}
 	}
 	parent->subChildren->emplace_back( child );
 	child->parent = parent;

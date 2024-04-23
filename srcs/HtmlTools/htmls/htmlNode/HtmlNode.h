@@ -52,23 +52,6 @@ namespace HtmlTools {
 	public:
 		HtmlNode( );
 		virtual ~HtmlNode( );
-		std::shared_ptr< std::wstring > getWSNode( ) const;
-		std::shared_ptr< std::wstring > getNodeWSName( ) const;
-	public:
-		Html_Node_Type getType( ) const {
-			return nodeType;
-		}
-		std::shared_ptr< HtmlNode > getStartNode( ) const { return startNode; }
-		std::shared_ptr< HtmlNode > getEndNode( ) const { return endNode; }
-		size_t nodeSize( ) const {
-			if( nodeType == Html_Node_Type::DoubleNode )
-				return endNode->ptrOffset + endNode->ptrCWtrLen - startNode->ptrOffset;
-			return ptrCWtrLen;
-		}
-		size_t getPtrOffset( ) const { return ptrOffset; }
-		size_t getPtrCWtrLen( ) const { return ptrCWtrLen; }
-		StdWString_Shared getContent( );
-		StdWString_Shared getPath( );
 	private:
 		/// <summary>
 		/// 解析属性<br/>

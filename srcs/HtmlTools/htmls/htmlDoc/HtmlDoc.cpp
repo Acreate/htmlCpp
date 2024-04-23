@@ -6,9 +6,11 @@
 #include "../enum/HtmlNodeType/Html_Node_Type.h"
 
 #include <clocale>
+#include <iostream>
 #include <memory>
 
 #include <stack>
+#include <sstream>
 #include <string>
 
 using namespace HtmlTools;
@@ -208,7 +210,7 @@ bool HtmlDoc::isAnnotation( const std::shared_ptr< std::wstring > std_c_w_string
 	}
 	return false;
 }
-Vector_HtmlNodeSPtr_Shared HtmlDoc::analysisDoubleNode( HtmlNode_Shared html_node, Vector_HtmlNodeSPtr_Shared html_node_char_pairs, size_t &start_index, size_t &end_index ) {
+Vector_HtmlNodeSPtr_Shared HtmlDoc::analysisDoubleNode( HtmlDoc_Shared html_doc_shared, HtmlNode_Shared html_node, Vector_HtmlNodeSPtr_Shared html_node_char_pairs, size_t &start_index, size_t &end_index ) {
 	Vector_HtmlNodeSPtr_Shared result( new Vector_HtmlNodeSPtr );
 	std::stack< HtmlNode_Shared > htmlNodeSharedTack;
 	size_t left, right, endLeft;
@@ -252,16 +254,17 @@ Vector_HtmlNodeSPtr_Shared HtmlDoc::analysisDoubleNode( HtmlNode_Shared html_nod
 		nodeType = isEndNode( stdCWString, endLeft, right );
 		if( !nodeType ) // 不是结束节点则跳过
 			continue;
-		auto endNodeName = *htmlNode->getNodeWSName( );
+		auto endNodeName = *html_doc_shared->getNodeWSName( htmlNode );
 		auto node = htmlNodeSharedTack.top( );
-		auto nodeName = *node->getNodeWSName( );
+		auto nodeName = *html_doc_shared->getNodeWSName( node );
 		if( nodeName == endNodeName ) { // 节点对象相等，则开始输出
 			node->nodeType = Html_Node_Type::DoubleNode;
 			htmlNode->endNode = htmlNode;
 			node->endNode = htmlNode;
 			htmlNode->startNode = node;
 			node->startNode = node;
-			htmlNode->setParent( node );
+			if( htmlNode->endNode.get( ) && htmlNode->endNode.get( ) != htmlNode.get( ) )
+				htmlNode->setParent( node );
 			htmlNodeSharedTack.pop( );
 			/*	qDebug( ) << "============";
 				qDebug( ) << QString::fromStdWString( *node->getContent( ) ).toStdString( ).c_str( );
@@ -286,42 +289,47 @@ HtmlDoc_Shared HtmlDoc::parse( const std::shared_ptr< std::wstring > std_c_w_str
 	for( ; index < maxSize; ++index ) {
 		auto htmlDocCharPair = htmlNodeCharPairs->at( index );
 		auto hasPtr = false;
-		for( auto ptr : *result->htmlDocNode )
-			if( htmlDocCharPair == ptr || ( htmlDocCharPair->nodeType == Html_Node_Type::DoubleNode && htmlDocCharPair->endNode == ptr ) ) {
+		HtmlNode *htmlNode = htmlDocCharPair.get( );
+		for( auto ptr : *result->htmlDocNode ) {
+			if( htmlNode == ptr.get( ) ) {
 				hasPtr = true;
 				break;
 			}
+			if( htmlDocCharPair->nodeType == Html_Node_Type::DoubleNode ) {
+				if( htmlDocCharPair->endNode.get( ) == ptr.get( ) ) {
+					hasPtr = true;
+					break;
+				}
+			}
+		}
 		if( hasPtr )
 			continue;
-		auto left = htmlDocCharPair.get( )->ptrOffset;
-		auto right = htmlDocCharPair.get( )->ptrCWtrLen + left;
+		auto left = htmlNode->ptrOffset;
+		auto right = htmlNode->ptrCWtrLen + left;
 		bool nodeType = isAnnotation( stdCWString, left, right );
 		if( nodeType && left < right ) {
 			htmlDocCharPair->nodeType = Html_Node_Type::AnnotationNode;
 			result->htmlDocNode->emplace_back( htmlDocCharPair );
 		} else {
-			left = htmlDocCharPair.get( )->ptrOffset;
-			right = htmlDocCharPair.get( )->ptrCWtrLen + left;
+			left = htmlNode->ptrOffset;
+			right = htmlNode->ptrCWtrLen + left;
 			nodeType = isSingelNode( stdCWString, left, right );
 			if( nodeType ) {
 				htmlDocCharPair->nodeType = Html_Node_Type::SingleNode;
 				result->htmlDocNode->emplace_back( htmlDocCharPair );
 			} else {
-				left = htmlDocCharPair.get( )->ptrOffset;
+				left = htmlNode->ptrOffset;
 				size_t endLeft = left;
-				right = htmlDocCharPair.get( )->ptrCWtrLen + left;
+				right = htmlNode->ptrCWtrLen + left;
 				if( isStartNode( stdCWString, left, right ) ) {
 					size_t lastNodeIndex = index + 1;
 					size_t endNodeIndex = maxSize;
-					auto vectorHtmlXPathSPtrShared = analysisDoubleNode( htmlDocCharPair, resultHtml, lastNodeIndex, endNodeIndex );
-					auto htmlNode = vectorHtmlXPathSPtrShared->begin( );
+					auto vectorHtmlXPathSPtrShared = analysisDoubleNode( result, htmlDocCharPair, resultHtml, lastNodeIndex, endNodeIndex );
+					auto htmlNodeIterator = vectorHtmlXPathSPtrShared->begin( );
 					auto endNode = vectorHtmlXPathSPtrShared->end( );
-					for( ; htmlNode != endNode; ++htmlNode )
-						result->htmlDocNode->emplace_back( *htmlNode );
-				} else if( isEndNode( stdCWString, endLeft, right ) )
-					continue;
-				else
-					result->htmlDocNode->emplace_back( htmlDocCharPair );
+					for( ; htmlNodeIterator != endNode; ++htmlNodeIterator )
+						result->htmlDocNode->emplace_back( *htmlNodeIterator );
+				}
 			}
 		}
 		if( index == 0 )
@@ -332,13 +340,13 @@ HtmlDoc_Shared HtmlDoc::parse( const std::shared_ptr< std::wstring > std_c_w_str
 }
 HtmlNode_Shared HtmlDoc::getNodeFromName( const std::wstring &nodeName ) const {
 	for( auto node : *htmlDocNode.get( ) )
-		if( *node->getNodeWSName( ) == nodeName )
+		if( *getNodeWSName( node ) == nodeName )
 			return node;
 	return nullptr;
 }
 HtmlNode_Shared HtmlDoc::getNodeFromName( const std::function< bool( const std::wstring &nodeName, Html_Node_Type htmlNodeType ) > &callFun ) const {
 	for( auto node : *htmlDocNode.get( ) )
-		if( callFun( *node->getNodeWSName( ), node->nodeType ) )
+		if( callFun( *getNodeWSName( node ), node->nodeType ) )
 			return node;
 
 	return nullptr;
@@ -436,4 +444,120 @@ Vector_HtmlNodeSPtr_Shared HtmlDoc::analysisAttributesNode( ) {
 	}
 
 	return analysisOver;
+}
+std::shared_ptr< std::wstring > HtmlDoc::getWSNode( const HtmlNode_Shared node_shared ) const {
+	auto c_w_str_star_ptr = node_shared->czWStr->c_str( ) + node_shared->ptrOffset;
+	std::shared_ptr< std::wstring > result( new std::wstring( c_w_str_star_ptr, node_shared->ptrCWtrLen ) );
+	return result;
+}
+std::shared_ptr< std::wstring > HtmlDoc::getNodeWSName( const HtmlNode_Shared node_shared ) const {
+	wchar_t currentChar = L'\0'; // 临时字符
+	auto c_w_str = node_shared->czWStr->c_str( ) + node_shared->ptrOffset; // 字符串指向坐标
+	size_t index = 0;
+	for( ; index < node_shared->ptrCWtrLen; ++index ) { // 找到 < 后面的非空
+		currentChar = c_w_str[ index ];
+		if( currentChar == nodeStartChar || WStrTools::isJumpSpace( currentChar ) )
+			continue;
+		break;
+	}
+	c_w_str = c_w_str + index; // 指向第一个非空字符
+	auto ptrCStrLen = node_shared->ptrCWtrLen - index; // 缩减长度
+	for( index = 0; index < ptrCStrLen; ++index ) { // 找到第一个空或者 / > 等字符
+		currentChar = c_w_str[ index ];
+		if( WStrTools::isJumpSpace( currentChar ) || currentChar == nodeEndChar || currentChar == forwardSlash )
+			break;
+	}
+	if( currentChar == forwardSlash ) { // 如果碰到斜杠 /(节点是尾节点)
+		for( ; index < ptrCStrLen; ++index ) { // 找到第一个非空或者 > 等字符
+			currentChar = c_w_str[ index ];
+			if( !WStrTools::isJumpSpace( currentChar ) ) {
+				++index;
+				c_w_str = c_w_str + index;
+				for( index = 0; index < ptrCStrLen; ++index ) { // 找到第一个空或者 > 等字符
+					currentChar = c_w_str[ index ];
+					if( WStrTools::isJumpSpace( currentChar ) || currentChar == nodeEndChar )
+						break;
+				}
+				break;
+			}
+		}
+	}
+	std::shared_ptr< std::wstring > result( new std::wstring( c_w_str, index ) );
+	return result;
+}
+
+
+Html_Node_Type HtmlDoc::getNodeType( const HtmlNode_Shared node_shared ) const {
+	return node_shared->nodeType;
+}
+std::shared_ptr< HtmlNode > HtmlDoc::getStartNode( const HtmlNode_Shared node_shared ) const { return node_shared->startNode; }
+std::shared_ptr< HtmlNode > HtmlDoc::getEndNode( const HtmlNode_Shared node_shared ) const { return node_shared->endNode; }
+size_t HtmlDoc::nodeSize( const HtmlNode_Shared node_shared ) const {
+	if( node_shared->nodeType == Html_Node_Type::DoubleNode )
+		return node_shared->endNode->ptrOffset + node_shared->endNode->ptrCWtrLen - node_shared->startNode->ptrOffset;
+	return node_shared->ptrCWtrLen;
+}
+size_t HtmlDoc::getPtrOffset( const HtmlNode_Shared node_shared ) const { return node_shared->ptrOffset; }
+size_t HtmlDoc::getPtrCWtrLen( const HtmlNode_Shared node_shared ) const { return node_shared->ptrCWtrLen; }
+StdWString_Shared HtmlDoc::getContent( const HtmlNode_Shared node_shared ) const {
+	return std::make_shared< std::wstring >( node_shared->czWStr->c_str( ), node_shared->ptrOffset, nodeSize( node_shared ) );
+}
+StdWString_Shared HtmlDoc::getPath( const HtmlNode_Shared node_shared ) const {
+	StdWString_Shared result( new std::wstring( L"/" + *getNodeWSName( node_shared ) ) );
+
+	HtmlNode_Shared parent = node_shared->parent;
+	while( parent ) {
+		*result = L"/" + *getNodeWSName( parent ) + *result;
+		parent = parent->parent;
+	}
+
+	return result;
+}
+StdWString_Shared HtmlDoc::getNodeText( const HtmlNode_Shared node_shared ) const {
+	// todo : 解析内容 - 分解字符串
+	auto startNode = node_shared->startNode;
+	auto endNode = node_shared->endNode;
+
+	auto offset = startNode->ptrOffset + startNode->ptrCWtrLen; // 开始节点的结束位置
+	auto wstrPtr = htmlWCStr->c_str( ); // 字符串指针
+	if( node_shared->subChildren->size( ) == 0 ) {
+		StdWString_Shared result( new std::wstring( wstrPtr + offset, endNode->ptrOffset - offset ) );
+		return result;
+	}
+	std::wstringstream stringstream;
+	auto iterator = startNode->subChildren->begin( ); // 迭代器
+	auto end = startNode->subChildren->end( ); // 迭代器终止位置
+	for( ; iterator != end; ++iterator ) {
+		auto nodeShared = *iterator;
+		auto forPathName = getPath( nodeShared );
+		if( nodeShared->ptrOffset > offset ) { // 检查开始位置
+			// <a> A... <b> </b> </a>
+			// 截取 A../
+			auto wcstrStartPtr = wstrPtr + offset;
+			std::wstring subWString( wcstrStartPtr, nodeShared->ptrOffset - offset );
+			stringstream << subWString;
+		}
+		if( nodeShared->nodeType == Html_Node_Type::DoubleNode ) {
+			// 循环节点当中的结束位置	
+			size_t forPtrNodeEndIndex = nodeShared->endNode->ptrOffset + nodeShared->endNode->ptrCWtrLen;
+			if( forPtrNodeEndIndex > offset )
+				offset = forPtrNodeEndIndex + 1;
+		} else {
+			size_t forPtrNodeEndIndex = nodeShared->ptrOffset + nodeShared->ptrCWtrLen;
+			if( forPtrNodeEndIndex > offset )
+				offset = forPtrNodeEndIndex + 1;
+		}
+	}
+	if( endNode->ptrOffset > offset ) {
+		// <a> <b> </b> A... </a>
+		// 截取 A../
+		std::wstring subWString( wstrPtr + offset, endNode->ptrOffset - offset );
+		stringstream << subWString;
+	}
+	auto mystr = stringstream.str( );
+	StdWString_Shared result( new std::wstring( mystr ) );
+	return result;
+}
+bool HtmlDoc::findAttribute( const HtmlNode_Shared node_shared, const std::function< bool( const WStringPairUnorderMap_Shared node_attribute_map_shred ) > callFunction ) const {
+	return callFunction( node_shared->refNodeAttributes );
 }
