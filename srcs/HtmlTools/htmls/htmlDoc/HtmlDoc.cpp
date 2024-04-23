@@ -514,7 +514,7 @@ StdWString_Shared HtmlDoc::getPath( const HtmlNode_Shared node_shared ) const {
 	return result;
 }
 StdWString_Shared HtmlDoc::getNodeText( const HtmlNode_Shared node_shared ) const {
-	// todo : 解析内容 - 分解字符串
+
 	auto startNode = node_shared->startNode;
 	auto endNode = node_shared->endNode;
 
@@ -556,6 +556,16 @@ StdWString_Shared HtmlDoc::getNodeText( const HtmlNode_Shared node_shared ) cons
 	}
 	auto mystr = stringstream.str( );
 	StdWString_Shared result( new std::wstring( mystr ) );
+	return result;
+}
+
+Vector_HtmlNodeSPtr_Shared HtmlDoc::matchChildrenNodes( const HtmlNode_Shared node_shared, const std::function< bool( const HtmlNode_Shared ) > callFunction ) {
+	Vector_HtmlNodeSPtr_Shared result( new Vector_HtmlNodeSPtr );
+
+	for( auto node : *node_shared->subChildren )
+		if( callFunction( node ) )
+			result->emplace_back( node );
+
 	return result;
 }
 bool HtmlDoc::findAttribute( const HtmlNode_Shared node_shared, const std::function< bool( const WStringPairUnorderMap_Shared node_attribute_map_shred ) > callFunction ) const {

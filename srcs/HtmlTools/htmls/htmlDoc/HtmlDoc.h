@@ -120,14 +120,14 @@ namespace HtmlTools {
 		/// </summary>
 		/// <param name="callFun">校验函数</param>
 		/// <returns>节点，失败返回 nullptr</returns>
-		HtmlNode_Shared getNodeFromName( const std::function< bool( const std::wstring &nodeName, Html_Node_Type htmlNodeType ) > &callFun ) const;
+		HtmlNode_Shared getNodeFromName( const std::function< bool( const std::wstring &, Html_Node_Type ) > &callFun ) const;
 		/// <summary>
 		/// 遍历获取节点<br/>
 		/// 节点传递到 callFun 调用参数当中，当需要存储时，返回 true。直到结束
 		/// </summary>
 		/// <param name="callFun">校验函数</param>
 		/// <returns>返回列表</returns>
-		Vector_HtmlNodeSPtr_Shared getNodes( const std::function< bool( const HtmlNode_Shared &node ) > &callFun );
+		Vector_HtmlNodeSPtr_Shared getNodes( const std::function< bool( const HtmlNode_Shared & ) > &callFun );
 	private: // 无法使用个构造函数
 		HtmlDoc( );
 	public:
@@ -194,11 +194,21 @@ namespace HtmlTools {
 		StdWString_Shared getNodeText( const HtmlNode_Shared node_shared ) const;
 		/// <summary>
 		/// 查找节点属性<br/>
-		/// 查找过程需要调用校验函数，当校验函数返回true时，则判断该节点可命中
-		/// </summary>
+		/// 查找过程需要调用校验函数，当校验函数返回true时，则判断该节点可命中<br/>
+		/// 命中时，可携返回
+		/// <param name="node_shared">查找的节点</param>
 		/// <param name="callFunction">校验函数</param>
-		/// <returns>校验函数是否命中</returns>
-		bool findAttribute( const HtmlNode_Shared node_shared, const std::function< bool( const WStringPairUnorderMap_Shared node_attribute_map_shred ) > callFunction ) const;
+		/// <returns>命中列表</returns>
+		bool findAttribute( const HtmlNode_Shared node_shared, const std::function< bool( const WStringPairUnorderMap_Shared ) > callFunction ) const;
+		/// <summary>
+		/// 查找子节点<br/>
+		/// 查找过程需要调用校验函数，当校验函数返回true时，则判断该节点可命中<br/>
+		/// 命中时，可携返回
+		/// </summary>
+		/// <param name="node_shared">查找的节点</param>
+		/// <param name="callFunction">校验函数</param>
+		/// <returns>命中列表</returns>
+		Vector_HtmlNodeSPtr_Shared matchChildrenNodes( const HtmlNode_Shared node_shared, const std::function< bool( const HtmlNode_Shared ) > callFunction );
 	};
 }
 
