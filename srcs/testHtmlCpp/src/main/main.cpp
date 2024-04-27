@@ -8,11 +8,18 @@
 #include <sstream>
 #include <string>
 #include <windows.h>
+
+#include "htmls/htmlTools/XPathTools.h"
 #include "wstr/WStrTools.h"
 
 
 int main( int argc, char *argv[ ] ) {
-	SetConsoleOutputCP( CP_UTF8 );
+
+
+	auto xPathTools = HtmlTools::XPathTools( L"1234443" );
+	std::wcout << xPathTools << std::endl;
+	xPathTools = xPathTools - L"3";
+	std::wcout << xPathTools << std::endl;
 	std::string fString( u8"%s/%s/%s" );
 	char path[ 4096 ]{ 0 };
 	int len = snprintf( path, sizeof( path ), fString.c_str( ), std::string( Project_Run_bin ).c_str( ), u8"writeFile", u8"www.121ds.cc.html" );

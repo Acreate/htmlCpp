@@ -24,6 +24,8 @@ namespace HtmlTools {
 	class HTMLTOOLS_EXPORT WStrTools;
 	// 节点
 	class HTMLTOOLS_EXPORT HtmlNode;
+	// 工具
+	class HTMLTOOLS_EXPORT XPathTools;
 	// 类型
 	enum class HTMLTOOLS_EXPORT Html_Node_Type;
 	// std::shared_ptr< HtmlDoc > 封装
