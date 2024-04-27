@@ -15,7 +15,7 @@ HtmlNode::~HtmlNode( ) {
 WStringPairUnorderMap_Shared HtmlNode::analysisAttribute( ) {
 	if( nodeType == Html_Node_Type::DoubleNode && endNode.get( ) == this ) {
 		endNode->refNodeAttributes = startNode->refNodeAttributes;
-		return startNode->refNodeAttributes;
+		return startNode->analysisAttribute( );
 	}
 	if( refNodeAttributes->size( ) > 0 )
 		return refNodeAttributes;

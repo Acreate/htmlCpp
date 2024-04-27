@@ -83,9 +83,9 @@ int main( int argc, char *argv[ ] ) {
 		}
 		return false;
 	} );
-	 // 解析族谱关系（父子，兄弟关系）
+	// 解析族谱关系（父子，兄弟关系）
 	htmlDoc->analysisBrotherNode( );
 	// 解析所有节点关系 (单独解析可以使用 WStringPairUnorderMap_Shared HtmlNode::analysisAttribute( ))
-	htmlDoc->analysisAttributesNode( ); 
+	htmlDoc->analysisAttributesNode( );
 	return 0;
 }
