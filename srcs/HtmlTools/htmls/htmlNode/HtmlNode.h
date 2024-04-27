@@ -1,6 +1,7 @@
 ﻿#ifndef HTMLNODE_H_H_HEAD__FILE__
 #define HTMLNODE_H_H_HEAD__FILE__
 #pragma once
+#include <functional>
 #include <string>
 #include <unordered_map>
 
@@ -60,6 +61,59 @@ namespace HtmlTools {
 		/// </summary>
 		/// <returns>属性映射表</returns>
 		WStringPairUnorderMap_Shared analysisAttribute( );
+		/// <summary>
+		/// 获取整个节点
+		/// </summary>
+		std::shared_ptr< std::wstring > getWSNode( ) const;
+		/// <summary>
+		/// 获取节点名称
+		/// </summary>
+		std::shared_ptr< std::wstring > getNodeWSName( ) const;
+		/// <summary>
+		/// 获取节点类型
+		/// </summary>
+		Html_Node_Type getNodeType( ) const;
+		/// <summary>
+		/// 如果是双节点，那么返回开始节点
+		/// </summary>
+		std::shared_ptr< HtmlNode > getStartNode( ) const;
+		/// <summary>
+		/// 如果是双节点，那么返回结束节点
+		/// </summary>
+		std::shared_ptr< HtmlNode > getEndNode( ) const;
+		/// <summary>
+		/// 获取节点大小
+		/// </summary>
+		size_t nodeSize( ) const;
+		/// <summary>
+		/// 获取节点基于字符串的偏移
+		/// </summary>
+		size_t getPtrOffset( ) const;
+		/// <summary>
+		/// 获取节点的字符串长度<br/>
+		/// 它只会返回基于 < 到 > 的长度。并不会返回双节点中的结束节点之间的内容
+		/// </summary>
+		size_t getPtrCWtrLen( ) const;
+		/// <summary>
+		/// 获取的内容
+		/// </summary>
+		StdWString_Shared getContent( ) const;
+		/// <summary>
+		/// 获取节点的路径
+		/// </summary>
+		StdWString_Shared getPath( ) const;
+		/// <summary>
+		/// 获取节点当中文本内容<br/>
+		/// 节点之间的内容会相对应的转换
+		/// </summary>
+		StdWString_Shared getNodeText( ) const;
+		/// <summary>
+		/// 查找节点属性<br/>
+		/// 查找过程需要调用校验函数，当校验函数返回true时，则判断该节点可命中<br/>
+		/// 命中时，可携返回
+		/// <param name="callFunction">校验函数</param>
+		/// <returns>命中列表</returns>
+		bool findAttribute( const std::function< bool( const WStringPairUnorderMap_Shared ) > callFunction ) const;
 	private:
 		/// <summary>
 		/// 生成 < 与 > 的配对

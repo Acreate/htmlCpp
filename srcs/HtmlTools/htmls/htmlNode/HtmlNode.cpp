@@ -146,6 +146,44 @@ WStringPairUnorderMap_Shared HtmlNode::analysisAttribute( ) {
 	*refNodeAttributes = *result;
 	return result;
 }
+std::shared_ptr< std::wstring > HtmlNode::getWSNode( ) const {
+	return htmldocShared->getWSNode( thisSharedPtr );
+}
+std::shared_ptr< std::wstring > HtmlNode::getNodeWSName( ) const {
+	return htmldocShared->getNodeWSName( thisSharedPtr );
+}
+Html_Node_Type HtmlNode::getNodeType( ) const {
+	return thisSharedPtr->nodeType;
+}
+std::shared_ptr< HtmlNode > HtmlNode::getStartNode( ) const {
+	return startNode;
+}
+std::shared_ptr< HtmlNode > HtmlNode::getEndNode( ) const {
+	return endNode;
+}
+size_t HtmlNode::nodeSize( ) const {
+	if( nodeType == Html_Node_Type::DoubleNode )
+		return endNode->ptrOffset + endNode->ptrCWtrLen - startNode->ptrOffset;
+	return ptrCWtrLen;
+}
+size_t HtmlNode::getPtrOffset( ) const {
+	return ptrOffset;
+}
+size_t HtmlNode::getPtrCWtrLen( ) const {
+	return ptrCWtrLen;
+}
+StdWString_Shared HtmlNode::getContent( ) const {
+	return htmldocShared->getContent( thisSharedPtr );
+}
+StdWString_Shared HtmlNode::getPath( ) const {
+	return htmldocShared->getPath( thisSharedPtr );
+}
+StdWString_Shared HtmlNode::getNodeText( ) const {
+	return htmldocShared->getNodeText( thisSharedPtr );
+}
+bool HtmlNode::findAttribute( const std::function< bool( const WStringPairUnorderMap_Shared ) > callFunction ) const {
+	return htmldocShared->findAttribute( thisSharedPtr, callFunction );
+}
 Vector_HtmlNodeSPtr_Shared HtmlNode::parseHtmlNodeCharPair( HtmlDoc_Shared html_doc_shared, size_t start_index, const size_t max_index, size_t &index_count ) {
 	Vector_HtmlNodeSPtr_Shared result( new Vector_HtmlNodeSPtr );
 	bool findCharResut = false;
