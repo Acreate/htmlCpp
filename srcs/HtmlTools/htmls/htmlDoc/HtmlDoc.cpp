@@ -335,7 +335,9 @@ HtmlDoc_Shared HtmlDoc::parse( const std::shared_ptr< std::wstring > std_c_w_str
 		if( index == 0 )
 			start_index = htmlDocCharPair.get( )->ptrOffset;
 	}
-	size_t size = result->htmlDocNode->size( );
+
+	result->analysisBrotherNode( );
+	result->analysisAttributesNode( );
 	return result;
 }
 HtmlNode_Shared HtmlDoc::getNodeFromName( const std::wstring &nodeName ) const {

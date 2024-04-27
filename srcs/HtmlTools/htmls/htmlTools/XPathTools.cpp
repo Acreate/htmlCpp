@@ -1,7 +1,7 @@
 ﻿#include "XPathTools.h"
 HtmlTools::XPathTools::XPathTools( const std::wstring &wstr ) : XPathTools( ) {
-	*stdWStringShared = wstr;
+	stdWStringListShared.emplace_back( std::make_shared< std::wstring >( wstr ) );
 }
-HtmlTools::XPathTools::XPathTools( ) : stdWStringShared( new std::wstring ) {
+HtmlTools::XPathTools::XPathTools( ) {
 
 }

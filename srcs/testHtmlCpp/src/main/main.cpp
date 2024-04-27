@@ -83,7 +83,5 @@ int main( int argc, char *argv[ ] ) {
 		}
 		return false;
 	} );
-	htmlDoc->analysisBrotherNode( );
-	htmlDoc->analysisAttributesNode( );
 	return 0;
 }
