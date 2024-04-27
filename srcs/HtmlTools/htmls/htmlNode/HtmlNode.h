@@ -38,6 +38,7 @@ namespace HtmlTools {
 		/// </summary>
 		Html_Node_Type nodeType = Html_Node_Type::None;
 	private:
+		HtmlDoc_Shared htmldocShared;
 		HtmlNode_Shared parent; // 父节点
 		Vector_HtmlNodeSPtr_Shared brother; // 友邻(同级/兄弟)节点
 		Vector_HtmlNodeSPtr_Shared subChildren; // 子节点
@@ -52,7 +53,7 @@ namespace HtmlTools {
 	public:
 		HtmlNode( );
 		virtual ~HtmlNode( );
-	private:
+	public:
 		/// <summary>
 		/// 解析属性<br/>
 		/// 键值对配置的属性列表
@@ -63,12 +64,12 @@ namespace HtmlTools {
 		/// <summary>
 		/// 生成 < 与 > 的配对
 		/// </summary>
-		/// <param name="std_w_str">检查的字符串</param>
+		/// <param name="html_doc_shared">html 文档对象指针</param>
 		/// <param name="start_index">遍历的开始下标</param>
 		/// <param name="max_index">遍历的结束下标</param>
 		/// <param name="index_count">遍历的个数</param>
 		/// <returns>配对列表</returns>
-		static Vector_HtmlNodeSPtr_Shared parseHtmlNodeCharPair( std::shared_ptr< std::wstring > std_w_str, size_t start_index, const size_t max_index, size_t &index_count );
+		static Vector_HtmlNodeSPtr_Shared parseHtmlNodeCharPair( HtmlDoc_Shared html_doc_shared, size_t start_index, const size_t max_index, size_t &index_count );
 	};
 
 }

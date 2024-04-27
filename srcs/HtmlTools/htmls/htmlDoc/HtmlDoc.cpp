@@ -281,7 +281,7 @@ HtmlDoc_Shared HtmlDoc::parse( const std::shared_ptr< std::wstring > std_c_w_str
 	result->htmlWCStr = std::make_shared< std::wstring >( std_c_w_string->c_str( ) + start_index, end_index - start_index );
 	auto stdCWString = result->htmlWCStr;
 	size_t count;
-	auto resultHtml = HtmlNode::parseHtmlNodeCharPair( stdCWString, 0, end_index, count );
+	auto resultHtml = HtmlNode::parseHtmlNodeCharPair( result, 0, end_index, count );
 	auto htmlNodeCharPairs = resultHtml.get( );
 	size_t maxSize = htmlNodeCharPairs->size( );
 	size_t index = start_index;
@@ -335,9 +335,6 @@ HtmlDoc_Shared HtmlDoc::parse( const std::shared_ptr< std::wstring > std_c_w_str
 		if( index == 0 )
 			start_index = htmlDocCharPair.get( )->ptrOffset;
 	}
-
-	result->analysisBrotherNode( );
-	result->analysisAttributesNode( );
 	return result;
 }
 HtmlNode_Shared HtmlDoc::getNodeFromName( const std::wstring &nodeName ) const {
