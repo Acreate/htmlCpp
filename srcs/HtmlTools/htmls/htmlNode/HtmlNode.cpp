@@ -133,7 +133,7 @@ WStringPairUnorderMap_Shared HtmlNode::analysisAttribute( ) {
 					if( currentChar == doubleQuotation )
 						break;
 				}
-			} else
+			} else if( !WStrTools::isJumpSpace( currentChar ) )
 				key.emplace_back( currentChar );
 		}
 
