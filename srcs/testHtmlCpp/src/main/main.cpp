@@ -9,17 +9,12 @@
 #include <string>
 #include <windows.h>
 
-#include "htmls/htmlTools/XPathTools.h"
+#include "htmls/htmlTools/XPath.h"
 #include "wstr/WStrTools.h"
 
 
 int main( int argc, char *argv[ ] ) {
 
-
-	auto xPathTools = HtmlTools::XPathTools( L"1234443" );
-	std::wcout << xPathTools << std::endl;
-	xPathTools = xPathTools - L"3";
-	std::wcout << xPathTools << std::endl;
 	std::string fString( u8"%s/%s/%s" );
 	char path[ 4096 ]{ 0 };
 	int len = snprintf( path, sizeof( path ), fString.c_str( ), std::string( Project_Run_bin ).c_str( ), u8"writeFile", u8"www.121ds.cc.html" );
@@ -40,7 +35,7 @@ int main( int argc, char *argv[ ] ) {
 		stringstream << L'\n';
 	} while( true );
 	std::shared_ptr< std::wstring > htmlContent( new std::wstring( stringstream.str( ) ) );
-	std::cout << HtmlTools::WStrTools::wstringConverString( *htmlContent ) << std::endl;
+	std::cout << htmlTools::WStrTools::wstringConverString( *htmlContent ) << std::endl;
 
 	ifstream.close( );
 	// 写入文件
@@ -55,10 +50,10 @@ int main( int argc, char *argv[ ] ) {
 
 	// 测试调用
 	size_t endIndex = htmlContent->size( ), startIndex = 0;
-	auto htmlDoc = HtmlTools::HtmlDoc::parse( htmlContent, endIndex, startIndex );
+	auto htmlDoc = htmlTools::HtmlDoc::parse( htmlContent, endIndex, startIndex );
 	htmlDoc->getNodes( [&]( auto node ) ->bool {
 		auto wsNode = *htmlDoc->getWSNode( node );
-		if( htmlDoc->getNodeType( node ) == HtmlTools::Html_Node_Type::DoubleNode && htmlDoc->getEndNode( node ).get( ) != node.get( ) ) {
+		if( htmlDoc->getNodeType( node ) == htmlTools::Html_Node_Type::DoubleNode && htmlDoc->getEndNode( node ).get( ) != node.get( ) ) {
 			auto wsNodeText = *htmlDoc->getNodeText( node );
 			std::wstringstream ss;
 			ss << L"================" << std::endl;
@@ -67,7 +62,7 @@ int main( int argc, char *argv[ ] ) {
 			ss << *htmlDoc->getPath( node ) << std::endl;
 			ss << L"================" << std::endl;
 
-			std::string converString = HtmlTools::WStrTools::wstringConverString( ss.str( ) );
+			std::string converString = htmlTools::WStrTools::wstringConverString( ss.str( ) );
 			std::cout << converString << std::endl;
 			std::cout.flush( );
 			std::cout.clear( );

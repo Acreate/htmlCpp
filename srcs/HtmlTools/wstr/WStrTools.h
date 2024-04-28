@@ -5,7 +5,7 @@
 #include <locale>
 
 #include "../nameSpace/HtmlTools.h"
-namespace HtmlTools {
+namespace htmlTools {
 	class HTMLTOOLS_EXPORT WStrTools {
 	public:
 		/// <summary>
@@ -51,8 +51,8 @@ namespace HtmlTools {
 		/// </summary>
 		/// <param name="wstr">被转换的字符串</param>
 		/// <returns>实现转换而的字符串</returns>
-		static std::string wstringConverString( const std::wstring &wstr );
-		static std::wstring stringConverWString( const std::string &str );
+		static std::string wstringConverString( const HtmlString &wstr );
+		static HtmlString stringConverWString( const std::string &str );
 	};
 
 }

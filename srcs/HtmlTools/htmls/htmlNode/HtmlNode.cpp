@@ -5,7 +5,8 @@
 #include "../../wstr/WStrTools.h"
 #include <sstream>
 
-using namespace HtmlTools;
+using namespace htmlTools;
+using namespace htmlTools::charValue;
 
 HtmlNode::HtmlNode( ) : parent( nullptr ), subChildren( new Vector_HtmlNodeSPtr ), brother( new Vector_HtmlNodeSPtr ), refNodeAttributes( new WStringPairUnorderMap ) {
 }
@@ -54,7 +55,7 @@ WStringPairUnorderMap_Shared HtmlNode::analysisAttribute( ) {
 		}
 
 	}
-	std::pair< std::wstring, std::wstring > pairUnity;
+	std::pair< HtmlString, HtmlString > pairUnity;
 	// index 的下标类型
 	// 0 未定义下标，循环首次开始
 	// 1 定义 key 的开始下标
@@ -67,8 +68,8 @@ WStringPairUnorderMap_Shared HtmlNode::analysisAttribute( ) {
 		currentChar = startWStrPtr[ equIndex ];
 		// 找到等号位置
 		if( currentType == 2 ) {
-			std::wstring keyval( key.data( ), key.size( ) );
-			std::wstring mapval( value.data( ), value.size( ) );
+			HtmlString keyval( key.data( ), key.size( ) );
+			HtmlString mapval( value.data( ), value.size( ) );
 			key.clear( );
 			value.clear( );
 			result->insert_or_assign( keyval, mapval );
@@ -139,26 +140,26 @@ WStringPairUnorderMap_Shared HtmlNode::analysisAttribute( ) {
 
 	}
 	if( key.size( ) != 0 || value.size( ) != 0 ) {
-		std::wstring keyval( key.data( ), key.size( ) );
-		std::wstring mapval( value.data( ), value.size( ) );
+		HtmlString keyval( key.data( ), key.size( ) );
+		HtmlString mapval( value.data( ), value.size( ) );
 		result->insert_or_assign( keyval, mapval );
 	}
 	*refNodeAttributes = *result;
 	return result;
 }
-std::shared_ptr< std::wstring > HtmlNode::getWSNode( ) const {
+HtmlString_Shared HtmlNode::getWSNode( ) const {
 	return htmldocShared->getWSNode( thisSharedPtr );
 }
-std::shared_ptr< std::wstring > HtmlNode::getNodeWSName( ) const {
+HtmlString_Shared HtmlNode::getNodeWSName( ) const {
 	return htmldocShared->getNodeWSName( thisSharedPtr );
 }
 Html_Node_Type HtmlNode::getNodeType( ) const {
 	return thisSharedPtr->nodeType;
 }
-std::shared_ptr< HtmlNode > HtmlNode::getStartNode( ) const {
+HtmlNode_Shared HtmlNode::getStartNode( ) const {
 	return startNode;
 }
-std::shared_ptr< HtmlNode > HtmlNode::getEndNode( ) const {
+HtmlNode_Shared HtmlNode::getEndNode( ) const {
 	return endNode;
 }
 size_t HtmlNode::nodeSize( ) const {
@@ -172,13 +173,13 @@ size_t HtmlNode::getPtrOffset( ) const {
 size_t HtmlNode::getPtrCWtrLen( ) const {
 	return ptrCWtrLen;
 }
-StdWString_Shared HtmlNode::getContent( ) const {
+HtmlString_Shared HtmlNode::getContent( ) const {
 	return htmldocShared->getContent( thisSharedPtr );
 }
-StdWString_Shared HtmlNode::getPath( ) const {
+HtmlString_Shared HtmlNode::getPath( ) const {
 	return htmldocShared->getPath( thisSharedPtr );
 }
-StdWString_Shared HtmlNode::getNodeText( ) const {
+HtmlString_Shared HtmlNode::getNodeText( ) const {
 	return htmldocShared->getNodeText( thisSharedPtr );
 }
 bool HtmlNode::findAttribute( const std::function< bool( const WStringPairUnorderMap_Shared ) > callFunction ) const {

@@ -4,7 +4,7 @@
 #include <string>
 #include <codecvt>
 #include <locale>
-using namespace HtmlTools;
+using namespace htmlTools;
 bool WStrTools::isJumpSpace( wchar_t currentChar ) {
 	return iswspace( currentChar ) || iswcntrl( currentChar ) || iswcntrl( currentChar );
 }

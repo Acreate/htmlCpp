@@ -9,23 +9,24 @@
 
 #include "../enum/HtmlNodeType/Html_Node_Type.h"
 
-namespace HtmlTools {
+namespace htmlTools {
 	class HTMLTOOLS_EXPORT HtmlNode {
 	public:
 		friend class HtmlDoc;
+		friend class XPath;
 	private: // 私有成员变量
 		/// <summary>
 		/// 字符串指针
 		/// </summary>
-		std::shared_ptr< std::wstring > czWStr = nullptr;
+		HtmlString_Shared czWStr = nullptr;
 		/// <summary> 
 		/// 开始节点，仅 nodeType 等于 Html_Node_Type::DoubleNode 有效
 		/// </summary>
-		std::shared_ptr< HtmlNode > startNode = nullptr;
+		HtmlNode_Shared startNode = nullptr;
 		/// <summary>
 		/// 结束节点，仅 nodeType 等于 Html_Node_Type::DoubleNode 有效
 		/// </summary>
-		std::shared_ptr< HtmlNode > endNode = nullptr;
+		HtmlNode_Shared endNode = nullptr;
 		/// <summary>
 		/// 字符串偏移量
 		/// </summary>
@@ -64,11 +65,11 @@ namespace HtmlTools {
 		/// <summary>
 		/// 获取整个节点
 		/// </summary>
-		std::shared_ptr< std::wstring > getWSNode( ) const;
+		HtmlString_Shared getWSNode( ) const;
 		/// <summary>
 		/// 获取节点名称
 		/// </summary>
-		std::shared_ptr< std::wstring > getNodeWSName( ) const;
+		HtmlString_Shared getNodeWSName( ) const;
 		/// <summary>
 		/// 获取节点类型
 		/// </summary>
@@ -76,11 +77,11 @@ namespace HtmlTools {
 		/// <summary>
 		/// 如果是双节点，那么返回开始节点
 		/// </summary>
-		std::shared_ptr< HtmlNode > getStartNode( ) const;
+		HtmlNode_Shared getStartNode( ) const;
 		/// <summary>
 		/// 如果是双节点，那么返回结束节点
 		/// </summary>
-		std::shared_ptr< HtmlNode > getEndNode( ) const;
+		HtmlNode_Shared getEndNode( ) const;
 		/// <summary>
 		/// 获取节点大小
 		/// </summary>
@@ -97,16 +98,16 @@ namespace HtmlTools {
 		/// <summary>
 		/// 获取的内容
 		/// </summary>
-		StdWString_Shared getContent( ) const;
+		HtmlString_Shared getContent( ) const;
 		/// <summary>
 		/// 获取节点的路径
 		/// </summary>
-		StdWString_Shared getPath( ) const;
+		HtmlString_Shared getPath( ) const;
 		/// <summary>
 		/// 获取节点当中文本内容<br/>
 		/// 节点之间的内容会相对应的转换
 		/// </summary>
-		StdWString_Shared getNodeText( ) const;
+		HtmlString_Shared getNodeText( ) const;
 		/// <summary>
 		/// 查找节点属性<br/>
 		/// 查找过程需要调用校验函数，当校验函数返回true时，则判断该节点可命中<br/>
