@@ -1,7 +1,7 @@
 ﻿#include "HtmlDoc.h"
 
 #include "../../macro/cmake_to_c_cpp_header_env.h"
-#include "../../wstr/HtmlStringTools.h"
+#include "../../wstr/WStrTools.h"
 #include "../HtmlNode/HtmlNode.h"
 #include "../htmlTools/XPath.h"
 #include "../enum/HtmlNodeType/Html_Node_Type.h"
@@ -256,9 +256,9 @@ Vector_HtmlNodeSPtr_Shared HtmlDoc::analysisDoubleNode( HtmlDoc_Shared html_doc_
 		nodeType = isEndNode( stdCWString, endLeft, right );
 		if( !nodeType ) // 不是结束节点则跳过
 			continue;
-		auto endNodeName = *html_doc_shared->getNodeWSName( htmlNode );
+		auto endNodeName = *html_doc_shared->getNodeName( htmlNode );
 		auto node = htmlNodeSharedTack.top( );
-		auto nodeName = *html_doc_shared->getNodeWSName( node );
+		auto nodeName = *html_doc_shared->getNodeName( node );
 		if( nodeName == endNodeName ) { // 节点对象相等，则开始输出
 			node->nodeType = Html_Node_Type::DoubleNode;
 			htmlNode->endNode = htmlNode;
@@ -269,7 +269,7 @@ Vector_HtmlNodeSPtr_Shared HtmlDoc::analysisDoubleNode( HtmlDoc_Shared html_doc_
 				htmlNode->setParent( node );
 			htmlNodeSharedTack.pop( );
 			/*	qDebug( ) << "============";
-				qDebug( ) << QString::fromStdWString( *node->getContent( ) ).toStdString( ).c_str( );
+				qDebug( ) << QString::fromStdWString( *node->getIncludeNodeContent( ) ).toStdString( ).c_str( );
 				qDebug( ) << "============";*/
 			continue;
 		}
@@ -285,6 +285,7 @@ HtmlDoc_Shared HtmlDoc::parse( const HtmlString_Shared std_c_w_string, size_t &e
 	auto stdCWString = result->htmlWCStr;
 	size_t count;
 	auto resultHtml = HtmlNode::parseHtmlNodeCharPair( result, 0, end_index, count );
+
 	auto htmlNodeCharPairs = resultHtml.get( );
 	size_t maxSize = htmlNodeCharPairs->size( );
 	size_t index = start_index;
@@ -323,8 +324,9 @@ HtmlDoc_Shared HtmlDoc::parse( const HtmlString_Shared std_c_w_string, size_t &e
 			} else {
 				left = htmlNode->ptrOffset;
 				size_t endLeft = left;
-				right = htmlNode->ptrCWtrLen + left;
-				if( isStartNode( stdCWString, left, right ) ) {
+				right = htmlNode->ptrCWtrLen + endLeft;
+				if( isStartNode( stdCWString, endLeft, right ) ) {
+					result->htmlDocNode->emplace_back( htmlDocCharPair );
 					size_t lastNodeIndex = index + 1;
 					size_t endNodeIndex = maxSize;
 					auto vectorHtmlXPathSPtrShared = analysisDoubleNode( result, htmlDocCharPair, resultHtml, lastNodeIndex, endNodeIndex );
@@ -340,20 +342,20 @@ HtmlDoc_Shared HtmlDoc::parse( const HtmlString_Shared std_c_w_string, size_t &e
 	}
 	return result;
 }
-HtmlNode_Shared HtmlDoc::getNodeFromName( const HtmlString &nodeName ) const {
+HtmlNode_Shared HtmlDoc::findNodeFromName( const HtmlString &nodeName ) const {
 	for( auto node : *htmlDocNode.get( ) )
-		if( *getNodeWSName( node ) == nodeName )
+		if( *getNodeName( node ) == nodeName )
 			return node;
 	return nullptr;
 }
-HtmlNode_Shared HtmlDoc::getNodeFromName( const std::function< bool( const HtmlString &nodeName, Html_Node_Type htmlNodeType ) > &callFun ) const {
+HtmlNode_Shared HtmlDoc::findNodeFromName( const std::function< bool( const HtmlString &nodeName, Html_Node_Type htmlNodeType ) > &callFun ) const {
 	for( auto node : *htmlDocNode.get( ) )
-		if( callFun( *getNodeWSName( node ), node->nodeType ) )
+		if( callFun( *getNodeName( node ), node->nodeType ) )
 			return node;
 
 	return nullptr;
 }
-Vector_HtmlNodeSPtr_Shared HtmlDoc::getNodes( const std::function< bool( const HtmlNode_Shared &node ) > &callFun ) {
+Vector_HtmlNodeSPtr_Shared HtmlDoc::findNodes( const std::function< bool( const HtmlNode_Shared &node ) > &callFun ) {
 	Vector_HtmlNodeSPtr_Shared result( new Vector_HtmlNodeSPtr );
 	for( auto node : *htmlDocNode.get( ) )
 		if( callFun( node ) )
@@ -449,12 +451,12 @@ Vector_HtmlNodeSPtr_Shared HtmlDoc::analysisAttributesNode( ) {
 
 	return analysisOver;
 }
-HtmlString_Shared HtmlDoc::getWSNode( const HtmlNode_Shared node_shared ) const {
+HtmlString_Shared HtmlDoc::getNodeContent( const HtmlNode_Shared node_shared ) const {
 	auto c_w_str_star_ptr = node_shared->czWStr->c_str( ) + node_shared->ptrOffset;
 	HtmlString_Shared result( new HtmlString( c_w_str_star_ptr, node_shared->ptrCWtrLen ) );
 	return result;
 }
-HtmlString_Shared HtmlDoc::getNodeWSName( const HtmlNode_Shared node_shared ) const {
+HtmlString_Shared HtmlDoc::getNodeName( const HtmlNode_Shared node_shared ) const {
 	wchar_t currentChar = zero; // 临时字符
 	auto c_w_str = node_shared->czWStr->c_str( ) + node_shared->ptrOffset; // 字符串指向坐标
 	size_t index = 0;
@@ -503,21 +505,21 @@ size_t HtmlDoc::nodeSize( const HtmlNode_Shared node_shared ) const {
 }
 size_t HtmlDoc::getPtrOffset( const HtmlNode_Shared node_shared ) const { return node_shared->ptrOffset; }
 size_t HtmlDoc::getPtrCWtrLen( const HtmlNode_Shared node_shared ) const { return node_shared->ptrCWtrLen; }
-HtmlString_Shared HtmlDoc::getContent( const HtmlNode_Shared node_shared ) const {
+HtmlString_Shared HtmlDoc::getIncludeNodeContent( const HtmlNode_Shared node_shared ) const {
 	return std::make_shared< HtmlString >( node_shared->czWStr->c_str( ), node_shared->ptrOffset, nodeSize( node_shared ) );
 }
 HtmlString_Shared HtmlDoc::getPath( const HtmlNode_Shared node_shared ) const {
-	HtmlString_Shared result( new HtmlString( L"/" + *getNodeWSName( node_shared ) ) );
+	HtmlString_Shared result( new HtmlString( L"/" + *getNodeName( node_shared ) ) );
 
 	HtmlNode_Shared parent = node_shared->parent;
 	while( parent ) {
-		*result = L"/" + *getNodeWSName( parent ) + *result;
+		*result = L"/" + *getNodeName( parent ) + *result;
 		parent = parent->parent;
 	}
 
 	return result;
 }
-HtmlString_Shared HtmlDoc::getNodeText( const HtmlNode_Shared node_shared ) const {
+HtmlString_Shared HtmlDoc::getNodeContentText( const HtmlNode_Shared node_shared ) const {
 
 	auto startNode = node_shared->startNode;
 	auto endNode = node_shared->endNode;
@@ -577,8 +579,12 @@ Vector_HtmlNodeSPtr_Shared HtmlDoc::xpath( const HtmlString &xpath ) {
 	return xPath.buider( thisStdShared );
 }
 Vector_HtmlNodeSPtr_Shared HtmlDoc::getHtmlNodeRoots( ) {
-	if( htmlNodeSPtrRoots ) {
+	bool isInit = false;
+	if( htmlNodeSPtrRoots == nullptr ) {
 		htmlNodeSPtrRoots = std::make_shared< Vector_HtmlNodeSPtr >( );
+		isInit = true;
+	}
+	if( isInit || htmlNodeSPtrRoots->size( ) == 0 ) {
 		for( auto &htmlNodeSPtr : *htmlDocNode )
 			if( htmlNodeSPtr->parent == nullptr )
 				htmlNodeSPtrRoots->emplace_back( htmlNodeSPtr );

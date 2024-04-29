@@ -1,4 +1,4 @@
-﻿#include "HtmlStringTools.h"
+﻿#include "WStrTools.h"
 
 #include <cwctype>
 #include <string>
@@ -7,6 +7,9 @@
 using namespace htmlTools;
 bool HtmlStringTools::isJumpSpace( HtmlChar currentChar ) {
 	return iswspace( currentChar ) || iswcntrl( currentChar ) || iswcntrl( currentChar );
+}
+bool HtmlStringTools::isRouteChar( HtmlChar currentChar ) {
+	return currentChar == charValue::forwardSlash || currentChar == charValue::backSlash;
 }
 bool HtmlStringTools::jimpSace( const HtmlChar *foreachWCStr, size_t foreachMaxIndex, size_t *startIndex ) {
 	for( ; *startIndex < foreachMaxIndex; ++( *startIndex ) )

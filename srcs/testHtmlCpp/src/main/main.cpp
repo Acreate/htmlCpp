@@ -10,7 +10,7 @@
 #include <windows.h>
 
 #include "htmls/htmlTools/XPath.h"
-#include "wstr/HtmlStringTools.h"
+#include "wstr/WStrTools.h"
 
 
 int main( int argc, char *argv[ ] ) {
@@ -51,10 +51,10 @@ int main( int argc, char *argv[ ] ) {
 	// 测试调用
 	size_t endIndex = htmlContent->size( ), startIndex = 0;
 	auto htmlDoc = htmlTools::HtmlDoc::parse( htmlContent, endIndex, startIndex );
-	htmlDoc->getNodes( [&]( auto node ) ->bool {
-		auto wsNode = *htmlDoc->getWSNode( node );
+	htmlDoc->findNodes( [&]( auto node ) ->bool {
+		auto wsNode = *htmlDoc->getNodeContent( node );
 		if( htmlDoc->getNodeType( node ) == htmlTools::Html_Node_Type::DoubleNode && htmlDoc->getEndNode( node ).get( ) != node.get( ) ) {
-			auto wsNodeText = *htmlDoc->getNodeText( node );
+			auto wsNodeText = *htmlDoc->getIncludeNodeContent( node );
 			std::wstringstream ss;
 			ss << L"================" << std::endl;
 			ss << wsNodeText << std::endl;
@@ -82,5 +82,12 @@ int main( int argc, char *argv[ ] ) {
 	htmlDoc->analysisBrotherNode( );
 	// 解析所有节点关系 (单独解析可以使用 WStringPairUnorderMap_Shared HtmlNode::analysisAttribute( ))
 	htmlDoc->analysisAttributesNode( );
+
+	auto xpath = htmlTools::XPath( L"//html/body/div/div/div/div" );
+	auto vectorHtmlNodeSPtrShared = xpath.buider( htmlDoc );
+	if( !vectorHtmlNodeSPtrShared )
+		return -1;
+	for( auto &node : *vectorHtmlNodeSPtrShared )
+		std::wcout << *node->getNodeName( ) << std::endl;
 	return 0;
 }
