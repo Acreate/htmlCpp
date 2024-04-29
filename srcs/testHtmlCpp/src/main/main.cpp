@@ -54,7 +54,7 @@ int main( int argc, char *argv[ ] ) {
 	htmlDoc->findNodes( [&]( auto node ) ->bool {
 		auto wsNode = *htmlDoc->getNodeContent( node );
 		if( htmlDoc->getNodeType( node ) == htmlTools::Html_Node_Type::DoubleNode && htmlDoc->getEndNode( node ).get( ) != node.get( ) ) {
-			auto wsNodeText = *htmlDoc->getNodeIncludeText( node );
+			auto wsNodeText = *htmlDoc->getIncludeNodeContent( node );
 			std::wstringstream ss;
 			ss << L"================" << std::endl;
 			ss << wsNodeText << std::endl;

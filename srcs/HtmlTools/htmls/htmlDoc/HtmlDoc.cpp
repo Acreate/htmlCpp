@@ -340,7 +340,6 @@ HtmlDoc_Shared HtmlDoc::parse( const HtmlString_Shared std_c_w_string, size_t &e
 		if( index == 0 )
 			start_index = htmlDocCharPair.get( )->ptrOffset;
 	}
-
 	return result;
 }
 HtmlNode_Shared HtmlDoc::findNodeFromName( const HtmlString &nodeName ) const {
