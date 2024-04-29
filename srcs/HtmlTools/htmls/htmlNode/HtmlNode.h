@@ -65,11 +65,11 @@ namespace htmlTools {
 		/// <summary>
 		/// 获取整个节点
 		/// </summary>
-		HtmlString_Shared getWSNode( ) const;
+		HtmlString_Shared getNodeContent( ) const;
 		/// <summary>
 		/// 获取节点名称
 		/// </summary>
-		HtmlString_Shared getNodeWSName( ) const;
+		HtmlString_Shared getNodeName( ) const;
 		/// <summary>
 		/// 获取节点类型
 		/// </summary>
@@ -98,7 +98,7 @@ namespace htmlTools {
 		/// <summary>
 		/// 获取的内容
 		/// </summary>
-		HtmlString_Shared getContent( ) const;
+		HtmlString_Shared getIncludeNodeContent( ) const;
 		/// <summary>
 		/// 获取节点的路径
 		/// </summary>
@@ -107,7 +107,7 @@ namespace htmlTools {
 		/// 获取节点当中文本内容<br/>
 		/// 节点之间的内容会相对应的转换
 		/// </summary>
-		HtmlString_Shared getNodeText( ) const;
+		HtmlString_Shared getNodeContentText( ) const;
 		/// <summary>
 		/// 查找节点属性<br/>
 		/// 查找过程需要调用校验函数，当校验函数返回true时，则判断该节点可命中<br/>

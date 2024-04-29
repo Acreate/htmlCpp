@@ -63,7 +63,7 @@ WStringPairUnorderMap_Shared HtmlNode::analysisAttribute( ) {
 	// 2 定义 value 的开始下标
 	// 3 未定义 key 的开始下标（已经实现 key/value 的配对）
 	int currentType = 0;
-	auto node = htmldocShared->getWSNode( thisSharedPtr );
+	auto node = htmldocShared->getNodeContent( thisSharedPtr );
 	std::vector< wchar_t > key, value;
 	for( ; equIndex < endIndex; ++equIndex ) {
 		currentChar = startWStrPtr[ equIndex ];
@@ -148,11 +148,11 @@ WStringPairUnorderMap_Shared HtmlNode::analysisAttribute( ) {
 	*refNodeAttributes = *result;
 	return result;
 }
-HtmlString_Shared HtmlNode::getWSNode( ) const {
-	return htmldocShared->getWSNode( thisSharedPtr );
+HtmlString_Shared HtmlNode::getNodeContent( ) const {
+	return htmldocShared->getNodeContent( thisSharedPtr );
 }
-HtmlString_Shared HtmlNode::getNodeWSName( ) const {
-	return htmldocShared->getNodeWSName( thisSharedPtr );
+HtmlString_Shared HtmlNode::getNodeName( ) const {
+	return htmldocShared->getNodeName( thisSharedPtr );
 }
 Html_Node_Type HtmlNode::getNodeType( ) const {
 	return thisSharedPtr->nodeType;
@@ -174,14 +174,14 @@ size_t HtmlNode::getPtrOffset( ) const {
 size_t HtmlNode::getPtrCWtrLen( ) const {
 	return ptrCWtrLen;
 }
-HtmlString_Shared HtmlNode::getContent( ) const {
-	return htmldocShared->getContent( thisSharedPtr );
+HtmlString_Shared HtmlNode::getIncludeNodeContent( ) const {
+	return htmldocShared->getIncludeNodeContent( thisSharedPtr );
 }
 HtmlString_Shared HtmlNode::getPath( ) const {
 	return htmldocShared->getPath( thisSharedPtr );
 }
-HtmlString_Shared HtmlNode::getNodeText( ) const {
-	return htmldocShared->getNodeText( thisSharedPtr );
+HtmlString_Shared HtmlNode::getNodeContentText( ) const {
+	return htmldocShared->getNodeContentText( thisSharedPtr );
 }
 bool HtmlNode::findAttribute( const std::function< bool( const WStringPairUnorderMap_Shared ) > callFunction ) const {
 	return htmldocShared->findAttribute( thisSharedPtr, callFunction );

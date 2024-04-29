@@ -106,7 +106,7 @@ Vector_HtmlNodeSPtr_Shared XPath::rootBuider( HtmlDoc_Shared html_doc ) {
 		for( ; nodeIterator != nodeEnd; ++nodeIterator ) {
 			if( nodeIterator == nodeEnd )
 				break;
-			auto nodeWsName = *nodeIterator->get( )->getNodeWSName( );
+			auto nodeWsName = *nodeIterator->get( )->getNodeName( );
 			if( subPath == nodeWsName )
 				buff->emplace_back( *nodeIterator );
 		}
@@ -127,11 +127,6 @@ Vector_HtmlNodeSPtr_Shared XPath::rootBuider( HtmlDoc_Shared html_doc ) {
 		}
 		break;
 	} while( true );
-	for( auto &node : *buff ) {
-		auto name = *node->getNodeWSName( );
-		std::wcout << name << std::endl;
-		std::wcout.flush( );
-	}
 	return result;
 }
 Vector_HtmlNodeSPtr_Shared XPath::relativeBuider( Vector_HtmlNodeSPtr html_node_shared ) {

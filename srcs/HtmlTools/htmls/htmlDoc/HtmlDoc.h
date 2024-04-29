@@ -123,7 +123,7 @@ namespace htmlTools {
 		/// </summary>
 		/// <param name="nodeName">获取的名称</param>
 		/// <returns>节点，失败返回 nullptr</returns>
-		HtmlNode_Shared getNodeFromName( const HtmlString &nodeName ) const;
+		HtmlNode_Shared findNodeFromName( const HtmlString &nodeName ) const;
 
 		/// <summary>
 		/// 获取指定的节点<br/>
@@ -131,14 +131,14 @@ namespace htmlTools {
 		/// </summary>
 		/// <param name="callFun">校验函数</param>
 		/// <returns>节点，失败返回 nullptr</returns>
-		HtmlNode_Shared getNodeFromName( const std::function< bool( const HtmlString &, Html_Node_Type ) > &callFun ) const;
+		HtmlNode_Shared findNodeFromName( const std::function< bool( const HtmlString &, Html_Node_Type ) > &callFun ) const;
 		/// <summary>
 		/// 遍历获取节点<br/>
 		/// 节点传递到 callFun 调用参数当中，当需要存储时，返回 true。直到结束
 		/// </summary>
 		/// <param name="callFun">校验函数</param>
 		/// <returns>返回列表</returns>
-		Vector_HtmlNodeSPtr_Shared getNodes( const std::function< bool( const HtmlNode_Shared & ) > &callFun );
+		Vector_HtmlNodeSPtr_Shared findNodes( const std::function< bool( const HtmlNode_Shared & ) > &callFun );
 	private: // 无法使用个构造函数
 		HtmlDoc( );
 	public:
@@ -160,11 +160,11 @@ namespace htmlTools {
 		/// <summary>
 		/// 获取整个节点
 		/// </summary>
-		HtmlString_Shared getWSNode( const HtmlNode_Shared node_shared ) const;
+		HtmlString_Shared getNodeContent( const HtmlNode_Shared node_shared ) const;
 		/// <summary>
 		/// 获取节点名称
 		/// </summary>
-		HtmlString_Shared getNodeWSName( const HtmlNode_Shared node_shared ) const;
+		HtmlString_Shared getNodeName( const HtmlNode_Shared node_shared ) const;
 		/// <summary>
 		/// 获取节点类型
 		/// </summary>
@@ -193,7 +193,7 @@ namespace htmlTools {
 		/// <summary>
 		/// 获取的内容
 		/// </summary>
-		HtmlString_Shared getContent( const HtmlNode_Shared node_shared ) const;
+		HtmlString_Shared getIncludeNodeContent( const HtmlNode_Shared node_shared ) const;
 		/// <summary>
 		/// 获取节点的路径
 		/// </summary>
@@ -202,7 +202,7 @@ namespace htmlTools {
 		/// 获取节点当中文本内容<br/>
 		/// 节点之间的内容会相对应的转换
 		/// </summary>
-		HtmlString_Shared getNodeText( const HtmlNode_Shared node_shared ) const;
+		HtmlString_Shared getNodeContentText( const HtmlNode_Shared node_shared ) const;
 		/// <summary>
 		/// 查找节点属性<br/>
 		/// 查找过程需要调用校验函数，当校验函数返回true时，则判断该节点可命中<br/>
