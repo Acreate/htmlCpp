@@ -1,5 +1,7 @@
 ﻿#include "XPath.h"
 
+#include <iostream>
+
 #include "../../wstr/HtmlStringTools.h"
 #include "../htmlNode/HtmlNode.h"
 #include "../htmlDoc/HtmlDoc.h"
@@ -17,13 +19,18 @@ XPath::XPath( const HtmlString &wstr ) : XPath( ) {
 		HtmlChar value = wstr[ index ];
 		if( HtmlStringTools::isJumpSpace( value ) )
 			continue;
+		if( value == forwardSlash ) { // 找到第一个 /
+			++index;
+			break;
+		}
+		break;
 	}
-
+	size_t dataSize;
 	// 分解 / 路径
 	for( ; index < length; ++index ) {
 		HtmlChar value = wstr[ index ];
 		if( value == forwardSlash ) {
-			size_t dataSize = subStrVector.size( );
+			dataSize = subStrVector.size( );
 			if( dataSize > 0 ) {
 				auto data = subStrVector.data( );
 				auto htmlStr = std::make_shared< HtmlString >( data, dataSize );
@@ -32,6 +39,12 @@ XPath::XPath( const HtmlString &wstr ) : XPath( ) {
 			}
 		} else
 			subStrVector.emplace_back( value );
+	}
+	dataSize = subStrVector.size( );
+	if( subStrVector.size( ) != 0 ) {
+		auto data = subStrVector.data( );
+		auto htmlStr = std::make_shared< HtmlString >( data, dataSize );
+		stdWStringListShared.emplace_back( htmlStr );
 	}
 }
 XPath::XPath( const List_HtmlStringSptr &std_w_string_list_shared, const HtmlString &separator )
@@ -43,14 +56,14 @@ XPath::~XPath( ) { }
 Vector_HtmlNodeSPtr_Shared XPath::rootBuider( HtmlDoc_Shared html_doc ) {
 	Vector_HtmlNodeSPtr_Shared result( new Vector_HtmlNodeSPtr );
 	// 获取所有根节点
-	auto findNodes = html_doc->getHtmlNodeRoots( );
+	auto findNodes = html_doc->analysisBrotherNode( ); // 必须解析族谱
 	auto buff( std::make_shared< Vector_HtmlNodeSPtr >( ) );
 	size_t strListSize = stdWStringListShared.size( ), index = 0;
 	auto ptr = stdWStringListShared.data( );
-	for( ; index < strListSize; ++index ) {
-		auto &subPath = ptr[ index ];
+	do {
 		auto nodeIterator = findNodes->begin( );
 		auto nodeEnd = findNodes->end( );
+		auto &subPath = ptr[ index ];
 		for( ; nodeIterator != nodeEnd; ++nodeIterator ) {
 			if( nodeIterator == nodeEnd )
 				break;
@@ -59,8 +72,25 @@ Vector_HtmlNodeSPtr_Shared XPath::rootBuider( HtmlDoc_Shared html_doc ) {
 		}
 		if( buff->size( ) == 0 )
 			break;
-		*findNodes = *buff;
-		buff->clear( );
+		++index;// 判断下一个下标是否超出
+		if( index < strListSize ) {  // 继续时，获取已经得到的子节点
+			if( buff->size( ) == 0 ) // 找不到
+				break;
+			findNodes->clear( );
+			for( auto &nodeShared : *buff ) {
+				auto nodeChildrenNodes = nodeShared->subChildren;
+				for( auto &children : *nodeChildrenNodes )
+					findNodes->emplace_back( children );
+			}
+			buff->clear( );
+			continue;
+		}
+		break;
+	} while( true );
+	for( auto &node : *buff ) {
+		auto name = *node->getNodeWSName( );
+		std::wcout << name << std::endl;
+		std::wcout.flush( );
 	}
 	return result;
 }
