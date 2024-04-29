@@ -2,7 +2,8 @@
 
 #include <iostream>
 
-#include "../../wstr/HtmlStringTools.h"
+
+#include "../../wstr/WStrTools.h"
 #include "../htmlNode/HtmlNode.h"
 #include "../htmlDoc/HtmlDoc.h"
 using namespace htmlTools;
@@ -14,22 +15,56 @@ XPath::XPath( const HtmlString &wstr ) : XPath( ) {
 	std::vector< size_t > forwardSlashIndes;
 	std::vector< HtmlChar > subStrVector;
 	size_t index = 0;
-	// 找到开始的 /
+	HtmlChar value;
+	// 处理开端的 / (/ 和 //)
 	for( ; index < length; ++index ) {
-		HtmlChar value = wstr[ index ];
+		value = wstr[ index ];
 		if( HtmlStringTools::isJumpSpace( value ) )
 			continue;
-		if( value == forwardSlash ) { // 找到第一个 /
+		if( HtmlStringTools::isRouteChar( value ) ) { // 找到第一个 /
 			++index;
+			value = wstr[ index ];
+			if( HtmlStringTools::isRouteChar( value ) ) {
+				auto string = std::make_shared< HtmlString >( );
+				*string += forwardSlash;
+				stdWStringListShared.emplace_back( string );
+				++index;
+				do {
+					value = wstr[ index ];
+					if( value != forwardSlash || !HtmlStringTools::isJumpSpace( value ) )
+						break;
+					++index;
+				} while( true );
+			}
 			break;
+		}
+		if( value == dot ) { // 处理 ./ 开头
+			++index;
+			value = wstr[ index ];
+			if( HtmlStringTools::isRouteChar( value ) ) {
+				auto string = std::make_shared< HtmlString >( );
+				*string += dot;
+				stdWStringListShared.emplace_back( string );
+				++index;
+				do {
+					value = wstr[ index ];
+					if( HtmlStringTools::isRouteChar( value ) || !HtmlStringTools::isJumpSpace( value ) )
+						break;
+					++index;
+				} while( true );
+				break;
+			}
+			throw L"路径不支持 ../";
 		}
 		break;
 	}
+
+
 	size_t dataSize;
 	// 分解 / 路径
 	for( ; index < length; ++index ) {
-		HtmlChar value = wstr[ index ];
-		if( value == forwardSlash ) {
+		value = wstr[ index ];
+		if( HtmlStringTools::isRouteChar( value ) ) {
 			dataSize = subStrVector.size( );
 			if( dataSize > 0 ) {
 				auto data = subStrVector.data( );
@@ -46,6 +81,9 @@ XPath::XPath( const HtmlString &wstr ) : XPath( ) {
 		auto htmlStr = std::make_shared< HtmlString >( data, dataSize );
 		stdWStringListShared.emplace_back( htmlStr );
 	}
+	auto htmlString = getHtmlString( );
+	std::wcout << htmlString << std::endl;
+	std::wcout.flush( );
 }
 XPath::XPath( const List_HtmlStringSptr &std_w_string_list_shared, const HtmlString &separator )
 	: separator( separator ) {

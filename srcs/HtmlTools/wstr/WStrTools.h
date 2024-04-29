@@ -16,6 +16,12 @@ namespace htmlTools {
 		/// <returns>true 表示空字符</returns>
 		static bool isJumpSpace( HtmlChar currentChar );
 		/// <summary>
+		/// 是否路径符(包含 '/' 与 '\')
+		/// </summary>
+		/// <param name="currentChar">检测符号</param>
+		/// <returns>true 表示路径符</returns>
+		static bool isRouteChar(HtmlChar currentChar);
+		/// <summary>
 		/// 找到第一个非空字符<br/>
 		/// 并且把值放置在 startIndex 当中
 		/// </summary>

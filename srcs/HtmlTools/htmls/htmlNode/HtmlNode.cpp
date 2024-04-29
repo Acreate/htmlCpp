@@ -3,7 +3,7 @@
 
 #include "../htmlDoc/HtmlDoc.h"
 #include "../htmlTools/XPath.h"
-#include "../../wstr/HtmlStringTools.h"
+#include "../../wstr/WStrTools.h"
 #include <sstream>
 
 using namespace htmlTools;

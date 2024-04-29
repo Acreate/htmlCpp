@@ -10,7 +10,7 @@
 #include <windows.h>
 
 #include "htmls/htmlTools/XPath.h"
-#include "wstr/HtmlStringTools.h"
+#include "wstr/WStrTools.h"
 
 
 int main( int argc, char *argv[ ] ) {
