@@ -285,6 +285,7 @@ HtmlDoc_Shared HtmlDoc::parse( const HtmlString_Shared std_c_w_string, size_t &e
 	auto stdCWString = result->htmlWCStr;
 	size_t count;
 	auto resultHtml = HtmlNode::parseHtmlNodeCharPair( result, 0, end_index, count );
+
 	auto htmlNodeCharPairs = resultHtml.get( );
 	size_t maxSize = htmlNodeCharPairs->size( );
 	size_t index = start_index;
@@ -323,8 +324,8 @@ HtmlDoc_Shared HtmlDoc::parse( const HtmlString_Shared std_c_w_string, size_t &e
 			} else {
 				left = htmlNode->ptrOffset;
 				size_t endLeft = left;
-				right = htmlNode->ptrCWtrLen + left;
-				if( isStartNode( stdCWString, left, right ) ) {
+				right = htmlNode->ptrCWtrLen + endLeft;
+				if( isStartNode( stdCWString, endLeft, right ) ) {
 					size_t lastNodeIndex = index + 1;
 					size_t endNodeIndex = maxSize;
 					auto vectorHtmlXPathSPtrShared = analysisDoubleNode( result, htmlDocCharPair, resultHtml, lastNodeIndex, endNodeIndex );
@@ -332,12 +333,16 @@ HtmlDoc_Shared HtmlDoc::parse( const HtmlString_Shared std_c_w_string, size_t &e
 					auto endNode = vectorHtmlXPathSPtrShared->end( );
 					for( ; htmlNodeIterator != endNode; ++htmlNodeIterator )
 						result->htmlDocNode->emplace_back( *htmlNodeIterator );
+					auto startNode = htmlDocCharPair->startNode;
+					if( startNode )
+						result->htmlDocNode->emplace_back( htmlDocCharPair );
 				}
 			}
 		}
 		if( index == 0 )
 			start_index = htmlDocCharPair.get( )->ptrOffset;
 	}
+
 	return result;
 }
 HtmlNode_Shared HtmlDoc::getNodeFromName( const HtmlString &nodeName ) const {
@@ -577,8 +582,12 @@ Vector_HtmlNodeSPtr_Shared HtmlDoc::xpath( const HtmlString &xpath ) {
 	return xPath.buider( thisStdShared );
 }
 Vector_HtmlNodeSPtr_Shared HtmlDoc::getHtmlNodeRoots( ) {
-	if( htmlNodeSPtrRoots ) {
+	bool isInit = false;
+	if( htmlNodeSPtrRoots == nullptr ) {
 		htmlNodeSPtrRoots = std::make_shared< Vector_HtmlNodeSPtr >( );
+		isInit = true;
+	}
+	if( isInit || htmlNodeSPtrRoots->size( ) == 0 ) {
 		for( auto &htmlNodeSPtr : *htmlDocNode )
 			if( htmlNodeSPtr->parent == nullptr )
 				htmlNodeSPtrRoots->emplace_back( htmlNodeSPtr );

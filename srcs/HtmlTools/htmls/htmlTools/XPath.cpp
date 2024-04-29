@@ -81,9 +81,6 @@ XPath::XPath( const HtmlString &wstr ) : XPath( ) {
 		auto htmlStr = std::make_shared< HtmlString >( data, dataSize );
 		stdWStringListShared.emplace_back( htmlStr );
 	}
-	auto htmlString = getHtmlString( );
-	std::wcout << htmlString << std::endl;
-	std::wcout.flush( );
 }
 XPath::XPath( const List_HtmlStringSptr &std_w_string_list_shared, const HtmlString &separator )
 	: separator( separator ) {
@@ -94,18 +91,23 @@ XPath::~XPath( ) { }
 Vector_HtmlNodeSPtr_Shared XPath::rootBuider( HtmlDoc_Shared html_doc ) {
 	Vector_HtmlNodeSPtr_Shared result( new Vector_HtmlNodeSPtr );
 	// 获取所有根节点
-	auto findNodes = html_doc->analysisBrotherNode( ); // 必须解析族谱
+	auto analysisBrotherNode = html_doc->analysisBrotherNode( ); // 必须解析族谱
+	for( auto &node : *analysisBrotherNode )
+		std::wcout << *node->getPath( ) << std::endl;
+	HtmlDoc *element = html_doc.get( );
+	auto findNodes = element->getHtmlNodeRoots( );
 	auto buff( std::make_shared< Vector_HtmlNodeSPtr >( ) );
-	size_t strListSize = stdWStringListShared.size( ), index = 0;
+	size_t strListSize = stdWStringListShared.size( ), index = 1;
 	auto ptr = stdWStringListShared.data( );
 	do {
 		auto nodeIterator = findNodes->begin( );
 		auto nodeEnd = findNodes->end( );
-		auto &subPath = ptr[ index ];
+		auto &subPath = *ptr[ index ];
 		for( ; nodeIterator != nodeEnd; ++nodeIterator ) {
 			if( nodeIterator == nodeEnd )
 				break;
-			if( subPath == nodeIterator->get( )->getNodeWSName( ) )
+			auto nodeWsName = *nodeIterator->get( )->getNodeWSName( );
+			if( subPath == nodeWsName )
 				buff->emplace_back( *nodeIterator );
 		}
 		if( buff->size( ) == 0 )
