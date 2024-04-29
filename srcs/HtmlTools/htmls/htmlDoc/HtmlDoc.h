@@ -98,19 +98,25 @@ namespace htmlTools {
 		/// <returns>解析后的列表</returns>
 		static HtmlDoc_Shared parse( const HtmlString_Shared std_c_w_string, size_t &end_index, size_t &start_index );
 	private: // 核心成员
+
+		HtmlDoc_Shared thisStdShared;
 		/// <summary>
 		/// 引用的 html 内容
 		/// </summary>
 		HtmlString_Shared htmlWCStr;
 
 		/// <summary>
-		/// 文件的顶级节点
+		/// 文件的节点
 		/// </summary>
 		Vector_HtmlNodeSPtr_Shared htmlDocNode;
 		/// <summary>
 		/// 解析的所有族谱节点
 		/// </summary>
 		Vector_HtmlNodeSPtr_Shared analysisOver;
+		/// <summary>
+		/// 存储所有根节点
+		/// </summary>
+		Vector_HtmlNodeSPtr_Shared htmlNodeSPtrRoots;
 	public:
 		/// <summary>
 		/// 获取指定名称的节点
@@ -154,11 +160,11 @@ namespace htmlTools {
 		/// <summary>
 		/// 获取整个节点
 		/// </summary>
-		std::shared_ptr< std::wstring > getWSNode( const HtmlNode_Shared node_shared ) const;
+		HtmlString_Shared getWSNode( const HtmlNode_Shared node_shared ) const;
 		/// <summary>
 		/// 获取节点名称
 		/// </summary>
-		std::shared_ptr< std::wstring > getNodeWSName( const HtmlNode_Shared node_shared ) const;
+		HtmlString_Shared getNodeWSName( const HtmlNode_Shared node_shared ) const;
 		/// <summary>
 		/// 获取节点类型
 		/// </summary>
@@ -201,6 +207,7 @@ namespace htmlTools {
 		/// 查找节点属性<br/>
 		/// 查找过程需要调用校验函数，当校验函数返回true时，则判断该节点可命中<br/>
 		/// 命中时，可携返回
+		/// </summary>
 		/// <param name="node_shared">查找的节点</param>
 		/// <param name="callFunction">校验函数</param>
 		/// <returns>命中列表</returns>
@@ -214,6 +221,19 @@ namespace htmlTools {
 		/// <param name="callFunction">校验函数</param>
 		/// <returns>命中列表</returns>
 		Vector_HtmlNodeSPtr_Shared matchChildrenNodes( const HtmlNode_Shared node_shared, const std::function< bool( const HtmlNode_Shared ) > callFunction );
+
+		/// <summary>
+		/// 使用 xpath 查找元素
+		/// </summary>
+		/// <param name="xpath">xpath</param>
+		/// <returns>节点列表</returns>
+		Vector_HtmlNodeSPtr_Shared xpath( const HtmlString &xpath );
+
+		/// <summary>
+		/// 获取所有根节点
+		/// </summary>
+		/// <returns>根节点列表</returns>
+		Vector_HtmlNodeSPtr_Shared getHtmlNodeRoots();
 	};
 }
 

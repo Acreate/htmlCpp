@@ -115,6 +115,18 @@ namespace htmlTools {
 		/// <param name="callFunction">校验函数</param>
 		/// <returns>命中列表</returns>
 		bool findAttribute( const std::function< bool( const WStringPairUnorderMap_Shared ) > callFunction ) const;
+		/// <summary>
+		/// 使用 xpath 查找元素
+		/// </summary>
+		/// <param name="xpath">xpath</param>
+		/// <returns>节点列表</returns>
+		Vector_HtmlNodeSPtr_Shared xpath(const HtmlString& xpath);
+		
+		/// <summary>
+		/// 获取所有根节点
+		/// </summary>
+		/// <returns>根节点列表</returns>
+		Vector_HtmlNodeSPtr_Shared getHtmlNodeRoots();
 	private:
 		/// <summary>
 		/// 生成 < 与 > 的配对

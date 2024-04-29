@@ -10,7 +10,7 @@
 #include <windows.h>
 
 #include "htmls/htmlTools/XPath.h"
-#include "wstr/WStrTools.h"
+#include "wstr/HtmlStringTools.h"
 
 
 int main( int argc, char *argv[ ] ) {
@@ -35,7 +35,7 @@ int main( int argc, char *argv[ ] ) {
 		stringstream << L'\n';
 	} while( true );
 	std::shared_ptr< std::wstring > htmlContent( new std::wstring( stringstream.str( ) ) );
-	std::cout << htmlTools::WStrTools::wstringConverString( *htmlContent ) << std::endl;
+	std::cout << htmlTools::HtmlStringTools::wstringConverString( *htmlContent ) << std::endl;
 
 	ifstream.close( );
 	// 写入文件
@@ -62,7 +62,7 @@ int main( int argc, char *argv[ ] ) {
 			ss << *htmlDoc->getPath( node ) << std::endl;
 			ss << L"================" << std::endl;
 
-			std::string converString = htmlTools::WStrTools::wstringConverString( ss.str( ) );
+			std::string converString = htmlTools::HtmlStringTools::wstringConverString( ss.str( ) );
 			std::cout << converString << std::endl;
 			std::cout.flush( );
 			std::cout.clear( );

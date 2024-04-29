@@ -2,7 +2,8 @@
 
 
 #include "../htmlDoc/HtmlDoc.h"
-#include "../../wstr/WStrTools.h"
+#include "../htmlTools/XPath.h"
+#include "../../wstr/HtmlStringTools.h"
 #include <sstream>
 
 using namespace htmlTools;
@@ -30,21 +31,21 @@ WStringPairUnorderMap_Shared HtmlNode::analysisAttribute( ) {
 		if( currentChar == nodeStartChar ) { // 找到名称
 			++equIndex;
 			currentChar = startWStrPtr[ equIndex ];
-			if( !WStrTools::isJumpSpace( currentChar ) ) { // 不是空，则是名称
+			if( !HtmlStringTools::isJumpSpace( currentChar ) ) { // 不是空，则是名称
 				++equIndex;
 				for( ; equIndex < endIndex; ++equIndex ) {
 					currentChar = startWStrPtr[ equIndex ];
-					if( WStrTools::isJumpSpace( currentChar ) )
+					if( HtmlStringTools::isJumpSpace( currentChar ) )
 						break;
 				}
 			} else { // 如果是空，则找到一个非空
 				for( ; equIndex < endIndex; ++equIndex ) {
 					currentChar = startWStrPtr[ equIndex ];
-					if( !WStrTools::isJumpSpace( currentChar ) ) {
+					if( !HtmlStringTools::isJumpSpace( currentChar ) ) {
 						++equIndex;
 						for( ; equIndex < endIndex; ++equIndex ) { // 找到末尾的空，或者结束该节点
 							currentChar = startWStrPtr[ equIndex ];
-							if( WStrTools::isJumpSpace( currentChar ) )
+							if( HtmlStringTools::isJumpSpace( currentChar ) )
 								break;
 						}
 						break;
@@ -75,9 +76,9 @@ WStringPairUnorderMap_Shared HtmlNode::analysisAttribute( ) {
 			result->insert_or_assign( keyval, mapval );
 			if( currentChar == nodeEndChar )
 				break;
-			if( WStrTools::isJumpSpace( currentChar ) )// 找到下一个非空
+			if( HtmlStringTools::isJumpSpace( currentChar ) )// 找到下一个非空
 				for( ++equIndex; equIndex < endIndex; ++equIndex )
-					if( WStrTools::isJumpSpace( startWStrPtr[ equIndex ] ) )
+					if( HtmlStringTools::isJumpSpace( startWStrPtr[ equIndex ] ) )
 						break;
 			currentType = 1;
 		} else {
@@ -89,11 +90,11 @@ WStringPairUnorderMap_Shared HtmlNode::analysisAttribute( ) {
 				++equIndex;
 				for( ; equIndex < endIndex; ++equIndex ) { // 找到 = 的下一个非空
 					currentChar = startWStrPtr[ equIndex ];
-					if( !WStrTools::isJumpSpace( currentChar ) ) {
+					if( !HtmlStringTools::isJumpSpace( currentChar ) ) {
 						// 找到值的末尾
 						for( ; equIndex < endIndex; ++equIndex ) {
 							currentChar = startWStrPtr[ equIndex ];
-							if( WStrTools::isJumpSpace( currentChar ) || currentChar == nodeEndChar )
+							if( HtmlStringTools::isJumpSpace( currentChar ) || currentChar == nodeEndChar )
 								break;
 							else if( currentChar == singleQuotation ) {
 								value.emplace_back( currentChar );
@@ -134,7 +135,7 @@ WStringPairUnorderMap_Shared HtmlNode::analysisAttribute( ) {
 					if( currentChar == doubleQuotation )
 						break;
 				}
-			} else if( !WStrTools::isJumpSpace( currentChar ) )
+			} else if( !HtmlStringTools::isJumpSpace( currentChar ) )
 				key.emplace_back( currentChar );
 		}
 
@@ -184,6 +185,13 @@ HtmlString_Shared HtmlNode::getNodeText( ) const {
 }
 bool HtmlNode::findAttribute( const std::function< bool( const WStringPairUnorderMap_Shared ) > callFunction ) const {
 	return htmldocShared->findAttribute( thisSharedPtr, callFunction );
+}
+Vector_HtmlNodeSPtr_Shared HtmlNode::xpath( const HtmlString &xpath ) {
+	XPath xPath( xpath );
+	return xPath.buider( { this->thisSharedPtr } );
+}
+Vector_HtmlNodeSPtr_Shared HtmlNode::getHtmlNodeRoots( ) {
+	return htmldocShared->getHtmlNodeRoots( );
 }
 Vector_HtmlNodeSPtr_Shared HtmlNode::parseHtmlNodeCharPair( HtmlDoc_Shared html_doc_shared, size_t start_index, const size_t max_index, size_t &index_count ) {
 	Vector_HtmlNodeSPtr_Shared result( new Vector_HtmlNodeSPtr );

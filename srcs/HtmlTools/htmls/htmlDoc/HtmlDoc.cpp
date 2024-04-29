@@ -1,8 +1,9 @@
 ﻿#include "HtmlDoc.h"
 
 #include "../../macro/cmake_to_c_cpp_header_env.h"
-#include "../../wstr/WStrTools.h"
+#include "../../wstr/HtmlStringTools.h"
 #include "../HtmlNode/HtmlNode.h"
+#include "../htmlTools/XPath.h"
 #include "../enum/HtmlNodeType/Html_Node_Type.h"
 
 #include <clocale>
@@ -121,7 +122,7 @@ bool HtmlDoc::isSingelNode( const HtmlString_Shared std_c_w_string, size_t &star
 	if( findNextNodeForwardSlash( std_c_w_string, end_index, forwardSlashIndex ) ) {
 		for( forwardSlashIndex += 1; forwardSlashIndex < end_index; ++forwardSlashIndex ) {
 			currentChar = c_str[ forwardSlashIndex ];
-			if( WStrTools::isJumpSpace( currentChar ) )
+			if( HtmlStringTools::isJumpSpace( currentChar ) )
 				continue;
 			if( currentChar != nodeEndChar )
 				break;
@@ -144,7 +145,7 @@ bool HtmlDoc::isStartNode( const HtmlString_Shared std_c_w_string, size_t &start
 	// 碰到的第一个必须是 > 而不是 /
 	for( auto index = start_index + 1; index <= end_index; ++index ) {
 		currentChar = c_str[ index ];
-		if( WStrTools::isJumpSpace( currentChar ) )
+		if( HtmlStringTools::isJumpSpace( currentChar ) )
 			continue;
 		if( currentChar == doubleQuotation ) {
 			++index;
@@ -179,7 +180,7 @@ bool HtmlDoc::isEndNode( const HtmlString_Shared std_c_w_string, size_t &start_i
 	}
 	for( auto index = start_index + 1; index <= end_index; ++index ) {
 		currentChar = c_str[ index ];
-		if( WStrTools::isJumpSpace( currentChar ) )
+		if( HtmlStringTools::isJumpSpace( currentChar ) )
 			continue;
 		if( currentChar != forwardSlash )
 			return true;
@@ -279,6 +280,7 @@ Vector_HtmlNodeSPtr_Shared HtmlDoc::analysisDoubleNode( HtmlDoc_Shared html_doc_
 
 HtmlDoc_Shared HtmlDoc::parse( const HtmlString_Shared std_c_w_string, size_t &end_index, size_t &start_index ) {
 	HtmlDoc_Shared result( new HtmlDoc );
+	result->thisStdShared = result;
 	result->htmlWCStr = std::make_shared< HtmlString >( std_c_w_string->c_str( ) + start_index, end_index - start_index );
 	auto stdCWString = result->htmlWCStr;
 	size_t count;
@@ -458,7 +460,7 @@ HtmlString_Shared HtmlDoc::getNodeWSName( const HtmlNode_Shared node_shared ) co
 	size_t index = 0;
 	for( ; index < node_shared->ptrCWtrLen; ++index ) { // 找到 < 后面的非空
 		currentChar = c_w_str[ index ];
-		if( currentChar == nodeStartChar || WStrTools::isJumpSpace( currentChar ) )
+		if( currentChar == nodeStartChar || HtmlStringTools::isJumpSpace( currentChar ) )
 			continue;
 		break;
 	}
@@ -466,18 +468,18 @@ HtmlString_Shared HtmlDoc::getNodeWSName( const HtmlNode_Shared node_shared ) co
 	auto ptrCStrLen = node_shared->ptrCWtrLen - index; // 缩减长度
 	for( index = 0; index < ptrCStrLen; ++index ) { // 找到第一个空或者 / > 等字符
 		currentChar = c_w_str[ index ];
-		if( WStrTools::isJumpSpace( currentChar ) || currentChar == nodeEndChar || currentChar == forwardSlash )
+		if( HtmlStringTools::isJumpSpace( currentChar ) || currentChar == nodeEndChar || currentChar == forwardSlash )
 			break;
 	}
 	if( currentChar == forwardSlash ) { // 如果碰到斜杠 /(节点是尾节点)
 		for( ; index < ptrCStrLen; ++index ) { // 找到第一个非空或者 > 等字符
 			currentChar = c_w_str[ index ];
-			if( !WStrTools::isJumpSpace( currentChar ) ) {
+			if( !HtmlStringTools::isJumpSpace( currentChar ) ) {
 				++index;
 				c_w_str = c_w_str + index;
 				for( index = 0; index < ptrCStrLen; ++index ) { // 找到第一个空或者 > 等字符
 					currentChar = c_w_str[ index ];
-					if( WStrTools::isJumpSpace( currentChar ) || currentChar == nodeEndChar )
+					if( HtmlStringTools::isJumpSpace( currentChar ) || currentChar == nodeEndChar )
 						break;
 				}
 				break;
@@ -569,6 +571,19 @@ Vector_HtmlNodeSPtr_Shared HtmlDoc::matchChildrenNodes( const HtmlNode_Shared no
 			result->emplace_back( node );
 
 	return result;
+}
+Vector_HtmlNodeSPtr_Shared HtmlDoc::xpath( const HtmlString &xpath ) {
+	XPath xPath( xpath );
+	return xPath.buider( thisStdShared );
+}
+Vector_HtmlNodeSPtr_Shared HtmlDoc::getHtmlNodeRoots( ) {
+	if( htmlNodeSPtrRoots ) {
+		htmlNodeSPtrRoots = std::make_shared< Vector_HtmlNodeSPtr >( );
+		for( auto &htmlNodeSPtr : *htmlDocNode )
+			if( htmlNodeSPtr->parent == nullptr )
+				htmlNodeSPtrRoots->emplace_back( htmlNodeSPtr );
+	}
+	return htmlNodeSPtrRoots;
 }
 bool HtmlDoc::findAttribute( const HtmlNode_Shared node_shared, const std::function< bool( const WStringPairUnorderMap_Shared node_attribute_map_shred ) > callFunction ) const {
 	return callFunction( node_shared->refNodeAttributes );

@@ -26,7 +26,7 @@ namespace htmlTools {
 	// html 文档
 	class HTMLTOOLS_EXPORT HtmlDoc;
 	// 宽字符工具
-	class HTMLTOOLS_EXPORT WStrTools;
+	class HTMLTOOLS_EXPORT HtmlStringTools;
 	// 节点
 	class HTMLTOOLS_EXPORT HtmlNode;
 	// 工具
@@ -48,6 +48,10 @@ namespace htmlTools {
 	/// </summary>
 	using HtmlString = std::wstring;
 	/// <summary>
+	/// 限定字符类型
+	/// </summary>
+	using HtmlChar = HtmlString::value_type;
+	/// <summary>
 	/// 宽字符串共享指针
 	/// </summary>
 	using HtmlString_Shared = std::shared_ptr< HtmlString >;
@@ -55,6 +59,10 @@ namespace htmlTools {
 	/// std::list< std::shared_ptr< HtmlString > >
 	/// </summary>
 	using List_HtmlStringSptr = std::list< HtmlString_Shared >;
+	/// <summary>
+	///  std::vector< HtmlString_Shared >
+	/// </summary>
+	using Vector_HtmlStringSptr = std::vector< HtmlString_Shared >;
 	/// <summary>
 	///  std::shared_ptr<std::list< std::shared_ptr< HtmlString > > >
 	/// </summary>
