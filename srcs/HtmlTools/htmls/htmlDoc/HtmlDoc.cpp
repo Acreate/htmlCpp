@@ -591,6 +591,6 @@ Vector_HtmlNodeSPtr_Shared HtmlDoc::getHtmlNodeRoots( ) {
 	}
 	return htmlNodeSPtrRoots;
 }
-bool HtmlDoc::findAttribute( const HtmlNode_Shared node_shared, const std::function< bool( const WStringPairUnorderMap_Shared node_attribute_map_shred ) > callFunction ) const {
+bool HtmlDoc::findAttribute( const HtmlNode_Shared node_shared, const std::function< bool( const HtmlStringPairUnorderMap_Shared node_attribute_map_shred ) > callFunction ) const {
 	return callFunction( node_shared->refNodeAttributes );
 }
