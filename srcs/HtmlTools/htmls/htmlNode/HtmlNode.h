@@ -47,9 +47,9 @@ namespace htmlTools {
 		HtmlNode_Shared thisSharedPtr; // 当前节点
 		HtmlStringPairUnorderMap_Shared refNodeAttributes; // 当前节点的所有属性
 	private:
-		static void setParent( HtmlNode_Shared child, HtmlNode_Shared parent );
+		static void setParent( HtmlNode_Shared &child, HtmlNode_Shared &parent );
 	public:
-		void setParent( HtmlNode_Shared parent ) const {
+		void setParent( HtmlNode_Shared &parent ) {
 			setParent( thisSharedPtr, parent );
 		}
 	public:
@@ -114,19 +114,19 @@ namespace htmlTools {
 		/// 命中时，可携返回
 		/// <param name="callFunction">校验函数</param>
 		/// <returns>命中列表</returns>
-		bool findAttribute( const std::function< bool( const HtmlStringPairUnorderMap_Shared ) > callFunction ) const;
+		bool findAttribute( const std::function< bool( const HtmlStringPairUnorderMap_Shared & ) > callFunction ) const;
 		/// <summary>
 		/// 使用 xpath 查找元素
 		/// </summary>
 		/// <param name="xpath">xpath</param>
 		/// <returns>节点列表</returns>
-		Vector_HtmlNodeSPtr_Shared xpath(const HtmlString& xpath);
-		
+		Vector_HtmlNodeSPtr_Shared xpath( const HtmlString &xpath );
+
 		/// <summary>
 		/// 获取所有根节点
 		/// </summary>
 		/// <returns>根节点列表</returns>
-		Vector_HtmlNodeSPtr_Shared getHtmlNodeRoots();
+		Vector_HtmlNodeSPtr_Shared getHtmlNodeRoots( );
 	private:
 		/// <summary>
 		/// 生成 < 与 > 的配对
@@ -136,7 +136,7 @@ namespace htmlTools {
 		/// <param name="max_index">遍历的结束下标</param>
 		/// <param name="index_count">遍历的个数</param>
 		/// <returns>配对列表</returns>
-		static Vector_HtmlNodeSPtr_Shared parseHtmlNodeCharPair( HtmlDoc_Shared html_doc_shared, size_t start_index, const size_t max_index, size_t &index_count );
+		static Vector_HtmlNodeSPtr_Shared parseHtmlNodeCharPair( HtmlDoc_Shared &html_doc_shared, size_t start_index, const size_t max_index, size_t &index_count );
 	};
 
 }

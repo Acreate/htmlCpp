@@ -240,7 +240,7 @@ bool compAttributesKey( HtmlString left, HtmlString right ) {
 
 	return left == right;
 }
-bool XDir::hasAttribute( const HtmlStringPairUnorderMap_Shared &attribute, const HtmlString &nodeName ) {
+bool XDir::hasAttribute( HtmlStringPairUnorderMap_Shared &attribute, const HtmlString &nodeName ) {
 	if( attribute->size( ) > 0 ) {
 		if( attributesMap.size( ) == 0 &&
 			initAttributesMap( attributesList, attributesMap ) == 0 ) // 当前 xpath 不要求存在属性
@@ -255,11 +255,11 @@ bool XDir::hasAttribute( const HtmlStringPairUnorderMap_Shared &attribute, const
 			auto iterator = attribute->begin( );
 			auto end = attribute->end( );
 			for( ; iterator != end; ++iterator ) {
-				if( compAttributesKey( iterator->first, begin->first ) ) {
+				if( compAttributesKey( iterator->first, begin->first ) )
 					if( compAttributesKey( iterator->second, begin->second ) )
 						return true;
-				}
 			}
+
 		}
 		return false;
 	}

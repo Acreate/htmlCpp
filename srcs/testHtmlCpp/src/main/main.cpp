@@ -98,7 +98,8 @@ int main( int argc, char *argv[ ] ) {
 	std::wcout << L"===============" << std::endl;
 	std::wcout << xpath.getHtmlString( ) << std::endl;
 	std::wcout << L"===============" << std::endl;
-	auto vectorHtmlNodeSPtrShared = xpath.buider( htmlDoc );
+	auto htmlNodeRoots = htmlDoc->getHtmlNodeRoots( );
+	auto vectorHtmlNodeSPtrShared = xpath.buider( htmlNodeRoots );
 	if( !vectorHtmlNodeSPtrShared )
 		return -1;
 	for( auto &node : *vectorHtmlNodeSPtrShared ) {

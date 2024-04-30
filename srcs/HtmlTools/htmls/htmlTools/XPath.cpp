@@ -126,7 +126,7 @@ static void findItem( Vector_HtmlNodeSPtr_Shared buff, XDir_Shared &subPath, Vec
 		}
 	}
 }
-Vector_HtmlNodeSPtr_Shared XPath::rootBuider( HtmlDoc_Shared html_doc ) {
+Vector_HtmlNodeSPtr_Shared XPath::rootBuider( HtmlDoc_Shared &html_doc ) {
 	Vector_HtmlNodeSPtr_Shared result( new Vector_HtmlNodeSPtr );
 	// 获取所有根节点
 	auto analysisBrotherNode = html_doc->analysisBrotherNode( ); // 必须解析族谱
@@ -162,19 +162,32 @@ Vector_HtmlNodeSPtr_Shared XPath::rootBuider( HtmlDoc_Shared html_doc ) {
 			result->emplace_back( node );
 	return result;
 }
-Vector_HtmlNodeSPtr_Shared XPath::relativeBuider( Vector_HtmlNodeSPtr html_node_shared ) {
+Vector_HtmlNodeSPtr_Shared XPath::relativeBuider( Vector_HtmlNodeSPtr &html_node_shared ) {
 	return { };
 }
-Vector_HtmlNodeSPtr_Shared XPath::anyBuider( Vector_HtmlNodeSPtr html_node_shared ) {
+Vector_HtmlNodeSPtr_Shared XPath::anyBuider( Vector_HtmlNodeSPtr &html_node_shared ) {
 	return { };
 }
 XPath::XPath( ) {
 
 }
-Vector_HtmlNodeSPtr_Shared XPath::buider( Vector_HtmlNodeSPtr html_node_shared_s ) {
+Vector_HtmlNodeSPtr_Shared XPath::buider( Vector_HtmlNodeSPtr_Shared &html_node_shared_s ) {
 	if( dirListSPtr.size( ) == 0 )
 		return nullptr;
+
 	Vector_HtmlNodeSPtr_Shared resultShared( new Vector_HtmlNodeSPtr );
+	auto &removeExtent = dirListSPtr[ 0 ];
+	auto basicString = removeExtent->getDirName( );
+	if( basicString[ 0 ] == charValue::forwardSlash ) { // 存在 / 在最前面
+		auto htmlNodeSharedS = *html_node_shared_s;
+		for( auto nodeShared : htmlNodeSharedS ) {
+			auto sharedPtrs = rootBuider( nodeShared->htmldocShared );
+			for( auto node : *sharedPtrs ) {
+				resultShared->emplace_back( node );
+			}
+		}
+		return resultShared;
+	}
 	Vector_HtmlNodeSPtr findNodes;
 	HtmlString htmlString = getHtmlString( );
 	auto pathStart = htmlString[ 0 ]; // 路径开始字符
@@ -193,7 +206,7 @@ Vector_HtmlNodeSPtr_Shared XPath::buider( Vector_HtmlNodeSPtr html_node_shared_s
 		return nullptr;
 	return resultShared;
 }
-Vector_HtmlNodeSPtr_Shared XPath::buider( HtmlDoc_Shared html_doc_shared ) {
+Vector_HtmlNodeSPtr_Shared XPath::buider( HtmlDoc_Shared &html_doc_shared ) {
 	if( dirListSPtr.size( ) == 0 )
 		return nullptr;
 	Vector_HtmlNodeSPtr_Shared resultShared = rootBuider( html_doc_shared );

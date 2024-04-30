@@ -183,17 +183,19 @@ HtmlString_Shared HtmlNode::getPath( ) const {
 HtmlString_Shared HtmlNode::getNodeContentText( ) const {
 	return htmldocShared->getNodeContentText( thisSharedPtr );
 }
-bool HtmlNode::findAttribute( const std::function< bool( const HtmlStringPairUnorderMap_Shared ) > callFunction ) const {
+bool HtmlNode::findAttribute( const std::function< bool( const HtmlStringPairUnorderMap_Shared &) > callFunction ) const {
 	return htmldocShared->findAttribute( thisSharedPtr, callFunction );
 }
 Vector_HtmlNodeSPtr_Shared HtmlNode::xpath( const HtmlString &xpath ) {
 	XPath xPath( xpath );
-	return xPath.buider( { this->thisSharedPtr } );
+	auto htmlNodeSharedS = std::make_shared< Vector_HtmlNodeSPtr >( );
+	htmlNodeSharedS->emplace_back( this->thisSharedPtr );
+	return xPath.buider( htmlNodeSharedS );
 }
 Vector_HtmlNodeSPtr_Shared HtmlNode::getHtmlNodeRoots( ) {
 	return htmldocShared->getHtmlNodeRoots( );
 }
-Vector_HtmlNodeSPtr_Shared HtmlNode::parseHtmlNodeCharPair( HtmlDoc_Shared html_doc_shared, size_t start_index, const size_t max_index, size_t &index_count ) {
+Vector_HtmlNodeSPtr_Shared HtmlNode::parseHtmlNodeCharPair( HtmlDoc_Shared& html_doc_shared, size_t start_index, const size_t max_index, size_t &index_count ) {
 	Vector_HtmlNodeSPtr_Shared result( new Vector_HtmlNodeSPtr );
 	bool findCharResut = false;
 	index_count = start_index;
@@ -219,7 +221,7 @@ Vector_HtmlNodeSPtr_Shared HtmlNode::parseHtmlNodeCharPair( HtmlDoc_Shared html_
 	return result;
 }
 
-void HtmlNode::setParent( HtmlNode_Shared child, HtmlNode_Shared parent ) {
+void HtmlNode::setParent( HtmlNode_Shared& child, HtmlNode_Shared& parent ) {
 
 	auto parentPtr = child->parent.get( );
 	if( parentPtr ) {

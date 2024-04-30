@@ -16,7 +16,7 @@ namespace htmlTools {
 		virtual ~XDir( );
 	public: // 比较
 		bool hasName( const HtmlString &dir_name );
-		bool hasAttribute( const HtmlStringPairUnorderMap_Shared &attribute,const HtmlString &nodeName );
+		bool hasAttribute( HtmlStringPairUnorderMap_Shared& attribute, const HtmlString &nodeName );
 	public: // 属性
 		HtmlString getDirName( );
 	};

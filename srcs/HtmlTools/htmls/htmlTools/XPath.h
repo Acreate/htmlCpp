@@ -26,21 +26,21 @@ namespace htmlTools {
 		/// </summary>
 		/// <param name="html_doc">节点文档</param>
 		/// <returns>匹配列表</returns>
-		Vector_HtmlNodeSPtr_Shared rootBuider( HtmlDoc_Shared html_doc );
+		Vector_HtmlNodeSPtr_Shared rootBuider( HtmlDoc_Shared& html_doc );
 		/// <summary>
 		/// 从相对访问的 xpath <br/>
 		/// 如果找不到则返回 nullptr
 		/// </summary>
 		/// <param name="html_node_shared">节点列表</param>
 		/// <returns>匹配列表</returns>
-		Vector_HtmlNodeSPtr_Shared relativeBuider( Vector_HtmlNodeSPtr html_node_shared );
+		Vector_HtmlNodeSPtr_Shared relativeBuider( Vector_HtmlNodeSPtr& html_node_shared );
 		/// <summary>
 		/// 从任意访问的 xpath <br/>
 		/// 如果找不到则返回 nullptr
 		/// </summary>
 		/// <param name="html_node_shared">节点列表</param>
 		/// <returns>匹配列表</returns>
-		Vector_HtmlNodeSPtr_Shared anyBuider( Vector_HtmlNodeSPtr html_node_shared );
+		Vector_HtmlNodeSPtr_Shared anyBuider( Vector_HtmlNodeSPtr& html_node_shared );
 	public: // 随机 xpath
 		/// <summary>
 		/// 从列表节点当中使用 xpath 查找节点<br/>
@@ -48,14 +48,14 @@ namespace htmlTools {
 		/// </summary>
 		/// <param name="html_node_shared_s">查找的列表</param>
 		/// <returns>节点列表</returns>
-		Vector_HtmlNodeSPtr_Shared buider( Vector_HtmlNodeSPtr html_node_shared_s );
+		Vector_HtmlNodeSPtr_Shared buider( Vector_HtmlNodeSPtr_Shared &html_node_shared_s );
 		/// <summary>
 		/// 从文档对象当中使用 xpath 查找节点<br/>
 		/// 找不到则返回 nullptr
 		/// </summary>
 		/// <param name="html_doc_shared">查找的列表</param>
 		/// <returns>节点列表</returns>
-		Vector_HtmlNodeSPtr_Shared buider( HtmlDoc_Shared html_doc_shared );
+		Vector_HtmlNodeSPtr_Shared buider( HtmlDoc_Shared& html_doc_shared );
 
 		inline operator HtmlString( ) const;
 		inline HtmlString getHtmlString( ) const {

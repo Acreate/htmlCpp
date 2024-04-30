@@ -17,7 +17,7 @@
 using namespace htmlTools;
 using namespace htmlTools::charValue;
 
-bool HtmlDoc::findNextNodeEndChar( const HtmlString_Shared std_c_w_string, size_t &max_index, size_t &start_index ) {
+bool HtmlDoc::findNextNodeEndChar( const HtmlString_Shared& std_c_w_string, size_t &max_index, size_t &start_index ) {
 	auto CWStrLen = std_c_w_string->length( );
 	if( max_index > CWStrLen )
 		max_index = CWStrLen;
@@ -43,7 +43,7 @@ bool HtmlDoc::findNextNodeEndChar( const HtmlString_Shared std_c_w_string, size_
 	}
 	return false;
 }
-bool HtmlDoc::findNextNodeStartChar( const HtmlString_Shared std_c_w_string, size_t &max_index, size_t &start_index ) {
+bool HtmlDoc::findNextNodeStartChar( const HtmlString_Shared& std_c_w_string, size_t &max_index, size_t &start_index ) {
 	auto cwStrPtr = std_c_w_string->c_str( );
 	auto cwStrLen = std_c_w_string->length( );
 	if( max_index > cwStrLen )
@@ -76,7 +76,7 @@ bool HtmlDoc::findNextNodeStartChar( const HtmlString_Shared std_c_w_string, siz
 	}
 	return false;
 }
-bool HtmlDoc::findNextNodeForwardSlash( const HtmlString_Shared std_c_w_string, size_t &max_index, size_t &start_index ) {
+bool HtmlDoc::findNextNodeForwardSlash( const HtmlString_Shared& std_c_w_string, size_t &max_index, size_t &start_index ) {
 	auto cwzStrPtr = std_c_w_string.get( )->c_str( );
 	auto cwzStrLen = std_c_w_string->length( );
 	if( max_index > cwzStrLen )
@@ -109,7 +109,7 @@ bool HtmlDoc::findNextNodeForwardSlash( const HtmlString_Shared std_c_w_string, 
 	}
 	return false;
 }
-bool HtmlDoc::isSingelNode( const HtmlString_Shared std_c_w_string, size_t &start_index, size_t &end_index ) {
+bool HtmlDoc::isSingelNode( const HtmlString_Shared& std_c_w_string, size_t &start_index, size_t &end_index ) {
 	auto c_str = std_c_w_string->c_str( );
 	auto currentChar = c_str[ start_index ];
 	if( currentChar != nodeStartChar )
@@ -132,7 +132,7 @@ bool HtmlDoc::isSingelNode( const HtmlString_Shared std_c_w_string, size_t &star
 	}
 	return false;
 }
-bool HtmlDoc::isStartNode( const HtmlString_Shared std_c_w_string, size_t &start_index, size_t &end_index ) {
+bool HtmlDoc::isStartNode( const HtmlString_Shared& std_c_w_string, size_t &start_index, size_t &end_index ) {
 	auto c_str = std_c_w_string->c_str( );
 	auto currentChar = c_str[ start_index ];
 	if( currentChar != nodeStartChar )
@@ -169,7 +169,7 @@ bool HtmlDoc::isStartNode( const HtmlString_Shared std_c_w_string, size_t &start
 	}
 	return false;
 }
-bool HtmlDoc::isEndNode( const HtmlString_Shared std_c_w_string, size_t &start_index, size_t &end_index ) {
+bool HtmlDoc::isEndNode( const HtmlString_Shared& std_c_w_string, size_t &start_index, size_t &end_index ) {
 	auto c_str = std_c_w_string->c_str( );
 	wchar_t currentChar = 0;
 	// 碰到的第一个必须是 / 而不是通用字符或者 >
@@ -187,7 +187,7 @@ bool HtmlDoc::isEndNode( const HtmlString_Shared std_c_w_string, size_t &start_i
 	}
 	return false;
 }
-bool HtmlDoc::isAnnotation( const HtmlString_Shared std_c_w_string, size_t &start_index, size_t &end_index ) {
+bool HtmlDoc::isAnnotation( const HtmlString_Shared& std_c_w_string, size_t &start_index, size_t &end_index ) {
 	auto c_str = std_c_w_string->c_str( );
 	auto currentChar = c_str[ start_index ];
 	if( currentChar != nodeStartChar )
@@ -212,7 +212,7 @@ bool HtmlDoc::isAnnotation( const HtmlString_Shared std_c_w_string, size_t &star
 	}
 	return false;
 }
-Vector_HtmlNodeSPtr_Shared HtmlDoc::analysisDoubleNode( HtmlDoc_Shared html_doc_shared, HtmlNode_Shared html_node, Vector_HtmlNodeSPtr_Shared html_node_char_pairs, size_t &start_index, size_t &end_index ) {
+Vector_HtmlNodeSPtr_Shared HtmlDoc::analysisDoubleNode( HtmlDoc_Shared& html_doc_shared, HtmlNode_Shared& html_node, Vector_HtmlNodeSPtr_Shared& html_node_char_pairs, size_t &start_index, size_t &end_index ) {
 	Vector_HtmlNodeSPtr_Shared result( new Vector_HtmlNodeSPtr );
 	std::stack< HtmlNode_Shared > htmlNodeSharedTack;
 	size_t left, right, endLeft;
@@ -278,7 +278,7 @@ Vector_HtmlNodeSPtr_Shared HtmlDoc::analysisDoubleNode( HtmlDoc_Shared html_doc_
 	return result;
 }
 
-HtmlDoc_Shared HtmlDoc::parse( const HtmlString_Shared std_c_w_string, size_t &end_index, size_t &start_index ) {
+HtmlDoc_Shared HtmlDoc::parse( const HtmlString_Shared& std_c_w_string, size_t &end_index, size_t &start_index ) {
 	HtmlDoc_Shared result( new HtmlDoc );
 	result->thisStdShared = result;
 	result->htmlWCStr = std::make_shared< HtmlString >( std_c_w_string->c_str( ) + start_index, end_index - start_index );
@@ -355,7 +355,7 @@ HtmlNode_Shared HtmlDoc::findNodeFromName( const std::function< bool( const Html
 
 	return nullptr;
 }
-Vector_HtmlNodeSPtr_Shared HtmlDoc::findNodes( const std::function< bool( const HtmlNode_Shared &node ) > &callFun ) {
+Vector_HtmlNodeSPtr_Shared HtmlDoc::findNodes( const std::function< bool( HtmlNode_Shared& ) > &callFun ) {
 	Vector_HtmlNodeSPtr_Shared result( new Vector_HtmlNodeSPtr );
 	for( auto node : *htmlDocNode.get( ) )
 		if( callFun( node ) )
@@ -451,12 +451,12 @@ Vector_HtmlNodeSPtr_Shared HtmlDoc::analysisAttributesNode( ) {
 
 	return analysisOver;
 }
-HtmlString_Shared HtmlDoc::getNodeContent( const HtmlNode_Shared node_shared ) const {
+HtmlString_Shared HtmlDoc::getNodeContent( const HtmlNode_Shared &node_shared ) const {
 	auto c_w_str_star_ptr = node_shared->czWStr->c_str( ) + node_shared->ptrOffset;
 	HtmlString_Shared result( new HtmlString( c_w_str_star_ptr, node_shared->ptrCWtrLen ) );
 	return result;
 }
-HtmlString_Shared HtmlDoc::getNodeName( const HtmlNode_Shared node_shared ) const {
+HtmlString_Shared HtmlDoc::getNodeName( const HtmlNode_Shared& node_shared ) const {
 	wchar_t currentChar = zero; // 临时字符
 	auto c_w_str = node_shared->czWStr->c_str( ) + node_shared->ptrOffset; // 字符串指向坐标
 	size_t index = 0;
@@ -493,22 +493,22 @@ HtmlString_Shared HtmlDoc::getNodeName( const HtmlNode_Shared node_shared ) cons
 }
 
 
-Html_Node_Type HtmlDoc::getNodeType( const HtmlNode_Shared node_shared ) const {
+Html_Node_Type HtmlDoc::getNodeType( const HtmlNode_Shared& node_shared ) const {
 	return node_shared->nodeType;
 }
-std::shared_ptr< HtmlNode > HtmlDoc::getStartNode( const HtmlNode_Shared node_shared ) const { return node_shared->startNode; }
-std::shared_ptr< HtmlNode > HtmlDoc::getEndNode( const HtmlNode_Shared node_shared ) const { return node_shared->endNode; }
-size_t HtmlDoc::nodeSize( const HtmlNode_Shared node_shared ) const {
+std::shared_ptr< HtmlNode > HtmlDoc::getStartNode( const HtmlNode_Shared& node_shared ) const { return node_shared->startNode; }
+std::shared_ptr< HtmlNode > HtmlDoc::getEndNode( const HtmlNode_Shared& node_shared ) const { return node_shared->endNode; }
+size_t HtmlDoc::nodeSize( const HtmlNode_Shared& node_shared ) const {
 	if( node_shared->nodeType == Html_Node_Type::DoubleNode )
 		return node_shared->endNode->ptrOffset + node_shared->endNode->ptrCWtrLen - node_shared->startNode->ptrOffset;
 	return node_shared->ptrCWtrLen;
 }
-size_t HtmlDoc::getPtrOffset( const HtmlNode_Shared node_shared ) const { return node_shared->ptrOffset; }
-size_t HtmlDoc::getPtrCWtrLen( const HtmlNode_Shared node_shared ) const { return node_shared->ptrCWtrLen; }
-HtmlString_Shared HtmlDoc::getIncludeNodeContent( const HtmlNode_Shared node_shared ) const {
+size_t HtmlDoc::getPtrOffset( const HtmlNode_Shared& node_shared ) const { return node_shared->ptrOffset; }
+size_t HtmlDoc::getPtrCWtrLen( const HtmlNode_Shared& node_shared ) const { return node_shared->ptrCWtrLen; }
+HtmlString_Shared HtmlDoc::getIncludeNodeContent( const HtmlNode_Shared& node_shared ) const {
 	return std::make_shared< HtmlString >( node_shared->czWStr->c_str( ), node_shared->ptrOffset, nodeSize( node_shared ) );
 }
-HtmlString_Shared HtmlDoc::getPath( const HtmlNode_Shared node_shared ) const {
+HtmlString_Shared HtmlDoc::getPath( const HtmlNode_Shared& node_shared ) const {
 	HtmlString_Shared result( new HtmlString( L"/" + *getNodeName( node_shared ) ) );
 
 	HtmlNode_Shared parent = node_shared->parent;
@@ -519,7 +519,7 @@ HtmlString_Shared HtmlDoc::getPath( const HtmlNode_Shared node_shared ) const {
 
 	return result;
 }
-HtmlString_Shared HtmlDoc::getNodeContentText( const HtmlNode_Shared node_shared ) const {
+HtmlString_Shared HtmlDoc::getNodeContentText( const HtmlNode_Shared& node_shared ) const {
 
 	auto startNode = node_shared->startNode;
 	auto endNode = node_shared->endNode;
@@ -565,7 +565,7 @@ HtmlString_Shared HtmlDoc::getNodeContentText( const HtmlNode_Shared node_shared
 	return result;
 }
 
-Vector_HtmlNodeSPtr_Shared HtmlDoc::matchChildrenNodes( const HtmlNode_Shared node_shared, const std::function< bool( const HtmlNode_Shared ) > callFunction ) {
+Vector_HtmlNodeSPtr_Shared HtmlDoc::matchChildrenNodes( const HtmlNode_Shared& node_shared, const std::function< bool( const HtmlNode_Shared& ) > callFunction ) {
 	Vector_HtmlNodeSPtr_Shared result( new Vector_HtmlNodeSPtr );
 
 	for( auto node : *node_shared->subChildren )
@@ -579,18 +579,14 @@ Vector_HtmlNodeSPtr_Shared HtmlDoc::xpath( const HtmlString &xpath ) {
 	return xPath.buider( thisStdShared );
 }
 Vector_HtmlNodeSPtr_Shared HtmlDoc::getHtmlNodeRoots( ) {
-	bool isInit = false;
 	if( htmlNodeSPtrRoots == nullptr ) {
 		htmlNodeSPtrRoots = std::make_shared< Vector_HtmlNodeSPtr >( );
-		isInit = true;
-	}
-	if( isInit || htmlNodeSPtrRoots->size( ) == 0 ) {
 		for( auto &htmlNodeSPtr : *htmlDocNode )
 			if( htmlNodeSPtr->parent == nullptr )
 				htmlNodeSPtrRoots->emplace_back( htmlNodeSPtr );
 	}
 	return htmlNodeSPtrRoots;
 }
-bool HtmlDoc::findAttribute( const HtmlNode_Shared node_shared, const std::function< bool( const HtmlStringPairUnorderMap_Shared node_attribute_map_shred ) > callFunction ) const {
+bool HtmlDoc::findAttribute( const HtmlNode_Shared& node_shared, const std::function< bool( const HtmlStringPairUnorderMap_Shared& node_attribute_map_shred ) > callFunction ) const {
 	return callFunction( node_shared->refNodeAttributes );
 }
