@@ -211,7 +211,7 @@ namespace htmlTools {
 		/// <param name="node_shared">查找的节点</param>
 		/// <param name="callFunction">校验函数</param>
 		/// <returns>命中列表</returns>
-		bool findAttribute( const HtmlNode_Shared node_shared, const std::function< bool( const WStringPairUnorderMap_Shared ) > callFunction ) const;
+		bool findAttribute( const HtmlNode_Shared node_shared, const std::function< bool( const HtmlStringPairUnorderMap_Shared ) > callFunction ) const;
 		/// <summary>
 		/// 查找子节点<br/>
 		/// 查找过程需要调用校验函数，当校验函数返回true时，则判断该节点可命中<br/>

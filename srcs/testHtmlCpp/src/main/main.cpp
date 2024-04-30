@@ -35,7 +35,7 @@ int main( int argc, char *argv[ ] ) {
 		stringstream << L'\n';
 	} while( true );
 	std::shared_ptr< std::wstring > htmlContent( new std::wstring( stringstream.str( ) ) );
-	std::cout << htmlTools::HtmlStringTools::wstringConverString( *htmlContent ) << std::endl;
+	std::cout << htmlTools::HtmlStringTools::HtmlStringConverString( *htmlContent ) << std::endl;
 
 	ifstream.close( );
 	// 写入文件
@@ -51,39 +51,13 @@ int main( int argc, char *argv[ ] ) {
 	// 测试调用
 	size_t endIndex = htmlContent->size( ), startIndex = 0;
 	auto htmlDoc = htmlTools::HtmlDoc::parse( htmlContent, endIndex, startIndex );
-	htmlDoc->findNodes( [&]( auto node ) ->bool {
-		auto wsNode = *htmlDoc->getNodeContent( node );
-		if( htmlDoc->getNodeType( node ) == htmlTools::Html_Node_Type::DoubleNode && htmlDoc->getEndNode( node ).get( ) != node.get( ) ) {
-			auto wsNodeText = *htmlDoc->getIncludeNodeContent( node );
-			std::wstringstream ss;
-			ss << L"================" << std::endl;
-			ss << wsNodeText << std::endl;
-			ss << L"----------------" << std::endl;
-			ss << *htmlDoc->getPath( node ) << std::endl;
-			ss << L"================" << std::endl;
 
-			std::string converString = htmlTools::HtmlStringTools::wstringConverString( ss.str( ) );
-			std::cout << converString << std::endl;
-			std::cout.flush( );
-			std::cout.clear( );
-			len = snprintf( path, sizeof( path ), fString.c_str( ), std::string( Cache_Path_Dir ).c_str( ), u8"", u8"www.121ds.cc.txt.node.write.txt" );
-			if( len == 0 )
-				return false;
-			std::wofstream ofstream( path, std::ios::binary | std::ios::out | std::ios::trunc );
-			if( !ofstream.is_open( ) )
-				return false;
-			ofstream << ss.str( );
-			ofstream.close( );
-			return false;
-		}
-		return false;
-	} );
 	// 解析族谱关系（父子，兄弟关系）
 	htmlDoc->analysisBrotherNode( );
-	// 解析所有节点关系 (单独解析可以使用 WStringPairUnorderMap_Shared HtmlNode::analysisAttribute( ))
+	// 解析所有节点关系 (单独解析可以使用 HtmlStringPairUnorderMap_Shared HtmlNode::analysisAttribute( ))
 	htmlDoc->analysisAttributesNode( );
 
-	auto xpath = htmlTools::XPath( L"//html/body/div/div/div/div" );
+	auto xpath = htmlTools::XPath( L"//html/body/div/div/div/div[@class='hd']" );
 	std::wcout << L"===============" << std::endl;
 	std::wcout << xpath.getHtmlString( ) << std::endl;
 	std::wcout << L"===============" << std::endl;
@@ -91,9 +65,9 @@ int main( int argc, char *argv[ ] ) {
 	if( !vectorHtmlNodeSPtrShared )
 		return -1;
 	for( auto &node : *vectorHtmlNodeSPtrShared ) {
-		auto nodeName = *node->getNodeName( );
-		auto path = *node->getPath( );
-		std::wcout << htmlTools::HtmlString( L"找到 [" ) << nodeName << htmlTools::HtmlString( L"]:" ) << path << std::endl;
+		auto nodeName = htmlTools::HtmlStringTools::HtmlStringConverString( *node->getNodeName( ) );
+		auto path = htmlTools::HtmlStringTools::HtmlStringConverString( *node->getPath( ) );
+		std::cout << "找到 [" << nodeName << "]:" << path << std::endl;
 	}
 	return 0;
 }

@@ -8,17 +8,17 @@ namespace htmlTools {
 	public:
 		friend class XPath;
 	private:
-		std::list< htmlTools::HtmlString > namesList;
-		HtmlStringMapToVectorHtmlStrSPtr attributesMapList;
+		std::list< HtmlString > namesList;
+		HtmlStringMapToVectorHtmlStrSPtr attributesList;
+		std::unordered_map< HtmlString, HtmlStringPairUnorderMap > attributesMap;
 	public:
-		XDir( );
 		XDir( const htmlTools::HtmlString &param );
 		virtual ~XDir( );
 	public: // 比较
-		bool hasName(const HtmlString &dir_name);
-		bool hasAttribute(const HtmlString &attribute);
+		bool hasName( const HtmlString &dir_name );
+		bool hasAttribute( const HtmlStringPairUnorderMap_Shared &attribute,const HtmlString &nodeName );
 	public: // 属性
-		HtmlString getDirName();
+		HtmlString getDirName( );
 	};
 }
 

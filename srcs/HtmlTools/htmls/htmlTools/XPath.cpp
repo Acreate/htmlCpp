@@ -117,8 +117,11 @@ static void findItem( Vector_HtmlNodeSPtr_Shared buff, XDir_Shared &subPath, Vec
 		if( nodeIterator == nodeEnd )
 			break;
 		auto nodeWsName = *nodeIterator->get( )->getNodeName( );
-		if( subPath->hasName( nodeWsName ) )
-			buff->emplace_back( *nodeIterator );
+		if( subPath->hasName( nodeWsName ) ) {
+			HtmlStringPairUnorderMap_Shared analysisAttribute = nodeIterator->get( )->analysisAttribute( );
+			if( subPath->hasAttribute( analysisAttribute, nodeWsName ) )
+				buff->emplace_back( *nodeIterator );
+		}
 	}
 }
 Vector_HtmlNodeSPtr_Shared XPath::rootBuider( HtmlDoc_Shared html_doc ) {

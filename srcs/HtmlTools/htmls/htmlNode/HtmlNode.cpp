@@ -9,19 +9,19 @@
 using namespace htmlTools;
 using namespace htmlTools::charValue;
 
-HtmlNode::HtmlNode( ) : parent( nullptr ), subChildren( new Vector_HtmlNodeSPtr ), brother( new Vector_HtmlNodeSPtr ), refNodeAttributes( new WStringPairUnorderMap ) {
+HtmlNode::HtmlNode( ) : parent( nullptr ), subChildren( new Vector_HtmlNodeSPtr ), brother( new Vector_HtmlNodeSPtr ), refNodeAttributes( new HtmlStringPairUnorderMap ) {
 }
 HtmlNode::~HtmlNode( ) {
 }
 
-WStringPairUnorderMap_Shared HtmlNode::analysisAttribute( ) {
+HtmlStringPairUnorderMap_Shared HtmlNode::analysisAttribute( ) {
 	if( nodeType == Html_Node_Type::DoubleNode && endNode.get( ) == this ) {
 		endNode->refNodeAttributes = startNode->refNodeAttributes;
 		return startNode->analysisAttribute( );
 	}
 	if( refNodeAttributes->size( ) > 0 )
 		return refNodeAttributes;
-	WStringPairUnorderMap_Shared result( new WStringPairUnorderMap );
+	HtmlStringPairUnorderMap_Shared result( new HtmlStringPairUnorderMap );
 
 	auto startWStrPtr = this->czWStr->c_str( ) + ptrOffset;
 	size_t equIndex = 0, endIndex = ptrCWtrLen;
@@ -84,7 +84,7 @@ WStringPairUnorderMap_Shared HtmlNode::analysisAttribute( ) {
 		} else {
 			if( currentType == 0 )
 				currentType = 1;
-			if( currentChar == euq ) {
+			if( currentChar == equ ) {
 				if( currentType == 1 )
 					currentType = 2;
 				++equIndex;
@@ -183,7 +183,7 @@ HtmlString_Shared HtmlNode::getPath( ) const {
 HtmlString_Shared HtmlNode::getNodeContentText( ) const {
 	return htmldocShared->getNodeContentText( thisSharedPtr );
 }
-bool HtmlNode::findAttribute( const std::function< bool( const WStringPairUnorderMap_Shared ) > callFunction ) const {
+bool HtmlNode::findAttribute( const std::function< bool( const HtmlStringPairUnorderMap_Shared ) > callFunction ) const {
 	return htmldocShared->findAttribute( thisSharedPtr, callFunction );
 }
 Vector_HtmlNodeSPtr_Shared HtmlNode::xpath( const HtmlString &xpath ) {
