@@ -19,6 +19,8 @@ namespace htmlTools {
 	using HtmlChar = HtmlString::value_type;
 
 	class HTMLTOOLS_EXPORT RefWStr;
+	// 限定字符串
+	class HTMLTOOLS_EXPORT HtmlXString;
 	// html 文档
 	class HTMLTOOLS_EXPORT HtmlDoc;
 	// 宽字符工具
@@ -27,6 +29,14 @@ namespace htmlTools {
 	class HTMLTOOLS_EXPORT HtmlNode;
 	// 工具
 	class HTMLTOOLS_EXPORT XPath;
+	// 工具目录
+	class HTMLTOOLS_EXPORT XDir;
+	// std::shared_ptr< XDir > 封装
+	using XDir_Shared = std::shared_ptr< XDir >;
+	//  std::vector< std::shared_ptr< XDir >> 封装
+	using Vector_XDirSPtr = std::vector< XDir_Shared >;
+	//  std::shared_ptr< std::vector< std::shared_ptr< XDir >> > 封装
+	using Vector_XDirSPtr_Shared = std::shared_ptr< Vector_XDirSPtr >;
 	// 类型
 	enum class HTMLTOOLS_EXPORT Html_Node_Type;
 	// std::shared_ptr< HtmlDoc > 封装
@@ -51,7 +61,9 @@ namespace htmlTools {
 	/// <summary>
 	///  std::vector< HtmlString_Shared >
 	/// </summary>
-	using Vector_HtmlStringSptr = std::vector< HtmlString_Shared >;
+	using Vector_HtmlStringSPtr = std::vector< HtmlString_Shared >;
+	// std::shared_ptr< Vector_HtmlStringSPtr >
+	using Vector_HtmlStringSPtr_Shared = std::shared_ptr< Vector_HtmlStringSPtr >;
 	/// <summary>
 	///  std::shared_ptr<std::list< std::shared_ptr< HtmlString > > >
 	/// </summary>
@@ -64,6 +76,9 @@ namespace htmlTools {
 	/// 字符串配对的列表映射 的共享指针
 	/// </summary>
 	using WStringPairUnorderMap_Shared = std::shared_ptr< WStringPairUnorderMap >;
+
+	// std::unordered_map< HtmlString, Vector_HtmlStringSPtr_Shared >
+	using HtmlStringMapToVectorHtmlStrSPtr = std::unordered_map< HtmlString, Vector_HtmlStringSPtr_Shared >;
 }
 namespace htmlTools {
 	namespace charValue {

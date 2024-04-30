@@ -84,10 +84,16 @@ int main( int argc, char *argv[ ] ) {
 	htmlDoc->analysisAttributesNode( );
 
 	auto xpath = htmlTools::XPath( L"//html/body/div/div/div/div" );
+	std::wcout << L"===============" << std::endl;
+	std::wcout << xpath.getHtmlString( ) << std::endl;
+	std::wcout << L"===============" << std::endl;
 	auto vectorHtmlNodeSPtrShared = xpath.buider( htmlDoc );
 	if( !vectorHtmlNodeSPtrShared )
 		return -1;
-	for( auto &node : *vectorHtmlNodeSPtrShared )
-		std::wcout << *node->getNodeName( ) << std::endl;
+	for( auto &node : *vectorHtmlNodeSPtrShared ) {
+		auto nodeName = *node->getNodeName( );
+		auto path = *node->getPath( );
+		std::wcout << htmlTools::HtmlString( L"找到 [" ) << nodeName << htmlTools::HtmlString( L"]:" ) << path << std::endl;
+	}
 	return 0;
 }

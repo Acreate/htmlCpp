@@ -13,7 +13,7 @@
 
 namespace htmlTools {
 	class HTMLTOOLS_EXPORT XPath {
-		Vector_HtmlStringSptr stdWStringListShared; // 名称
+		Vector_XDirSPtr dirListSPtr; // 名称
 		HtmlString separator; // 分隔符
 	public:
 		XPath( const HtmlString &wstr );
@@ -56,30 +56,7 @@ namespace htmlTools {
 		/// <param name="html_doc_shared">查找的列表</param>
 		/// <returns>节点列表</returns>
 		Vector_HtmlNodeSPtr_Shared buider( HtmlDoc_Shared html_doc_shared );
-		inline operator HtmlString( ) const {
-			HtmlString result;
-			auto iterator = stdWStringListShared.begin( );
-			auto end = stdWStringListShared.end( );
-			if( iterator != end ) {
-				auto subStr = *iterator->get( );
-				if(subStr.length(  ) == 1) {
-					if(HtmlStringTools::isRouteChar(  subStr[0] )) {
-						++iterator;
-						result = result.append( subStr );
-					}
-				}
-				do {
-					subStr = *iterator->get( );
-					++iterator;
-					if( iterator == end ) {
-						result = result.append( subStr );
-						break;
-					}
-					result = result.append( subStr ) + charValue::forwardSlash;
-				} while( true );
-			}
-			return result;
-		}
+		inline operator HtmlString( ) const;
 		inline HtmlString getHtmlString( ) const {
 			return operator HtmlString( );
 		}
