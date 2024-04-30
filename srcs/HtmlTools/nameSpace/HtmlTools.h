@@ -73,14 +73,12 @@ namespace htmlTools {
 	/// <summary>
 	/// 字符串配对的列表映射 的共享指针
 	/// </summary>
-<<<<<<< HEAD
-	using WStringPairUnorderMap_Shared = std::shared_ptr< WStringPairUnorderMap >;
-=======
+
 	using HtmlStringPairUnorderMap_Shared = std::shared_ptr< HtmlStringPairUnorderMap >;
 
 	// std::unordered_map< HtmlString, Vector_HtmlStringSPtr_Shared >
 	using HtmlStringMapToVectorHtmlStrSPtr = std::unordered_map< HtmlString, Vector_HtmlStringSPtr_Shared >;
->>>>>>> dev
+
 }
 namespace htmlTools {
 	namespace charValue {
@@ -91,11 +89,7 @@ namespace htmlTools {
 		static constexpr HtmlChar nodeEndChar = L'>'; // 节点结束
 		static constexpr HtmlChar forwardSlash = L'/'; // 斜杠路径符。节点类型判定(单元素节点/双元素节点)
 		static constexpr HtmlChar backSlash = L'\\'; // 反斜杠路径符
-<<<<<<< HEAD
-		static constexpr HtmlChar euq = L'='; // 等号
-=======
 		static constexpr HtmlChar equ = L'='; // 等号
->>>>>>> dev
 		static constexpr HtmlChar dot = L'.'; // 点
 		static constexpr HtmlChar zero = L'\0'; // 字符串结束符
 		static constexpr HtmlChar at = L'@'; // 服务器位置符号

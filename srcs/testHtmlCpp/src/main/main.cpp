@@ -51,33 +51,13 @@ int main( int argc, char *argv[ ] ) {
 	// 测试调用
 	size_t endIndex = htmlContent->size( ), startIndex = 0;
 	auto htmlDoc = htmlTools::HtmlDoc::parse( htmlContent, endIndex, startIndex );
-<<<<<<< HEAD
-	htmlDoc->findNodes( [&]( auto node ) ->bool {
-		auto wsNode = *htmlDoc->getNodeContent( node );
-		if( htmlDoc->getNodeType( node ) == htmlTools::Html_Node_Type::DoubleNode && htmlDoc->getEndNode( node ).get( ) != node.get( ) ) {
-			auto wsNodeText = *htmlDoc->getIncludeNodeContent( node );
-			std::wstringstream ss;
-			ss << L"================" << std::endl;
-			ss << wsNodeText << std::endl;
-			ss << L"----------------" << std::endl;
-			ss << *htmlDoc->getPath( node ) << std::endl;
-			ss << L"================" << std::endl;
-=======
->>>>>>> dev
+
 
 	// 解析族谱关系（父子，兄弟关系）
 	htmlDoc->analysisBrotherNode( );
 	// 解析所有节点关系 (单独解析可以使用 HtmlStringPairUnorderMap_Shared HtmlNode::analysisAttribute( ))
 	htmlDoc->analysisAttributesNode( );
 
-<<<<<<< HEAD
-	auto xpath = htmlTools::XPath( L"//html/body/div/div/div/div" );
-	auto vectorHtmlNodeSPtrShared = xpath.buider( htmlDoc );
-	if( !vectorHtmlNodeSPtrShared )
-		return -1;
-	for( auto &node : *vectorHtmlNodeSPtrShared )
-		std::wcout << *node->getNodeName( ) << std::endl;
-=======
 	auto xpath = htmlTools::XPath( L"//html/body/div/div/div/div[@class='hd']" );
 	std::wcout << L"===============" << std::endl;
 	std::wcout << xpath.getHtmlString( ) << std::endl;
@@ -90,6 +70,5 @@ int main( int argc, char *argv[ ] ) {
 		auto path = htmlTools::HtmlStringTools::HtmlStringConverString( *node->getPath( ) );
 		std::cout << "找到 [" << nodeName << "]:" << path << std::endl;
 	}
->>>>>>> dev
 	return 0;
 }

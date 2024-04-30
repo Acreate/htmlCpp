@@ -20,11 +20,7 @@ namespace htmlTools {
 		/// </summary>
 		/// <param name="currentChar">检测符号</param>
 		/// <returns>true 表示路径符</returns>
-<<<<<<< HEAD
-		static bool isRouteChar(HtmlChar currentChar);
-=======
 		static bool isRouteChar( HtmlChar currentChar );
->>>>>>> dev
 		/// <summary>
 		/// 找到第一个非空字符<br/>
 		/// 并且把值放置在 startIndex 当中
