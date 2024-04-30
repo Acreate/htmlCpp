@@ -58,7 +58,7 @@ int main( int argc, char *argv[ ] ) {
 	// 解析所有节点关系 (单独解析可以使用 HtmlStringPairUnorderMap_Shared HtmlNode::analysisAttribute( ))
 	htmlDoc->analysisAttributesNode( );
 
-	auto xpath = htmlTools::XPath( L"//html/body/div/div/div/div[@class='hd']" );
+	auto xpath = htmlTools::XPath( L"//html/body/div/div/div/div[@class='hd']/ul/li/a" );
 	std::wcout << L"===============" << std::endl;
 	std::wcout << xpath.getHtmlString( ) << std::endl;
 	std::wcout << L"===============" << std::endl;
