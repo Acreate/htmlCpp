@@ -52,14 +52,3 @@ bool HtmlStringTools::findNextWStringPotion( const HtmlChar *w_c_ptr, size_t src
 	}
 	return false;
 }
-std::wstring HtmlStringTools::stringConverHtmlString( const std::string &str ) {
-	std::wstring_convert< std::codecvt_utf8< wchar_t > > converter;
-	HtmlString bytes = converter.from_bytes( str );
-	return bytes;
-}
-std::string HtmlStringTools::HtmlStringConverString( const std::wstring &wstr ) {
-
-	std::wstring_convert< std::codecvt_utf8< wchar_t > > converter;
-	std::string string = converter.to_bytes( wstr );
-	return string;
-}

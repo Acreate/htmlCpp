@@ -52,18 +52,6 @@ namespace htmlTools {
 		/// <param name="result">相对位置</param>
 		/// <returns>成功返回 true</returns>
 		static bool findNextWStringPotion( const HtmlChar *w_c_ptr, size_t src_w_c_str_len, size_t startIndex, const HtmlChar *find_w_c_string, size_t find_w_c_str_len, size_t maxIndex, size_t *result );
-		/// <summary>
-		/// 从 HtmlString 转换到 std::string
-		/// </summary>
-		/// <param name="wstr">被转换的字符串</param>
-		/// <returns>实现转换而的字符串</returns>
-		static std::string HtmlStringConverString( const HtmlString &wstr );
-		/// <summary>
-		/// std::string 转换到 HtmlString
-		/// </summary>
-		/// <param name="str">被转换的字符串</param>
-		/// <returns>实现转换而的字符串</returns>
-		static HtmlString stringConverHtmlString( const std::string &str );
 	};
 
 }
