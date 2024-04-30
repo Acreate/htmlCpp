@@ -87,7 +87,7 @@ namespace htmlTools {
 		/// <param name="start_index">开始的节点列表下标</param>
 		/// <param name="end_index">结束的节点列表下标</param>
 		/// <returns>匹配的节点列表</returns>
-		static Vector_HtmlNodeSPtr_Shared analysisDoubleNode( HtmlDoc_Shared& html_doc_shared, HtmlNode_Shared& html_node, Vector_HtmlNodeSPtr_Shared& html_node_char_pairs, size_t &start_index, size_t &end_index );
+		static Vector_HtmlNodeSPtr_Shared analysisDoubleNode(const HtmlDoc_Shared& html_doc_shared, HtmlNode_Shared& html_node, Vector_HtmlNodeSPtr_Shared& html_node_char_pairs, size_t &start_index, size_t &end_index );
 	public: // 静态对象生成器
 		/// <summary>
 		/// 根据字符串内容生成节点列表

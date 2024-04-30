@@ -212,7 +212,7 @@ bool HtmlDoc::isAnnotation( const HtmlString_Shared& std_c_w_string, size_t &sta
 	}
 	return false;
 }
-Vector_HtmlNodeSPtr_Shared HtmlDoc::analysisDoubleNode( HtmlDoc_Shared& html_doc_shared, HtmlNode_Shared& html_node, Vector_HtmlNodeSPtr_Shared& html_node_char_pairs, size_t &start_index, size_t &end_index ) {
+Vector_HtmlNodeSPtr_Shared HtmlDoc::analysisDoubleNode(const HtmlDoc_Shared& html_doc_shared, HtmlNode_Shared& html_node, Vector_HtmlNodeSPtr_Shared& html_node_char_pairs, size_t &start_index, size_t &end_index ) {
 	Vector_HtmlNodeSPtr_Shared result( new Vector_HtmlNodeSPtr );
 	std::stack< HtmlNode_Shared > htmlNodeSharedTack;
 	size_t left, right, endLeft;

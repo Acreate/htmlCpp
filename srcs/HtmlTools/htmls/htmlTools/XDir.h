@@ -15,10 +15,10 @@ namespace htmlTools {
 		XDir( const htmlTools::HtmlString &param );
 		virtual ~XDir( );
 	public: // 比较
-		bool hasName( const HtmlString &dir_name );
-		bool hasAttribute( HtmlStringPairUnorderMap_Shared& attribute, const HtmlString &nodeName );
+		bool hasName( const HtmlString &dir_name ) const;
+		bool hasAttribute( const HtmlStringPairUnorderMap_Shared &attribute, const HtmlString &nodeName );
 	public: // 属性
-		HtmlString getDirName( );
+		HtmlString getDirName( ) const;
 	};
 }
 

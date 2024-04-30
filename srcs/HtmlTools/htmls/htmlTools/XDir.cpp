@@ -5,7 +5,7 @@
 #include "../../wstr/WStrTools.h"
 using namespace htmlTools;
 
-static bool insertOrAssign( HtmlStringMapToVectorHtmlStrSPtr &mapObj, HtmlString &key, HtmlString &value ) {
+inline bool insertOrAssign( HtmlStringMapToVectorHtmlStrSPtr &mapObj, const HtmlString &key, const HtmlString &value ) {
 	auto iterator = mapObj.begin( );
 	auto end = mapObj.end( );
 	for( ; iterator != end; ++iterator )
@@ -18,7 +18,7 @@ static bool insertOrAssign( HtmlStringMapToVectorHtmlStrSPtr &mapObj, HtmlString
 	mapObj.insert( std::make_pair( key, list ) );
 	return true;
 }
-static bool tryGet( HtmlStringMapToVectorHtmlStrSPtr &mapObj, HtmlString &key, Vector_HtmlStringSPtr &value ) {
+inline bool tryGet( const HtmlStringMapToVectorHtmlStrSPtr &mapObj, const HtmlString &key, Vector_HtmlStringSPtr &value ) {
 	auto iterator = mapObj.begin( );
 	auto end = mapObj.end( );
 	for( ; iterator != end; ++iterator )
@@ -89,14 +89,14 @@ XDir::XDir( const htmlTools::HtmlString &param ) {
 }
 XDir::~XDir( ) {
 }
-bool XDir::hasName( const HtmlString &dir_name ) {
+bool XDir::hasName( const HtmlString &dir_name ) const {
 	for( auto &name : namesList )
 		if( dir_name == name )
 			return true;
 	return false;
 }
 
-void insertOrAssign( std::unordered_map< HtmlString, HtmlStringPairUnorderMap > &mapObj, HtmlString &key, std::pair< HtmlString, HtmlString > &value ) {
+void insertOrAssign( std::unordered_map< HtmlString, HtmlStringPairUnorderMap > &mapObj, const HtmlString &key, const std::pair< HtmlString, HtmlString > &value ) {
 	auto iterator = mapObj.begin( );
 	auto end = mapObj.end( );
 	for( ; iterator != end; ++end )
@@ -117,8 +117,8 @@ void insertOrAssign( std::unordered_map< HtmlString, HtmlStringPairUnorderMap > 
 /// <param name="src">路径映射列表</param>
 /// <param name="target">属性映射列表</param>
 /// <returns>列表个数</returns>
-static size_t initAttributesMap(
-	HtmlStringMapToVectorHtmlStrSPtr &src,
+inline size_t initAttributesMap(
+	const HtmlStringMapToVectorHtmlStrSPtr &src,
 	std::unordered_map< HtmlString, HtmlStringPairUnorderMap > &target ) {
 	auto iterator = src.begin( );
 	auto end = src.end( );
@@ -185,7 +185,7 @@ static size_t initAttributesMap(
 	return target.size( );
 }
 
-bool compAttributesKey( HtmlString left, HtmlString right ) {
+inline bool compAttributesKey( HtmlString left, HtmlString right ) {
 	size_t leftLen = left.length( );
 	size_t rightLen = right.length( );
 	size_t index = 0, buffIndex = 0;
@@ -240,7 +240,7 @@ bool compAttributesKey( HtmlString left, HtmlString right ) {
 
 	return left == right;
 }
-bool XDir::hasAttribute( HtmlStringPairUnorderMap_Shared &attribute, const HtmlString &nodeName ) {
+bool XDir::hasAttribute( const HtmlStringPairUnorderMap_Shared &attribute, const HtmlString &nodeName ) {
 	if( attribute->size( ) > 0 ) {
 		if( attributesMap.size( ) == 0 &&
 			initAttributesMap( attributesList, attributesMap ) == 0 ) // 当前 xpath 不要求存在属性
@@ -266,7 +266,7 @@ bool XDir::hasAttribute( HtmlStringPairUnorderMap_Shared &attribute, const HtmlS
 
 	return true;
 }
-HtmlString XDir::getDirName( ) {
+HtmlString XDir::getDirName( ) const {
 	HtmlString result;
 	for( auto &name : namesList ) {
 		result.append( name );

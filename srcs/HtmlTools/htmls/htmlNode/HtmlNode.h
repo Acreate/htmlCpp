@@ -47,9 +47,9 @@ namespace htmlTools {
 		HtmlNode_Shared thisSharedPtr; // 当前节点
 		HtmlStringPairUnorderMap_Shared refNodeAttributes; // 当前节点的所有属性
 	private:
-		static void setParent( HtmlNode_Shared &child, HtmlNode_Shared &parent );
+		static void setParent(const HtmlNode_Shared &child, const HtmlNode_Shared &parent );
 	public:
-		void setParent( HtmlNode_Shared &parent ) {
+		void setParent( const HtmlNode_Shared &parent ) {
 			setParent( thisSharedPtr, parent );
 		}
 	public:
@@ -136,7 +136,7 @@ namespace htmlTools {
 		/// <param name="max_index">遍历的结束下标</param>
 		/// <param name="index_count">遍历的个数</param>
 		/// <returns>配对列表</returns>
-		static Vector_HtmlNodeSPtr_Shared parseHtmlNodeCharPair( HtmlDoc_Shared &html_doc_shared, size_t start_index, const size_t max_index, size_t &index_count );
+		static Vector_HtmlNodeSPtr_Shared parseHtmlNodeCharPair(const HtmlDoc_Shared &html_doc_shared, size_t start_index, const size_t max_index, size_t &index_count );
 	};
 
 }
