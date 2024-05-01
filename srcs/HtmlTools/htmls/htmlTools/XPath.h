@@ -9,7 +9,7 @@
 #include "../../nameSpace/HtmlTools.h"
 #include <ostream>
 
-#include "../../wstr/HtmlStringTools.h"
+#include "../../htmlString/HtmlStringTools.h"
 
 namespace htmlTools {
 	class HTMLTOOLS_EXPORT XPath {

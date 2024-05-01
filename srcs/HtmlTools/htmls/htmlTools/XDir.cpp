@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include "../../wstr/HtmlStringTools.h"
+#include "../../htmlString/HtmlStringTools.h"
 using namespace htmlTools;
 
 inline bool insertOrAssign( HtmlStringMapToVectorHtmlStrSPtr &mapObj, const HtmlString &key, const HtmlString &value ) {

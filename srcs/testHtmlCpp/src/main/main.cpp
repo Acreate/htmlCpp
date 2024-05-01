@@ -10,7 +10,7 @@
 #include <windows.h>
 
 #include "htmls/htmlTools/XPath.h"
-#include "wstr/HtmlStringTools.h"
+#include "htmlString/HtmlStringTools.h"
 
 /// <summary>
 /// 根查找

@@ -4,7 +4,7 @@
 
 
 #include "XDir.h"
-#include "../../wstr/HtmlStringTools.h"
+#include "../../htmlString/HtmlStringTools.h"
 #include "../htmlNode/HtmlNode.h"
 #include "../htmlDoc/HtmlDoc.h"
 using namespace htmlTools;
