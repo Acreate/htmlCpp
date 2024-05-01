@@ -10,9 +10,15 @@
 #include <windows.h>
 
 #include "htmls/htmlTools/XPath.h"
-#include "wstr/HtmlStringTools.h"
+#include "htmlString/HtmlStringTools.h"
 
-
+/// <summary>
+/// 根查找
+/// </summary>
+/// <param name="stringstream"></param>
+/// <param name="htmlDoc"></param>
+/// <param name="xpath"></param>
+/// <returns></returns>
 bool getValue( std::wstringstream &stringstream, htmlTools::HtmlDoc_Shared htmlDoc, htmlTools::XPath &xpath ) {
 	std::wcout << L"===============" << std::endl;
 	std::wcout << xpath.getHtmlString( ) << std::endl;
@@ -38,6 +44,13 @@ bool getValue( std::wstringstream &stringstream, htmlTools::HtmlDoc_Shared htmlD
 	stringstream << std::endl << std::endl;
 	return true;
 }
+/// <summary>
+/// 节点查找
+/// </summary>
+/// <param name="stringstream"></param>
+/// <param name="html_nodes"></param>
+/// <param name="xpath"></param>
+/// <returns></returns>
 bool getValue( std::wstringstream &stringstream, htmlTools::Vector_HtmlNodeSPtr_Shared &html_nodes, htmlTools::XPath &xpath ) {
 
 	std::wcout << L"===============" << std::endl;

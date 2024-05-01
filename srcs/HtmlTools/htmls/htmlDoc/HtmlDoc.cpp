@@ -1,7 +1,7 @@
 #include "HtmlDoc.h"
 
 #include "../../macro/cmake_to_c_cpp_header_env.h"
-#include "../../wstr/HtmlStringTools.h"
+#include "../../htmlString/HtmlStringTools.h"
 #include "../HtmlNode/HtmlNode.h"
 #include "../htmlTools/XPath.h"
 #include "../enum/HtmlNodeType/Html_Node_Type.h"
