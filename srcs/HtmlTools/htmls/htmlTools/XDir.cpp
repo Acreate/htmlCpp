@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include "../../wstr/WStrTools.h"
+#include "../../wstr/HtmlStringTools.h"
 using namespace htmlTools;
 
 inline bool insertOrAssign( HtmlStringMapToVectorHtmlStrSPtr &mapObj, const HtmlString &key, const HtmlString &value ) {
@@ -23,8 +23,8 @@ inline bool tryGet( const HtmlStringMapToVectorHtmlStrSPtr &mapObj, const HtmlSt
 	auto end = mapObj.end( );
 	for( ; iterator != end; ++iterator )
 		if( iterator->first == key ) {
-			auto sharedPtrs = iterator->second;
-			for( auto &ptr : *sharedPtrs )
+			auto& sharedPtrs = iterator->second;
+			for( auto& ptr : *sharedPtrs )
 				value.emplace_back( std::make_shared< HtmlString >( *ptr ) );
 			return true;
 		}
@@ -125,12 +125,12 @@ inline size_t initAttributesMap(
 	size_t equIndex, index;
 	std::vector< HtmlChar > bufff;
 	for( ; iterator != end; ++iterator ) { // 遍历属性列表
-		auto second = iterator->second;
-		for( auto &attributeIterator : *second ) {
+		auto& second = iterator->second;
+		for( auto& attributeIterator : *second ) {
 			size_t length = attributeIterator->length( );
-			auto dirKey = iterator->first;
+			auto& dirKey = iterator->first;
 			for( index = 0; index < length; ++index ) {
-				auto valueChar = attributeIterator->at( index );
+				auto& valueChar = attributeIterator->at( index );
 				if( valueChar == charValue::at ) { // 分解属性
 					for( equIndex = index + 1; equIndex < length; ++equIndex ) {
 						valueChar = attributeIterator->at( equIndex );
@@ -273,7 +273,7 @@ HtmlString XDir::getDirName( ) const {
 		Vector_HtmlStringSPtr outHtmlStringShared;
 		if( tryGet( attributesList, name, outHtmlStringShared ) ) { // 存在
 			result.append( L"[" );
-			for( auto &attribute : outHtmlStringShared )
+			for( auto& attribute : outHtmlStringShared )
 				result.append( *attribute );
 			result.append( L"]" );
 		}

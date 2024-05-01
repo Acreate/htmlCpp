@@ -4,7 +4,7 @@
 
 
 #include "XDir.h"
-#include "../../wstr/WStrTools.h"
+#include "../../wstr/HtmlStringTools.h"
 #include "../htmlNode/HtmlNode.h"
 #include "../htmlDoc/HtmlDoc.h"
 using namespace htmlTools;
@@ -107,7 +107,7 @@ XPath::XPath( const HtmlString &wstr ) : XPath( ) {
 }
 XPath::XPath( const List_HtmlStringSptr &std_w_string_list_shared, const HtmlString &separator )
 	: separator( separator ) {
-	for( auto &stdWString : std_w_string_list_shared )
+	for( auto& stdWString : std_w_string_list_shared )
 		dirListSPtr.emplace_back( std::make_shared< XDir >( *stdWString ) );
 }
 XPath::~XPath( ) { }
@@ -132,7 +132,9 @@ Vector_HtmlNodeSPtr_Shared XPath::rootBuider( HtmlDoc_Shared &html_doc ) {
 	auto analysisBrotherNode = html_doc->analysisBrotherNode( ); // 必须解析族谱
 
 	HtmlDoc *element = html_doc.get( );
-	auto findNodes = element->getHtmlNodeRoots( );
+	auto findNodes( std::make_shared< Vector_HtmlNodeSPtr >( ) );
+	for( auto& node : *element->getHtmlNodeRoots( ) )
+		findNodes->emplace_back( node );
 	auto buff( std::make_shared< Vector_HtmlNodeSPtr >( ) );
 	size_t strListSize = dirListSPtr.size( ), index = 1;
 	auto ptr = dirListSPtr.data( );
@@ -147,9 +149,9 @@ Vector_HtmlNodeSPtr_Shared XPath::rootBuider( HtmlDoc_Shared &html_doc ) {
 			if( buff->size( ) == 0 ) // 找不到
 				break;
 			findNodes->clear( );
-			for( auto &nodeShared : *buff ) {
+			for( auto& nodeShared : *buff ) {
 				auto nodeChildrenNodes = nodeShared->subChildren;
-				for( auto &children : *nodeChildrenNodes )
+				for( auto& children : *nodeChildrenNodes )
 					findNodes->emplace_back( children );
 			}
 			buff->clear( );
@@ -158,12 +160,44 @@ Vector_HtmlNodeSPtr_Shared XPath::rootBuider( HtmlDoc_Shared &html_doc ) {
 		break;
 	} while( true );
 	if( index == strListSize )
-		for( auto &node : *buff )
+		for( auto& node : *buff )
 			result->emplace_back( node );
 	return result;
 }
-Vector_HtmlNodeSPtr_Shared XPath::relativeBuider( Vector_HtmlNodeSPtr &html_node_shared ) {
-	return { };
+Vector_HtmlNodeSPtr_Shared XPath::relativeBuider( HtmlNode &html_node_shared ) {
+	Vector_HtmlNodeSPtr_Shared result( new Vector_HtmlNodeSPtr );
+	// 获取所有根节点
+	html_node_shared.analysisAttribute( ); // 必须解析族谱
+
+	auto &findNodes = html_node_shared.subChildren;
+	auto buff( std::make_shared< Vector_HtmlNodeSPtr >( ) );
+	size_t strListSize = dirListSPtr.size( ), index = 1;
+	auto ptr = dirListSPtr.data( );
+	do {
+		auto &subPath = ptr[ index ];
+		findItem( buff, subPath, findNodes );
+
+		if( buff->size( ) == 0 )
+			break;
+		++index;// 判断下一个下标是否超出
+		if( index < strListSize ) {  // 继续时，获取已经得到的子节点
+			if( buff->size( ) == 0 ) // 找不到
+				break;
+			findNodes->clear( );
+			for( auto& nodeShared : *buff ) {
+				auto nodeChildrenNodes = nodeShared->subChildren;
+				for( auto& children : *nodeChildrenNodes )
+					findNodes->emplace_back( children );
+			}
+			buff->clear( );
+			continue;
+		}
+		break;
+	} while( true );
+	if( index == strListSize )
+		for( auto& node : *buff )
+			result->emplace_back( node );
+	return result;
 }
 Vector_HtmlNodeSPtr_Shared XPath::anyBuider( Vector_HtmlNodeSPtr &html_node_shared ) {
 	return { };
@@ -178,32 +212,27 @@ Vector_HtmlNodeSPtr_Shared XPath::buider( Vector_HtmlNodeSPtr_Shared &html_node_
 	Vector_HtmlNodeSPtr_Shared resultShared( new Vector_HtmlNodeSPtr );
 	auto &removeExtent = dirListSPtr[ 0 ];
 	auto basicString = removeExtent->getDirName( );
-	if( basicString[ 0 ] == charValue::forwardSlash ) { // 存在 / 在最前面
+	HtmlString first( 1, charValue::forwardSlash );
+	if( basicString == first ) { // 存在 / 在最前面
 		auto htmlNodeSharedS = *html_node_shared_s;
-		for( auto nodeShared : htmlNodeSharedS ) {
+		for( auto& nodeShared : htmlNodeSharedS ) {
 			auto sharedPtrs = rootBuider( nodeShared->htmldocShared );
-			for( auto node : *sharedPtrs ) {
+			for( auto& node : *sharedPtrs )
 				resultShared->emplace_back( node );
-			}
 		}
 		return resultShared;
 	}
-	Vector_HtmlNodeSPtr findNodes;
-	HtmlString htmlString = getHtmlString( );
-	auto pathStart = htmlString[ 0 ]; // 路径开始字符
-	auto pathSecond = htmlString[ 1 ];
-	if( pathStart == forwardSlash ) {
-		if( pathSecond == pathStart ) { // 出现 // 开头
-
-		} else { // 顶部只有一个 /
+	first = HtmlString( 1, dot );
+	if( basicString == first ) { // .
+		auto htmlNodeSharedS = *html_node_shared_s;
+		for( auto& nodeShared : htmlNodeSharedS ) {
+			auto sharedPtrs = relativeBuider( *nodeShared );
+			for( auto& node : *sharedPtrs )
+				resultShared->emplace_back( node );
 		}
-
+		return resultShared;
 	}
-	if( pathStart == dot && pathSecond == forwardSlash ) { // 
 
-	}
-	if( resultShared->size( ) == 0 )
-		return nullptr;
 	return resultShared;
 }
 Vector_HtmlNodeSPtr_Shared XPath::buider( HtmlDoc_Shared &html_doc_shared ) {

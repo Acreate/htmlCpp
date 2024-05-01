@@ -10,9 +10,72 @@
 #include <windows.h>
 
 #include "htmls/htmlTools/XPath.h"
-#include "wstr/WStrTools.h"
+#include "wstr/HtmlStringTools.h"
 
 
+bool getValue( std::wstringstream &stringstream, htmlTools::HtmlDoc_Shared htmlDoc, htmlTools::XPath &xpath ) {
+	std::wcout << L"===============" << std::endl;
+	std::wcout << xpath.getHtmlString( ) << std::endl;
+	std::wcout << L"===============" << std::endl;
+	auto htmlNodeRoots = htmlDoc->getHtmlNodeRoots( );
+	auto vectorHtmlNodeSPtrShared = xpath.buider( htmlNodeRoots );
+	if( !vectorHtmlNodeSPtrShared )
+		return false;
+	stringstream << xpath.getHtmlString( ) << L":\n";
+	for( auto &node : *vectorHtmlNodeSPtrShared ) {
+		auto name = *node->getNodeName( );
+		auto contentText = *node->getNodeContentText( );
+		auto content = *node->getNodeContent( );
+		auto path = *node->getPath( );
+		stringstream << L"\t" << L"=======================" << std::endl;
+		stringstream << L"\t" << L"找到 [" << name << L"]:" << path << std::endl;
+		stringstream << L"\t" << L"<<<<<<<<<<" L"\t" L"nodeText" L"\t" L"<<<<<<<<<<" << std::endl;
+		stringstream << L"\t" << contentText << std::endl;
+		stringstream << L"\t" << L"<<<<<<<<<<" L"\t" L"nodeContent" L"\t" L"<<<<<<<<<<" << std::endl;
+		stringstream << L"\t" << content << std::endl;
+		stringstream << L"\t" << L"=======================" << std::endl;
+	}
+	stringstream << std::endl << std::endl;
+	return true;
+}
+bool getValue( std::wstringstream &stringstream, htmlTools::Vector_HtmlNodeSPtr_Shared &html_nodes, htmlTools::XPath &xpath ) {
+
+	std::wcout << L"===============" << std::endl;
+	std::wcout << xpath.getHtmlString( ) << std::endl;
+	std::wcout << L"===============" << std::endl;
+	auto vectorHtmlNodeSPtrShared = xpath.buider( html_nodes );
+	if( !vectorHtmlNodeSPtrShared )
+		return false;
+	stringstream << xpath.getHtmlString( ) << L":\n";
+	for( auto &htmlNode : *html_nodes ) {
+		auto name = *htmlNode->getNodeName( );
+		auto contentText = *htmlNode->getNodeContentText( );
+		auto content = *htmlNode->getNodeContent( );
+		auto path = *htmlNode->getPath( );
+		stringstream << L"\t" << L"------------------------" << std::endl;
+		stringstream << L"\t" << L"遍历 [" << name << L"]:" << path << std::endl;
+		stringstream << L"\t" << L"++++++++++" L"\t" L"nodeText" L"\t" L"++++++++++" << std::endl;
+		stringstream << L"\t" << contentText << std::endl;
+		stringstream << L"\t" << L"++++++++++" L"\t" L"nodeContent" L"\t" L"++++++++++" << std::endl;
+		stringstream << L"\t" << content << std::endl;
+		stringstream << L"\t" << L"------------------------" << std::endl;
+	}
+	for( auto &node : *vectorHtmlNodeSPtrShared ) {
+		auto name = *node->getNodeName( );
+		auto contentText = *node->getNodeContentText( );
+		auto content = *node->getNodeContent( );
+		auto path = *node->getPath( );
+		stringstream << L"\t" << L"=======================" << std::endl;
+		stringstream << L"\t" << L"找到 [" << name << L"]:" << path << std::endl;
+		stringstream << L"\t" << L"<<<<<<<<<<" L"\t" L"nodeText" L"\t" L"<<<<<<<<<<" << std::endl;
+		stringstream << L"\t" << contentText << std::endl;
+		stringstream << L"\t" << L"<<<<<<<<<<" L"\t" L"nodeContent" L"\t" L"<<<<<<<<<<" << std::endl;
+		stringstream << L"\t" << content << std::endl;
+		stringstream << L"\t" << L"=======================" << std::endl;
+	}
+	stringstream << std::endl << std::endl;
+	return true;
+}
 int main( int argc, char *argv[ ] ) {
 	std::locale locale( "zh_CN.UTF-8" );
 
@@ -88,33 +151,66 @@ int main( int argc, char *argv[ ] ) {
 	size_t endIndex = htmlContent->size( ), startIndex = 0;
 	auto htmlDoc = htmlTools::HtmlDoc::parse( htmlContent, endIndex, startIndex );
 
+	stringstream = std::wstringstream( );
+	htmlDoc->findNodes( [=,&stringstream]( htmlTools::HtmlNode_Shared &node )->bool {
+		auto htmlNodeType = node->getNodeType( );
+		htmlTools::HtmlString type;
+		switch( htmlNodeType ) {
+		case htmlTools::Html_Node_Type::DoubleNode :
+			type = L"DoubleNode";
+			break;
+		case htmlTools::Html_Node_Type::SingleNode :
+			type = L"SingleNode";
+			break;
+		case htmlTools::Html_Node_Type::AnnotationNode :
+			type = L"AnnotationNode";
+			break;
+		case htmlTools::Html_Node_Type::None :
+			type = L"None";
+			break;
+		}
+		auto nodeName = *node->getNodeName( );
+		auto path = *node->getPath( );
+		stringstream << nodeName << " : " << type << " : " << path << std::endl;
+		return false;
+	} );
+
+	len = snprintf( path, sizeof( path ), fString.c_str( ), std::string( Cache_Path_Dir ).c_str( ), u8"", u8"www.121ds.cc.allNode.txt" );
+	ofstream.open( path, std::ios::binary | std::ios::out | std::ios::trunc );
+	if( !ofstream.is_open( ) )
+		return -2;
+	ofstream.imbue( locale );
+	ofstream << stringstream.str( );
+	ofstream.close( );
+
 
 	// 解析族谱关系（父子，兄弟关系）
 	htmlDoc->analysisBrotherNode( );
 	// 解析所有节点关系 (单独解析可以使用 HtmlStringPairUnorderMap_Shared HtmlNode::analysisAttribute( ))
 	htmlDoc->analysisAttributesNode( );
 
-	auto xpath = htmlTools::XPath( L"//html/body/div/div/div/div[@class='hd']/ul/li/a" );
-	std::wcout << L"===============" << std::endl;
-	std::wcout << xpath.getHtmlString( ) << std::endl;
-	std::wcout << L"===============" << std::endl;
-	auto htmlNodeRoots = htmlDoc->getHtmlNodeRoots( );
-	auto vectorHtmlNodeSPtrShared = xpath.buider( htmlNodeRoots );
-	if( !vectorHtmlNodeSPtrShared )
-		return -1;
-	for( auto &node : *vectorHtmlNodeSPtrShared ) {
-		auto name = *node->getNodeName( );
-		auto contentText = *node->getNodeContentText( );
-		auto content = *node->getNodeContent( );
-		auto path = *node->getPath( );
-		std::wcout << L"=======================" << std::endl;
-		std::wcout << L"找到 [" << name << L"]:" << path << std::endl;
-		std::wcout << L"<<<<<<<<<<" L"\t" L"nodeText" L"\t" L"<<<<<<<<<<" << std::endl;
-		std::wcout << contentText << std::endl;
-		std::wcout << L"<<<<<<<<<<" L"\t" L"nodeContent" L"\t" L"<<<<<<<<<<" << std::endl;
-		std::wcout << content << std::endl;
-		std::wcout << L"=======================" << std::endl;
+	stringstream = std::wstringstream( );
 
-	}
+
+	htmlTools::XPath xpath = htmlTools::XPath( L"//html/body/div/div/div/div[@class='hd']/ul/li/a" );;
+	if( !getValue( stringstream, htmlDoc, xpath ) )
+		return -7;
+
+	xpath = htmlTools::XPath( L"./body/div/div/div/div[@class='hd']/ul/li/a" );
+	auto nodeSPtrShared = htmlDoc->getHtmlNodeRoots( );
+
+	if( !getValue( stringstream, nodeSPtrShared, xpath ) )
+		return -8;
+	// 写入文件
+	len = snprintf( path, sizeof( path ), fString.c_str( ), std::string( Cache_Path_Dir ).c_str( ), u8"", u8"www.121ds.cc.xpath.txt" );
+	if( len == 0 )
+		return -1;
+	ofstream.open( path, std::ios::binary | std::ios::out | std::ios::trunc );
+	ofstream.imbue( locale );
+	if( !ofstream.is_open( ) )
+		return -2;
+	auto mystr = stringstream.str( );
+	ofstream << mystr;
+	ofstream.close( );
 	return 0;
 }

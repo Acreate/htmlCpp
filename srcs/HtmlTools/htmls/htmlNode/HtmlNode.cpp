@@ -3,25 +3,26 @@
 
 #include "../htmlDoc/HtmlDoc.h"
 #include "../htmlTools/XPath.h"
-#include "../../wstr/WStrTools.h"
+#include "../../wstr/HtmlStringTools.h"
 #include <sstream>
 
 using namespace htmlTools;
 using namespace htmlTools::charValue;
 
-HtmlNode::HtmlNode( ) : parent( nullptr ), subChildren( new Vector_HtmlNodeSPtr ), brother( new Vector_HtmlNodeSPtr ), refNodeAttributes( new HtmlStringPairUnorderMap ) {
+HtmlNode::HtmlNode( ) : parent( nullptr ), subChildren( new Vector_HtmlNodeSPtr ), brother( new Vector_HtmlNodeSPtr ) {
 }
 HtmlNode::~HtmlNode( ) {
 }
 
 HtmlStringPairUnorderMap_Shared HtmlNode::analysisAttribute( ) {
-	if( nodeType == Html_Node_Type::DoubleNode && endNode.get( ) == this ) {
-		endNode->refNodeAttributes = startNode->refNodeAttributes;
-		return startNode->analysisAttribute( );
-	}
-	if( refNodeAttributes->size( ) > 0 )
+	if( refNodeAttributes ) {
+		if( nodeType == Html_Node_Type::DoubleNode && endNode.get( ) == this ) {
+			endNode->refNodeAttributes = startNode->refNodeAttributes;
+			return startNode->analysisAttribute( );
+		}
 		return refNodeAttributes;
-	HtmlStringPairUnorderMap_Shared result( new HtmlStringPairUnorderMap );
+	}
+	refNodeAttributes = std::make_shared< HtmlStringPairUnorderMap >( );
 
 	auto startWStrPtr = this->czWStr->c_str( ) + ptrOffset;
 	size_t equIndex = 0, endIndex = ptrCWtrLen;
@@ -73,7 +74,7 @@ HtmlStringPairUnorderMap_Shared HtmlNode::analysisAttribute( ) {
 			HtmlString mapval( value.data( ), value.size( ) );
 			key.clear( );
 			value.clear( );
-			result->insert_or_assign( keyval, mapval );
+			refNodeAttributes->insert_or_assign( keyval, mapval );
 			if( currentChar == nodeEndChar )
 				break;
 			if( HtmlStringTools::isJumpSpace( currentChar ) )// 找到下一个非空
@@ -143,10 +144,9 @@ HtmlStringPairUnorderMap_Shared HtmlNode::analysisAttribute( ) {
 	if( key.size( ) != 0 || value.size( ) != 0 ) {
 		HtmlString keyval( key.data( ), key.size( ) );
 		HtmlString mapval( value.data( ), value.size( ) );
-		result->insert_or_assign( keyval, mapval );
+		refNodeAttributes->insert_or_assign( keyval, mapval );
 	}
-	*refNodeAttributes = *result;
-	return result;
+	return refNodeAttributes;
 }
 HtmlString_Shared HtmlNode::getNodeContent( ) const {
 	return htmldocShared->getNodeContent( thisSharedPtr );
@@ -222,7 +222,8 @@ Vector_HtmlNodeSPtr_Shared HtmlNode::parseHtmlNodeCharPair( const HtmlDoc_Shared
 }
 
 void HtmlNode::setParent( const HtmlNode_Shared &child, const HtmlNode_Shared &parent ) {
-
+	if( child == nullptr || child.get( ) == parent.get( ) )
+		return;
 	auto parentPtr = child->parent.get( );
 	if( parentPtr ) {
 		auto vectorHtmlXPathSPtrShared = parentPtr->subChildren;
