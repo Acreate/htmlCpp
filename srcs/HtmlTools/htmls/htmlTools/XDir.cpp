@@ -4,88 +4,158 @@
 
 #include "../../htmlString/HtmlStringTools.h"
 using namespace cylHtmlTools;
+XDir::XDir_Attribute_Status XDir::insertXDirAttributeInfo( const HtmlString &dir_set_name, const HtmlString &xdir_set_type_name, const HtmlString &xDir_set_attribute_value ) {
+	return { };
+}
+XDir::XDir_Attribute_Status XDir::tryAttributeGet( const HtmlString &dir_set_name, const HtmlString &xdir_set_type_name, Vector_HtmlStringSPtr &xDir_result_attribute_value ) {
+	return { };
+}
+/// <summary>
+/// 找到下一个字符串<br/>
+/// 字符串两侧不存在空格（如 R(" abd es")，则返回 abd，如果需要空格，则需要使用单引号或者双引号）
+/// </summary>
+/// <param name="buff">检查缓冲</param>
+/// <param name="buff_size">缓冲大小</param>
+/// <param name="current_index">缓冲开始位置</param>
+/// <param name="get_str_start">返回的字符串开始位置</param>
+/// <param name="get_str_end">返回的字符串结束位置</param>
+/// <returns></returns>
+inline bool findStr(
+	HtmlChar *buff, const size_t buff_size, size_t current_index, size_t &get_str_start, size_t &get_str_end
+) {
 
-inline bool insertOrAssign( HtmlStringMapToVectorHtmlStrSPtr &mapObj, const HtmlString &key, const HtmlString &value ) {
-	auto iterator = mapObj.begin( );
-	auto end = mapObj.end( );
-	for( ; iterator != end; ++iterator )
-		if( iterator->first == key ) {
-			iterator->second->emplace_back( std::make_shared< HtmlString >( value ) );
-			return true;
+	for( ; current_index < buff_size; ++current_index )  // 获取第一个非空
+		if( !HtmlStringTools::isSpace( buff[ current_index ] ) )
+			break;
+	for( ; current_index < buff_size; ++current_index )  // 查找等号
+		if( buff[ current_index ] == charValue::equ ) {
+			break;
+		} else if( buff[ current_index ] == charValue::singleQuotation
+			|| buff[ current_index ] == charValue::doubleQuotation ) { // 跳过匹配的双引号
+			size_t getQuotation;
+			std::vector< std::pair< size_t, size_t > > getQuoattionPostions;
+			if( !HtmlStringTools::jumpQuotation( buff, buff_size, current_index, getQuotation, getQuoattionPostions ) )
+				return false;
 		}
-	auto list( std::make_shared< Vector_HtmlStringSPtr >( ) );
-	list->emplace_back( std::make_shared< HtmlString >( value ) );
-	mapObj.insert( std::make_pair( key, list ) );
+
 	return true;
 }
-inline bool tryGet( const HtmlStringMapToVectorHtmlStrSPtr &mapObj, const HtmlString &key, Vector_HtmlStringSPtr &value ) {
-	auto iterator = mapObj.begin( );
-	auto end = mapObj.end( );
-	for( ; iterator != end; ++iterator )
-		if( iterator->first == key ) {
-			auto &sharedPtrs = iterator->second;
-			for( auto &ptr : *sharedPtrs )
-				value.emplace_back( std::make_shared< HtmlString >( *ptr ) );
-			return true;
-		}
-	return false;
-}
 
-XDir::XDir( const cylHtmlTools::HtmlString &param ) {
+/// <summary>
+/// 解析字符串当中的属性
+/// </summary>
+/// <param name="buff">缓冲</param>
+/// <param name="buff_size">缓冲长度</param>
+/// <param name="save_vector_html_str_s">解析对象存储位置</param>
+/// <returns>解析个数</returns>
+inline size_t parse( HtmlChar *buff, size_t buff_size, HtmlStringMapToVectorHtmlStrSPtr &save_vector_html_str_s ) {
+	size_t parseCount = 0;
+	HtmlChar charValue;
+	size_t index = 0;
+	size_t nameLeft, nameRight;
+	size_t valueLeft, valueRight;
+	HtmlString designatedAttributeAtClass( L"class" );
+	for( ; index < buff_size; ++index ) {
+		charValue = buff[ index ];
+		if( charValue == charValue::at ) { // 找到了 @ 符号
+			//// 找到属性名称 (匹配的 nameLeft, nameRight)
+			if( !findStr( buff, buff_size, index + 1, nameLeft, nameRight ) )
+				break;
+			//// 找到属性值 (匹配的 valueLeft, valueRight)
+			if( !findStr( buff, buff_size, nameRight + 1, valueLeft, valueRight ) )
+				break;
+			index = valueRight;
+
+			HtmlString attributeName( buff, nameLeft, nameRight - nameLeft );
+			if( HtmlStringTools::equHtmlString( attributeName, designatedAttributeAtClass ) ) { // 如果是属性的话，需要二次分解
+
+				continue;
+			}
+
+			auto iterator = save_vector_html_str_s.begin( );
+			auto end = save_vector_html_str_s.end( );
+			for( ; iterator != end; ++iterator )
+				if( iterator->first == attributeName ) {// 存在属性名称
+					iterator->second->emplace_back( std::make_shared< HtmlString >( buff, valueLeft, valueRight - valueLeft ) );
+					break;
+				}
+			if( iterator == end ) { // 不存在睡醒
+				Vector_HtmlStringSPtr_Shared vectorHtmlStringSPtr( std::make_shared< Vector_HtmlStringSPtr >( ) );
+				vectorHtmlStringSPtr->emplace_back( std::make_shared< HtmlString >( buff, valueLeft, valueRight - valueLeft ) );
+				save_vector_html_str_s.insert( std::make_pair( attributeName, vectorHtmlStringSPtr ) );
+			}
+		}
+	}
+
+	return parseCount;
+}
+XDir::XDir( const HtmlString &param ) {
 	size_t length = param.length( );
 	if( length == 0 )
 		return;
-	cylHtmlTools::HtmlChar value;
-	std::vector< cylHtmlTools::HtmlChar > buff;
+	HtmlChar value;
+	HtmlChar *buff = new HtmlChar[ length + 1 ];
+	size_t buffIndex = 0;
+	HtmlStringMapToVectorHtmlStrSPtr attributesResult;
 	for( size_t index = 0; index < length; ++index ) {
 		value = param[ index ];
 		if( value == L'[' ) { // 找到 ]
-			HtmlString name( buff.data( ), buff.size( ) );
+			HtmlString name( buff, buffIndex );
 			namesList.emplace_back( name );
-			buff.clear( );
+			buffIndex = 0;
 			++index;
 			for( ; index < length; ++index ) {
 				value = param[ index ];
 				if( value == L']' ) { // 找到 ]
-					if( buff.size( ) > 0 ) {
-						HtmlString mapValue( buff.data( ), buff.size( ) );
-						insertOrAssign( attributesList, name, mapValue );
-						buff.clear( );
+					if( buffIndex > 0 ) {
+						// 分解属性
+						attributesResult.clear( );
+						auto projectCount = parse( buff, buffIndex, attributesResult );
+						if( projectCount ) {
+							HtmlString attributeTypeName;
+							HtmlString attributeTypeValue;
+							insertXDirAttributeInfo( name, attributeTypeName, attributeTypeValue );
+						}
+						buffIndex = 0;
 					}
 					break;
 				}
 				if( value == charValue::doubleQuotation ) {
-					buff.emplace_back( value );
+					buff[ buffIndex ] = value;
 					++index;
+					++buffIndex;
 					for( ; index < length; ++index ) {
-						value = param[ index ];
-						buff.emplace_back( value );
+						buff[ buffIndex ] = value = param[ index ];
+						++buffIndex;
 						if( value == charValue::doubleQuotation )
 							break;
 					}
 					continue;
 				}
 				if( value == charValue::singleQuotation ) {
-					buff.emplace_back( value );
-					++index;
+					buff[ buffIndex ] = value = param[ index ];
+					++buffIndex;
 					for( ; index < length; ++index ) {
-						value = param[ index ];
-						buff.emplace_back( value );
+						buff[ buffIndex ] = value = param[ index ];
+						++buffIndex;
 						if( param[ index ] == charValue::singleQuotation )
 							break;
 					}
 					continue;
 				}
-				buff.emplace_back( value );
+				buff[ buffIndex ] = value;
+				++buffIndex;
 			}
 			continue;
 		}
-		buff.emplace_back( value );
+		buff[ buffIndex ] = value;
+		++buff;
 	}
-	if( buff.size( ) > 0 ) {
-		HtmlString name( buff.data( ), buff.size( ) );
+	if( buffIndex > 0 ) {
+		HtmlString name( buff, buffIndex );
 		namesList.emplace_back( name );
 	}
+	delete buff;
 }
 XDir::~XDir( ) {
 }
@@ -96,177 +166,8 @@ bool XDir::hasName( const HtmlString &dir_name ) const {
 	return false;
 }
 
-void insertOrAssign( std::unordered_map< HtmlString, HtmlStringPairUnorderMap > &mapObj, const HtmlString &key, const std::pair< HtmlString, HtmlString > &value ) {
-	auto iterator = mapObj.begin( );
-	auto end = mapObj.end( );
-	for( ; iterator != end; ++end )
-		if( iterator->first == key ) {
-			auto &map = iterator->second;
-			map.insert_or_assign( value.first, value.second );
-			return;
-		}
-	std::unordered_map< std::wstring, std::wstring > unorderedMap;
-	unorderedMap.insert_or_assign( value.first, value.second );
-	mapObj.insert_or_assign( key, unorderedMap );
 
-}
-
-/// <summary>
-/// 生成属性映射列表，而不是路径映射列表
-/// </summary>
-/// <param name="src">路径映射列表</param>
-/// <param name="target">属性映射列表</param>
-/// <returns>列表个数</returns>
-inline size_t initAttributesMap(
-	const HtmlStringMapToVectorHtmlStrSPtr &src,
-	std::shared_ptr< std::unordered_map< HtmlString, HtmlStringPairUnorderMap > > &target ) {
-	target = std::make_shared< std::unordered_map< HtmlString, HtmlStringPairUnorderMap > >( );
-	auto iterator = src.begin( );
-	auto end = src.end( );
-	size_t equIndex, index;
-	std::vector< HtmlChar > bufff;
-	for( ; iterator != end; ++iterator ) { // 遍历属性列表
-		auto &second = iterator->second;
-		for( auto &attributeIterator : *second ) {
-			size_t length = attributeIterator->length( );
-			auto &dirKey = iterator->first;
-			for( index = 0; index < length; ++index ) {
-				auto &valueChar = attributeIterator->at( index );
-				if( valueChar == charValue::at ) { // 分解属性
-					for( equIndex = index + 1; equIndex < length; ++equIndex ) {
-						valueChar = attributeIterator->at( equIndex );
-						if( valueChar == charValue::equ ) {
-							for( index = equIndex + 1; index < length; ++index )
-								if( !HtmlStringTools::isJumpSpace( attributeIterator->at( index ) ) )
-									break;
-							break;
-						}
-						bufff.emplace_back( valueChar );
-					}
-
-					size_t buffSize = bufff.size( );
-					if( buffSize ) {
-						auto key( HtmlString( bufff.data( ), buffSize ) );
-						bufff.clear( );
-						for( ; index < length; ++index ) {
-							valueChar = attributeIterator->at( index );
-							if( HtmlStringTools::isJumpSpace( valueChar ) )
-								break;
-							bufff.emplace_back( valueChar );
-							if( valueChar == charValue::doubleQuotation ) {
-								for( index = index + 1; index < length; ++index ) {
-									valueChar = attributeIterator->at( index );
-									bufff.emplace_back( valueChar );
-									if( valueChar == charValue::doubleQuotation )
-										break;
-								}
-								continue;
-							}
-							if( valueChar == charValue::singleQuotation ) {
-								for( index = index + 1; index < length; ++index ) {
-									valueChar = attributeIterator->at( index );
-									bufff.emplace_back( valueChar );
-									if( valueChar == charValue::singleQuotation )
-										break;
-								}
-								continue;
-							}
-
-						}
-						buffSize = bufff.size( );
-						auto value( HtmlString( bufff.data( ), buffSize ) );
-						bufff.clear( );
-						insertOrAssign( *target, dirKey, std::make_pair( key, value ) );
-					}
-				}
-
-			}
-		}
-	}
-	return target->size( );
-}
-
-inline bool compAttributesKey( HtmlString left, HtmlString right ) {
-	size_t leftLen = left.length( );
-	size_t rightLen = right.length( );
-	size_t index = 0, buffIndex = 0;
-	for( ; index < leftLen; ++index )
-		if( !HtmlStringTools::isJumpSpace( left[ index ] ) ) {
-			buffIndex = leftLen - 1;
-			leftLen -= index;
-			do {
-				if( !HtmlStringTools::isJumpSpace( left[ buffIndex ] ) )
-					break;
-				if( buffIndex == 0 )
-					break;
-				--buffIndex;
-			} while( true );
-			left = left.substr( index, leftLen * 2 - index - buffIndex - 1 );
-			leftLen = left.length( );
-			break;
-		}
-
-	for( index = 0; index < rightLen; ++index )
-		if( !HtmlStringTools::isJumpSpace( right[ index ] ) ) {
-			buffIndex = rightLen - 1;
-			leftLen -= index;
-			do {
-				if( !HtmlStringTools::isJumpSpace( right[ buffIndex ] ) )
-					break;
-				if( buffIndex == 0 )
-					break;
-				--buffIndex;
-			} while( true );
-			right = right.substr( index, rightLen * 2 - index - buffIndex - 1 );
-			rightLen = right.length( );
-			break;
-		}
-
-	if( leftLen == rightLen ) {
-		for( index = 0; index < leftLen; ++index ) {
-			auto leftChar = left[ index ];
-			auto rightChar = right[ index ];
-			bool leftIsEquQuotation = rightChar == charValue::doubleQuotation || rightChar == charValue::singleQuotation;
-			if( leftIsEquQuotation ) { // 跳过引号
-				bool rightIsEquQuotation = leftChar == charValue::doubleQuotation || leftChar == charValue::singleQuotation;
-				if( !rightIsEquQuotation )
-					return false;
-				continue;
-			}
-			if( leftChar != rightChar )
-				return false;
-		}
-		return true;
-	}
-
-	return left == right;
-}
 bool XDir::hasAttribute( const HtmlStringPairUnorderMap_Shared &attribute, const HtmlString &nodeName ) {
-	if( attribute->size( ) > 0 ) {
-		if( !attributesMap ) { // 初始化一次
-			auto mapCount = initAttributesMap( attributesList, attributesMap );
-			if( mapCount == 0 ) // 当前 xpath 不要求存在属性
-				return true;
-		} else if( attributesMap->size( ) == 0 )// 当前 xpath 不要求存在属性
-			return true;
-
-		// 检查属性
-		HtmlStringPairUnorderMap unorderedMap = attributesMap->at( nodeName );
-		if( unorderedMap.size( ) == 0 )
-			return false;
-		auto begin = unorderedMap.begin( );
-		auto dirEnd = unorderedMap.end( );
-		for( ; begin != dirEnd; ++begin ) {
-			auto iterator = attribute->begin( );
-			auto end = attribute->end( );
-			for( ; iterator != end; ++iterator ) {
-				if( compAttributesKey( iterator->first, begin->first ) )
-					if( compAttributesKey( iterator->second, begin->second ) )
-						return true;
-			}
-		}
-		return false;
-	}
 
 	return true;
 }
@@ -284,6 +185,7 @@ HtmlString XDir::getXDirName( ) const {
 	}
 	return result;
 }
+
 HtmlString XDir::getDirName( ) const {
 	HtmlString result;
 	for( auto &name : namesList )

@@ -32,21 +32,21 @@ HtmlStringPairUnorderMap_Shared HtmlNode::analysisAttribute( ) {
 		if( currentChar == nodeStartChar ) { // 找到名称
 			++equIndex;
 			currentChar = startWStrPtr[ equIndex ];
-			if( !HtmlStringTools::isJumpSpace( currentChar ) ) { // 不是空，则是名称
+			if( !HtmlStringTools::isSpace( currentChar ) ) { // 不是空，则是名称
 				++equIndex;
 				for( ; equIndex < endIndex; ++equIndex ) {
 					currentChar = startWStrPtr[ equIndex ];
-					if( HtmlStringTools::isJumpSpace( currentChar ) )
+					if( HtmlStringTools::isSpace( currentChar ) )
 						break;
 				}
 			} else { // 如果是空，则找到一个非空
 				for( ; equIndex < endIndex; ++equIndex ) {
 					currentChar = startWStrPtr[ equIndex ];
-					if( !HtmlStringTools::isJumpSpace( currentChar ) ) {
+					if( !HtmlStringTools::isSpace( currentChar ) ) {
 						++equIndex;
 						for( ; equIndex < endIndex; ++equIndex ) { // 找到末尾的空，或者结束该节点
 							currentChar = startWStrPtr[ equIndex ];
-							if( HtmlStringTools::isJumpSpace( currentChar ) )
+							if( HtmlStringTools::isSpace( currentChar ) )
 								break;
 						}
 						break;
@@ -77,9 +77,9 @@ HtmlStringPairUnorderMap_Shared HtmlNode::analysisAttribute( ) {
 			refNodeAttributes->insert_or_assign( keyval, mapval );
 			if( currentChar == nodeEndChar )
 				break;
-			if( HtmlStringTools::isJumpSpace( currentChar ) )// 找到下一个非空
+			if( HtmlStringTools::isSpace( currentChar ) )// 找到下一个非空
 				for( ++equIndex; equIndex < endIndex; ++equIndex )
-					if( HtmlStringTools::isJumpSpace( startWStrPtr[ equIndex ] ) )
+					if( HtmlStringTools::isSpace( startWStrPtr[ equIndex ] ) )
 						break;
 			currentType = 1;
 		} else {
@@ -91,11 +91,11 @@ HtmlStringPairUnorderMap_Shared HtmlNode::analysisAttribute( ) {
 				++equIndex;
 				for( ; equIndex < endIndex; ++equIndex ) { // 找到 = 的下一个非空
 					currentChar = startWStrPtr[ equIndex ];
-					if( !HtmlStringTools::isJumpSpace( currentChar ) ) {
+					if( !HtmlStringTools::isSpace( currentChar ) ) {
 						// 找到值的末尾
 						for( ; equIndex < endIndex; ++equIndex ) {
 							currentChar = startWStrPtr[ equIndex ];
-							if( HtmlStringTools::isJumpSpace( currentChar ) || currentChar == nodeEndChar )
+							if( HtmlStringTools::isSpace( currentChar ) || currentChar == nodeEndChar )
 								break;
 							else if( currentChar == singleQuotation ) {
 								value.emplace_back( currentChar );
@@ -136,7 +136,7 @@ HtmlStringPairUnorderMap_Shared HtmlNode::analysisAttribute( ) {
 					if( currentChar == doubleQuotation )
 						break;
 				}
-			} else if( !HtmlStringTools::isJumpSpace( currentChar ) )
+			} else if( !HtmlStringTools::isSpace( currentChar ) )
 				key.emplace_back( currentChar );
 		}
 

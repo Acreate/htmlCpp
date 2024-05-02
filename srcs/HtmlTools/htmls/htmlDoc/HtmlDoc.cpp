@@ -121,7 +121,7 @@ bool HtmlDoc::isSingelNode( const HtmlString_Shared &std_c_w_string, size_t &sta
 	if( findNextNodeForwardSlash( std_c_w_string, end_index, forwardSlashIndex ) ) {
 		for( forwardSlashIndex += 1; forwardSlashIndex < end_index; ++forwardSlashIndex ) {
 			currentChar = c_str[ forwardSlashIndex ];
-			if( HtmlStringTools::isJumpSpace( currentChar ) )
+			if( HtmlStringTools::isSpace( currentChar ) )
 				continue;
 			if( currentChar != nodeEndChar )
 				break;
@@ -144,7 +144,7 @@ bool HtmlDoc::isStartNode( const HtmlString_Shared &std_c_w_string, size_t &star
 	// 碰到的第一个必须是 > 而不是 /
 	for( auto index = start_index + 1; index <= end_index; ++index ) {
 		currentChar = c_str[ index ];
-		if( HtmlStringTools::isJumpSpace( currentChar ) )
+		if( HtmlStringTools::isSpace( currentChar ) )
 			continue;
 		if( currentChar == doubleQuotation ) {
 			++index;
@@ -179,7 +179,7 @@ bool HtmlDoc::isEndNode( const HtmlString_Shared &std_c_w_string, size_t &start_
 	}
 	for( auto index = start_index + 1; index <= end_index; ++index ) {
 		currentChar = c_str[ index ];
-		if( HtmlStringTools::isJumpSpace( currentChar ) )
+		if( HtmlStringTools::isSpace( currentChar ) )
 			continue;
 		if( currentChar != forwardSlash )
 			return true;
@@ -471,7 +471,7 @@ HtmlString_Shared HtmlDoc::getNodeName( const HtmlNode_Shared &node_shared ) con
 	size_t index = 0;
 	for( ; index < node_shared->ptrCWtrLen; ++index ) { // 找到 < 后面的非空
 		currentChar = c_w_str[ index ];
-		if( currentChar == nodeStartChar || HtmlStringTools::isJumpSpace( currentChar ) )
+		if( currentChar == nodeStartChar || HtmlStringTools::isSpace( currentChar ) )
 			continue;
 		break;
 	}
@@ -479,18 +479,18 @@ HtmlString_Shared HtmlDoc::getNodeName( const HtmlNode_Shared &node_shared ) con
 	auto ptrCStrLen = node_shared->ptrCWtrLen - index; // 缩减长度
 	for( index = 0; index < ptrCStrLen; ++index ) { // 找到第一个空或者 / > 等字符
 		currentChar = c_w_str[ index ];
-		if( HtmlStringTools::isJumpSpace( currentChar ) || currentChar == nodeEndChar || currentChar == forwardSlash )
+		if( HtmlStringTools::isSpace( currentChar ) || currentChar == nodeEndChar || currentChar == forwardSlash )
 			break;
 	}
 	if( currentChar == forwardSlash ) { // 如果碰到斜杠 /(节点是尾节点)
 		for( ; index < ptrCStrLen; ++index ) { // 找到第一个非空或者 > 等字符
 			currentChar = c_w_str[ index ];
-			if( !HtmlStringTools::isJumpSpace( currentChar ) ) {
+			if( !HtmlStringTools::isSpace( currentChar ) ) {
 				++index;
 				c_w_str = c_w_str + index;
 				for( index = 0; index < ptrCStrLen; ++index ) { // 找到第一个空或者 > 等字符
 					currentChar = c_w_str[ index ];
-					if( HtmlStringTools::isJumpSpace( currentChar ) || currentChar == nodeEndChar )
+					if( HtmlStringTools::isSpace( currentChar ) || currentChar == nodeEndChar )
 						break;
 				}
 				break;

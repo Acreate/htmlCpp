@@ -5,15 +5,52 @@
 #include <codecvt>
 #include <locale>
 using namespace cylHtmlTools;
-bool HtmlStringTools::isJumpSpace( HtmlChar currentChar ) {
+bool HtmlStringTools::isSpace( HtmlChar currentChar ) {
 	return iswspace( currentChar ) || iswcntrl( currentChar ) || iswcntrl( currentChar );
+}
+bool HtmlStringTools::jumpQuotation( HtmlChar *buff, const size_t buff_size, size_t start_index, size_t &get_quoation_position_end, std::vector< std::pair< size_t, size_t > > &get_quotation_position_s ) {
+	size_t doubleQuotationFirstIndex = 0, doubleQuotationEndIndex = 0;
+	do {
+		if( buff[ start_index ] == charValue::doubleQuotation ) {
+			for( ++start_index; start_index < buff_size; ++start_index )
+				if( buff[ start_index ] == charValue::doubleQuotation )
+					break;
+				else if( buff[ start_index ] == charValue::singleQuotation ) {
+					if( !jumpQuotation( buff, buff_size, start_index, get_quoation_position_end, get_quotation_position_s ) )
+						break;
+					start_index = get_quoation_position_end;
+				}
+			if( start_index == buff_size )
+				break;
+			doubleQuotationEndIndex = start_index;
+			get_quotation_position_s.emplace_back( std::make_pair( doubleQuotationFirstIndex, doubleQuotationEndIndex ) );
+		} else if( buff[ start_index ] == charValue::singleQuotation ) {
+			for( ++start_index; start_index < buff_size; ++start_index )
+				if( buff[ start_index ] == charValue::singleQuotation )
+					break;
+				else if( buff[ start_index ] == charValue::doubleQuotation ) {
+					if( !jumpQuotation( buff, buff_size, start_index, get_quoation_position_end, get_quotation_position_s ) )
+						break;
+					start_index = get_quoation_position_end;
+				}
+			if( start_index == buff_size )
+				break;
+			doubleQuotationEndIndex = start_index;
+			get_quotation_position_s.emplace_back( std::make_pair( doubleQuotationFirstIndex, doubleQuotationEndIndex ) );
+		} else
+			return false;
+	} while( false );
+
+	if( doubleQuotationFirstIndex > doubleQuotationEndIndex )
+		return false;
+	return true;
 }
 bool HtmlStringTools::isRouteChar( HtmlChar currentChar ) {
 	return currentChar == charValue::forwardSlash || currentChar == charValue::backSlash;
 }
 bool HtmlStringTools::jimpSace( const HtmlChar *foreachWCStr, size_t foreachMaxIndex, size_t *startIndex ) {
 	for( ; *startIndex < foreachMaxIndex; ++( *startIndex ) )
-		if( !isJumpSpace( foreachWCStr[ *startIndex ] ) )
+		if( !isSpace( foreachWCStr[ *startIndex ] ) )
 			return true;
 	return false;
 }
@@ -52,7 +89,7 @@ bool HtmlStringTools::findNextWStringPotion( const HtmlChar *w_c_ptr, size_t src
 	}
 	return false;
 }
-bool HtmlStringTools::equHtmlString( HtmlString &left, HtmlString &right ) {
+bool HtmlStringTools::equHtmlString( const HtmlString &left, const HtmlString &right ) {
 	size_t leftLen = left.length( );
 	size_t rightLen = right.length( );
 	if( leftLen != rightLen )
@@ -66,7 +103,7 @@ bool HtmlStringTools::equHtmlString( HtmlString &left, HtmlString &right ) {
 void HtmlStringTools::removeLeftSpace( HtmlString &str ) {
 	size_t index = 0, leftLen = str.length( );
 	for( ; index < leftLen; ++index )
-		if( !isJumpSpace( str[ index ] ) )
+		if( !isSpace( str[ index ] ) )
 			break;
 	if( index == leftLen )
 		str = HtmlString( );
@@ -77,7 +114,7 @@ void HtmlStringTools::removeRightSpace( HtmlString &str ) {
 	// 删除 left 字符串
 	size_t leftLen = str.length( );
 	while( 0 < leftLen ) {
-		if( !HtmlStringTools::isJumpSpace( str[ leftLen - 1 ] ) ) {
+		if( !HtmlStringTools::isSpace( str[ leftLen - 1 ] ) ) {
 			str = str.substr( 0, leftLen );
 			break;
 		}
@@ -93,9 +130,9 @@ void HtmlStringTools::removeBothSpace( HtmlString &str ) {
 	// 删除 str 字符串
 	size_t index = 0, leftLen = str.length( );
 	for( ; index < leftLen; ++index )
-		if( !isJumpSpace( str[ index ] ) ) {
+		if( !isSpace( str[ index ] ) ) {
 			while( index < leftLen ) {
-				if( !isJumpSpace( str[ leftLen - 1 ] ) ) {
+				if( !isSpace( str[ leftLen - 1 ] ) ) {
 					str = str.substr( index, leftLen - index );
 					break;
 				}

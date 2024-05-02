@@ -14,7 +14,18 @@ namespace cylHtmlTools {
 		/// </summary>
 		/// <param name="currentChar">检测的字符</param>
 		/// <returns>true 表示空字符</returns>
-		static bool isJumpSpace( HtmlChar currentChar );
+		static bool isSpace( HtmlChar currentChar );
+		/// <summary>
+		/// 获取缓冲的的匹配引号位置<br/>
+		/// buff[start_index] 必须等于 charValue::doubleQuotation 或者 charValue::singleQuotation，否则返回 false
+		/// </summary>
+		/// <param name="buff">缓冲</param>
+		/// <param name="buff_size">缓冲大小</param>
+		/// <param name="start_index">开始位置</param>
+		/// <param name="get_quoation_position_end">最后的引号匹配位置</param>
+		/// <param name="get_quotation_position_s">引号匹配列表（包含嵌套）</param>
+		/// <returns>不存在返回 faluse</returns>
+		static bool jumpQuotation( HtmlChar* buff, const size_t buff_size, size_t start_index, size_t& get_quoation_position_end, std::vector<std::pair<size_t, size_t>> &get_quotation_position_s);
 		/// <summary>
 		/// 是否路径符(包含 '/' 与 '\')
 		/// </summary>
@@ -59,7 +70,7 @@ namespace cylHtmlTools {
 		/// <param name="left">左操作符</param>
 		/// <param name="right">有操作符</param>
 		/// <returns>相等返回 true</returns>
-		static bool equHtmlString( HtmlString &left, HtmlString &right );
+		static bool equHtmlString( const HtmlString &left, const HtmlString &right );
 		/// <summary>
 		/// 删除左侧空白字符
 		/// </summary>

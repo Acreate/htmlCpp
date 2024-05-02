@@ -29,6 +29,33 @@ namespace cylHtmlTools {
 		/// </summary>
 		/// <returns>具备 [] 属性的名称</returns>
 		HtmlString getXDirName( ) const;
+	public: // - 属性映射z
+		enum XDir_Attribute_Status {
+			Replace // 替换
+			, Add // 添加
+			, Remove // 移除
+			, Get // 获取
+			, Error // 错误 - 定义的错误类型为 Error ~ Error + 4096
+			, Try = Error + 4096 // 异常 - 定义的异常类型为 Try ~ Try + 4096
+			, None = Try + 4096
+		};
+		/// <summary>
+		/// 插入一个属性<br/>
+		/// 操作状态: 
+		/// </summary>
+		/// <param name="dir_set_name">目录名称</param>
+		/// <param name="xdir_set_type_name">属性名称</param>
+		/// <param name="xDir_set_attribute_value">设置的属性值</param>
+		/// <returns>返回操作状态</returns>
+		XDir_Attribute_Status insertXDirAttributeInfo( const HtmlString &dir_set_name, const HtmlString &xdir_set_type_name, const HtmlString &xDir_set_attribute_value );
+		/// <summary>
+		/// 获取属性
+		/// </summary>
+		/// <param name="dir_set_name">目录名称</param>
+		/// <param name="xdir_set_type_name">属性名称</param>
+		/// <param name="xDir_result_attribute_value">返回的属性值</param>
+		/// <returns>返回操作状态</returns>
+		XDir_Attribute_Status tryAttributeGet( const HtmlString &dir_set_name, const HtmlString &xdir_set_type_name, Vector_HtmlStringSPtr &xDir_result_attribute_value );
 	};
 }
 
