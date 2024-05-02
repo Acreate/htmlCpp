@@ -68,10 +68,12 @@ namespace cylHtmlTools {
 		/// <summary>
 		/// 目录控制符
 		/// </summary>
-		/// <param name="current_find_nodes">控制及诶单</param>
-		/// <param name="control_type">控制符类型</param>
+		/// <param name="current_find_nodes">控制节点列表</param>
+		/// <param name="xdirInfo">目录信息</param>
+		/// <param name="current_control_type">控制符类型</param>
+		/// <param name="old_control_type">上次控制符类型</param>
 		/// <returns>经过控制符转换的节点</returns>
-		Vector_HtmlNodeSPtr pathControlDirName( Vector_HtmlNodeSPtr &current_find_nodes, XDir_Control_Type control_type );
+		Vector_HtmlNodeSPtr pathControlDirName( Vector_HtmlNodeSPtr &current_find_nodes, XDir *xdirInfo, XDir_Control_Type current_control_type, XDir_Control_Type old_control_type );
 
 		/// <summary>
 		/// 匹配全部节点<br/>

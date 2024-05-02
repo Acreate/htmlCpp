@@ -143,9 +143,9 @@ XPath::XPath( ) {
 
 }
 
-Vector_HtmlNodeSPtr XPath::pathControlDirName( Vector_HtmlNodeSPtr &current_find_nodes, XDir_Control_Type control_type ) {
+Vector_HtmlNodeSPtr XPath::pathControlDirName( Vector_HtmlNodeSPtr &current_find_nodes, XDir *xdirInfo, XDir_Control_Type current_control_type, XDir_Control_Type old_control_type ) {
 	Vector_HtmlNodeSPtr result;
-	switch( control_type ) {
+	switch( current_control_type ) {
 	case Cd_Current :// 获取参数列表节点当中的友邻节点-如果存在
 		for( auto &node : current_find_nodes ) {
 			auto copyNode = node.get( );
@@ -211,6 +211,42 @@ Vector_HtmlNodeSPtr XPath::pathControlDirName( Vector_HtmlNodeSPtr &current_find
 			}
 		}
 		break;
+	case Cd_None : {
+		if( old_control_type == Cd_None ) // 上次节点控制符使用的是名称代表，则当前需要使用子目录
+			for( auto &findNode : current_find_nodes ) { // 获取检查节点
+				for( auto &subNode : *findNode->getChildren( ) ) { // 获取子节点
+					auto iterator = result.begin( );
+					auto end = result.end( );
+					for( ; iterator != end; ++iterator )
+						if( *iterator->get( ) == *subNode.get( ) )
+							break;
+					if( iterator == end ) {
+						HtmlNode *htmlNode = subNode.get( );
+						auto nodeName = *htmlNode->getNodeName( );
+						if( xdirInfo->hasName( nodeName ) )
+							if( xdirInfo->hasAttribute( htmlNode->analysisAttribute( ), nodeName ) )
+								result.emplace_back( subNode );
+					}
+				}
+			}
+		else { // 上次节点控制符使用的是路径控制符，则当前需要使用当前目录
+			for( auto &findNode : current_find_nodes ) { // 获取检查节点
+				auto iterator = result.begin( );
+				auto end = result.end( );
+				for( ; iterator != end; ++iterator )
+					if( *iterator->get( ) == *findNode.get( ) )
+						break;
+				if( iterator == end ) {
+					HtmlNode *htmlNode = findNode.get( );
+					auto nodeName = *htmlNode->getNodeName( );
+					if( xdirInfo->hasName( nodeName ) )
+						if( xdirInfo->hasAttribute( htmlNode->analysisAttribute( ), nodeName ) )
+							result.emplace_back( findNode );
+				}
+			}
+		}
+	}
+	break;
 	}
 	return result;
 }
@@ -255,17 +291,22 @@ Vector_HtmlNodeSPtr_Shared XPath::buider( Vector_HtmlNodeSPtr_Shared &html_node_
 	HtmlString currentPath( 1, dot );
 	HtmlString topPath( 1, dot );
 	HtmlString dirName;
+	auto dirControlType = Cd_None;
 	// 第一个节点
 	auto xdir = iterator->get( );
 	dirName.append( xdir->getDirName( ) );
 	if( HtmlStringTools::equRemoveSpaceOverHtmlString( rootPath, dirName ) ) {
-		currentFindNodes = pathControlDirName( currentFindNodes, Cd_Root );
+		currentFindNodes = pathControlDirName( currentFindNodes, xdir, Cd_Root, dirControlType );
+		dirControlType = Cd_Root;
 	} else if( HtmlStringTools::equRemoveSpaceOverHtmlString( currentPath, dirName ) ) {
-		currentFindNodes = pathControlDirName( currentFindNodes, Cd_Current );
+		currentFindNodes = pathControlDirName( currentFindNodes, xdir, Cd_Current, dirControlType );
+		dirControlType = Cd_Current;
 	} else if( HtmlStringTools::equRemoveSpaceOverHtmlString( topPath, dirName ) ) {
-		currentFindNodes = pathControlDirName( currentFindNodes, Cd_Parent );
+		currentFindNodes = pathControlDirName( currentFindNodes, xdir, Cd_Parent, dirControlType );
+		dirControlType = Cd_Parent;
 	} else { // 正常名称
 		currentFindNodes = matchesHtmlDocAllNodes( currentFindNodes, xdir, dirName );
+		dirControlType = Cd_None;
 	}
 
 	++iterator; // 下一个节点
@@ -302,49 +343,32 @@ Vector_HtmlNodeSPtr_Shared XPath::buider( Vector_HtmlNodeSPtr_Shared &html_node_
 		xdir = iterator->get( );
 		dirName = xdir->getDirName( );
 		if( HtmlStringTools::equRemoveSpaceOverHtmlString( rootPath, dirName ) ) {
-			currentFindNodes = pathControlDirName( currentFindNodes, Cd_Root );
+			currentFindNodes = pathControlDirName( currentFindNodes, xdir, Cd_Root, dirControlType );
+			dirControlType = Cd_Root;
 		} else if( HtmlStringTools::equRemoveSpaceOverHtmlString( currentPath, dirName ) ) {
-			currentFindNodes = pathControlDirName( currentFindNodes, Cd_Current );
+			currentFindNodes = pathControlDirName( currentFindNodes, xdir, Cd_Current, dirControlType );
+			dirControlType = Cd_Current;
 		} else if( HtmlStringTools::equRemoveSpaceOverHtmlString( topPath, dirName ) ) {
-			currentFindNodes = pathControlDirName( currentFindNodes, Cd_Parent );
+			currentFindNodes = pathControlDirName( currentFindNodes, xdir, Cd_Parent, dirControlType );
+			dirControlType = Cd_Parent;
 		} else { // 正常名称
+			currentFindNodes = pathControlDirName( currentFindNodes, xdir, Cd_None, dirControlType );
+			dirControlType = Cd_None;
+		}
 
-		/*
-		 *	todo :
-		 *	1.遍历当前节点，匹配名称
-		 *	2.是否跳出调用
-		 *		A.跳出 -> 返回当前匹配的所有节点
-		 *		B.继续 -> 获取所有子节点
-		 */
-			
-			
-			for( auto &node : *resultShared ) { // 获取子节点
-				for( auto &subNode : *node->getChildren( ) ) {
-					auto finNodeBegin = currentFindNodes.begin( );
-					auto finNodeEnd = currentFindNodes.end( );
-					for( ; finNodeBegin != finNodeEnd; ++finNodeBegin )
-						if( *finNodeBegin->get( ) == *subNode.get( ) )
-							break;
-					if( finNodeBegin == finNodeEnd )
-						currentFindNodes.emplace_back( subNode );
-				}
+		++iterator;
+		if( iterator == end ) {
+			for( auto &node : currentFindNodes ) {
+				auto resultIterator = resultShared->begin( );
+				auto resultEnd = resultShared->end( );
+				for( ; resultIterator != resultEnd; ++resultIterator )
+					if( *resultIterator->get( ) == *node )
+						break;
+				if( resultIterator == resultEnd )
+					resultShared->emplace_back( node );
 			}
-		}
-
-		++iterator; // 下一个节点
-		for( auto &node : currentFindNodes ) {
-			auto resultIterator = resultShared->begin( );
-			auto resultEnd = resultShared->end( );
-			for( ; resultIterator != resultEnd; ++resultIterator )
-				if( *resultIterator->get( ) == *node )
-					break;
-			if( resultIterator == resultEnd )
-				resultShared->emplace_back( node );
-		}
-		if( iterator == end )  // 无法继续下去
 			return resultShared;
-		currentFindNodes.clear( );
-
+		}
 	} while( true );
 	return resultShared;
 }
