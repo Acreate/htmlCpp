@@ -8,7 +8,7 @@
 #include <string>
 
 #include "../export/HtmlTools_export.h" // 导出导入声明
-namespace htmlTools {
+namespace cylHtmlTools {
 	/// <summary>
 	/// 限定文本类型
 	/// </summary>
@@ -80,7 +80,7 @@ namespace htmlTools {
 	using HtmlStringMapToVectorHtmlStrSPtr = std::unordered_map< HtmlString, Vector_HtmlStringSPtr_Shared >;
 
 }
-namespace htmlTools {
+namespace cylHtmlTools {
 	namespace charValue {
 		static constexpr HtmlChar singleQuotation = L'\''; // 单引号
 		static constexpr HtmlChar exclamation = L'!'; // 感叹号。用于识别 DOCTYPE 节点或注释节点

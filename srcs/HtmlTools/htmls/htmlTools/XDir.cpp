@@ -3,7 +3,7 @@
 #include <iostream>
 
 #include "../../htmlString/HtmlStringTools.h"
-using namespace htmlTools;
+using namespace cylHtmlTools;
 
 inline bool insertOrAssign( HtmlStringMapToVectorHtmlStrSPtr &mapObj, const HtmlString &key, const HtmlString &value ) {
 	auto iterator = mapObj.begin( );
@@ -23,20 +23,20 @@ inline bool tryGet( const HtmlStringMapToVectorHtmlStrSPtr &mapObj, const HtmlSt
 	auto end = mapObj.end( );
 	for( ; iterator != end; ++iterator )
 		if( iterator->first == key ) {
-			auto& sharedPtrs = iterator->second;
-			for( auto& ptr : *sharedPtrs )
+			auto &sharedPtrs = iterator->second;
+			for( auto &ptr : *sharedPtrs )
 				value.emplace_back( std::make_shared< HtmlString >( *ptr ) );
 			return true;
 		}
 	return false;
 }
 
-XDir::XDir( const htmlTools::HtmlString &param ) {
+XDir::XDir( const cylHtmlTools::HtmlString &param ) {
 	size_t length = param.length( );
 	if( length == 0 )
 		return;
-	htmlTools::HtmlChar value;
-	std::vector< htmlTools::HtmlChar > buff;
+	cylHtmlTools::HtmlChar value;
+	std::vector< cylHtmlTools::HtmlChar > buff;
 	for( size_t index = 0; index < length; ++index ) {
 		value = param[ index ];
 		if( value == L'[' ) { // 找到 ]
@@ -91,7 +91,7 @@ XDir::~XDir( ) {
 }
 bool XDir::hasName( const HtmlString &dir_name ) const {
 	for( auto &name : namesList )
-		if( dir_name == name )
+		if( HtmlStringTools::equRemoveSpaceOverHtmlString( dir_name, name ) )
 			return true;
 	return false;
 }
@@ -119,18 +119,19 @@ void insertOrAssign( std::unordered_map< HtmlString, HtmlStringPairUnorderMap > 
 /// <returns>列表个数</returns>
 inline size_t initAttributesMap(
 	const HtmlStringMapToVectorHtmlStrSPtr &src,
-	std::unordered_map< HtmlString, HtmlStringPairUnorderMap > &target ) {
+	std::shared_ptr< std::unordered_map< HtmlString, HtmlStringPairUnorderMap > > &target ) {
+	target = std::make_shared< std::unordered_map< HtmlString, HtmlStringPairUnorderMap > >( );
 	auto iterator = src.begin( );
 	auto end = src.end( );
 	size_t equIndex, index;
 	std::vector< HtmlChar > bufff;
 	for( ; iterator != end; ++iterator ) { // 遍历属性列表
-		auto& second = iterator->second;
-		for( auto& attributeIterator : *second ) {
+		auto &second = iterator->second;
+		for( auto &attributeIterator : *second ) {
 			size_t length = attributeIterator->length( );
-			auto& dirKey = iterator->first;
+			auto &dirKey = iterator->first;
 			for( index = 0; index < length; ++index ) {
-				auto& valueChar = attributeIterator->at( index );
+				auto &valueChar = attributeIterator->at( index );
 				if( valueChar == charValue::at ) { // 分解属性
 					for( equIndex = index + 1; equIndex < length; ++equIndex ) {
 						valueChar = attributeIterator->at( equIndex );
@@ -175,14 +176,14 @@ inline size_t initAttributesMap(
 						buffSize = bufff.size( );
 						auto value( HtmlString( bufff.data( ), buffSize ) );
 						bufff.clear( );
-						insertOrAssign( target, dirKey, std::make_pair( key, value ) );
+						insertOrAssign( *target, dirKey, std::make_pair( key, value ) );
 					}
 				}
 
 			}
 		}
 	}
-	return target.size( );
+	return target->size( );
 }
 
 inline bool compAttributesKey( HtmlString left, HtmlString right ) {
@@ -242,11 +243,15 @@ inline bool compAttributesKey( HtmlString left, HtmlString right ) {
 }
 bool XDir::hasAttribute( const HtmlStringPairUnorderMap_Shared &attribute, const HtmlString &nodeName ) {
 	if( attribute->size( ) > 0 ) {
-		if( attributesMap.size( ) == 0 &&
-			initAttributesMap( attributesList, attributesMap ) == 0 ) // 当前 xpath 不要求存在属性
+		if( !attributesMap ) { // 初始化一次
+			auto mapCount = initAttributesMap( attributesList, attributesMap );
+			if( mapCount == 0 ) // 当前 xpath 不要求存在属性
+				return true;
+		} else if( attributesMap->size( ) == 0 )// 当前 xpath 不要求存在属性
 			return true;
+
 		// 检查属性
-		HtmlStringPairUnorderMap unorderedMap = attributesMap.at( nodeName );
+		HtmlStringPairUnorderMap unorderedMap = attributesMap->at( nodeName );
 		if( unorderedMap.size( ) == 0 )
 			return false;
 		auto begin = unorderedMap.begin( );
@@ -259,24 +264,29 @@ bool XDir::hasAttribute( const HtmlStringPairUnorderMap_Shared &attribute, const
 					if( compAttributesKey( iterator->second, begin->second ) )
 						return true;
 			}
-
 		}
 		return false;
 	}
 
 	return true;
 }
-HtmlString XDir::getDirName( ) const {
+HtmlString XDir::getXDirName( ) const {
 	HtmlString result;
 	for( auto &name : namesList ) {
 		result.append( name );
 		Vector_HtmlStringSPtr outHtmlStringShared;
 		if( tryGet( attributesList, name, outHtmlStringShared ) ) { // 存在
 			result.append( L"[" );
-			for( auto& attribute : outHtmlStringShared )
+			for( auto &attribute : outHtmlStringShared )
 				result.append( *attribute );
 			result.append( L"]" );
 		}
 	}
+	return result;
+}
+HtmlString XDir::getDirName( ) const {
+	HtmlString result;
+	for( auto &name : namesList )
+		result.append( name );
 	return result;
 }

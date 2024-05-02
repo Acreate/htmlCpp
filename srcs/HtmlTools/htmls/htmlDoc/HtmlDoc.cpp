@@ -1,4 +1,4 @@
-#include "HtmlDoc.h"
+ï»¿#include "HtmlDoc.h"
 
 #include "../../macro/cmake_to_c_cpp_header_env.h"
 #include "../../htmlString/HtmlStringTools.h"
@@ -10,12 +10,11 @@
 #include <iostream>
 #include <memory>
 
-#include <stack>
 #include <sstream>
 #include <string>
 
-using namespace htmlTools;
-using namespace htmlTools::charValue;
+using namespace cylHtmlTools;
+using namespace cylHtmlTools::charValue;
 
 bool HtmlDoc::findNextNodeEndChar( const HtmlString_Shared &std_c_w_string, size_t &max_index, size_t &start_index ) {
 	auto CWStrLen = std_c_w_string->length( );
@@ -142,7 +141,7 @@ bool HtmlDoc::isStartNode( const HtmlString_Shared &std_c_w_string, size_t &star
 				break;
 		}
 
-	// Åöµ½µÄµÚÒ»¸ö±ØĞëÊÇ > ¶ø²»ÊÇ /
+	// ç¢°åˆ°çš„ç¬¬ä¸€ä¸ªå¿…é¡»æ˜¯ > è€Œä¸æ˜¯ /
 	for( auto index = start_index + 1; index <= end_index; ++index ) {
 		currentChar = c_str[ index ];
 		if( HtmlStringTools::isJumpSpace( currentChar ) )
@@ -172,7 +171,7 @@ bool HtmlDoc::isStartNode( const HtmlString_Shared &std_c_w_string, size_t &star
 bool HtmlDoc::isEndNode( const HtmlString_Shared &std_c_w_string, size_t &start_index, size_t &end_index ) {
 	auto c_str = std_c_w_string->c_str( );
 	wchar_t currentChar = 0;
-	// Åöµ½µÄµÚÒ»¸ö±ØĞëÊÇ / ¶ø²»ÊÇÍ¨ÓÃ×Ö·û»òÕß >
+	// ç¢°åˆ°çš„ç¬¬ä¸€ä¸ªå¿…é¡»æ˜¯ / è€Œä¸æ˜¯é€šç”¨å­—ç¬¦æˆ–è€… >
 	for( ; start_index <= end_index; ++start_index ) {
 		currentChar = c_str[ start_index ];
 		if( currentChar == nodeStartChar )
@@ -228,7 +227,7 @@ Vector_HtmlNodeSPtr_Shared HtmlDoc::analysisDoubleNode( const HtmlDoc_Shared &ht
 		right = htmlNode.get( )->ptrCWtrLen + left;
 		nodeType = isAnnotation( stdCWString, left, right );
 		if( nodeType ) {
-			// Ìø¹ı×¢ÊÍ½Úµã
+			// è·³è¿‡æ³¨é‡ŠèŠ‚ç‚¹
 			htmlNode->nodeType = Html_Node_Type::AnnotationNode;
 			if( htmlNodeSharedTack.size( ) > 0 )
 				htmlNode->setParent( htmlNodeSharedTack.back( ) );
@@ -239,7 +238,7 @@ Vector_HtmlNodeSPtr_Shared HtmlDoc::analysisDoubleNode( const HtmlDoc_Shared &ht
 		right = htmlNode.get( )->ptrCWtrLen + left;
 		nodeType = isSingelNode( stdCWString, left, right );
 		if( nodeType ) {
-			// Ìø¹ıµ¥½Úµã
+			// è·³è¿‡å•èŠ‚ç‚¹
 			htmlNode->nodeType = Html_Node_Type::SingleNode;
 			if( htmlNodeSharedTack.size( ) > 0 )
 				htmlNode->setParent( htmlNodeSharedTack.back( ) );
@@ -260,10 +259,10 @@ Vector_HtmlNodeSPtr_Shared HtmlDoc::analysisDoubleNode( const HtmlDoc_Shared &ht
 			continue;
 		}
 		nodeType = isEndNode( stdCWString, endLeft, right );
-		if( !nodeType ) // ²»ÊÇ½áÊø½ÚµãÔòÌø¹ı
+		if( !nodeType ) // ä¸æ˜¯ç»“æŸèŠ‚ç‚¹åˆ™è·³è¿‡
 			continue;
 		auto endNodeName = *html_doc_shared->getNodeName( htmlNode );
-		// ÕÒµ½Í¬Ãû½Úµã
+		// æ‰¾åˆ°åŒåèŠ‚ç‚¹
 		size_t index = htmlNodeSharedTack.size( );
 		for( ; index > 0; --index ) {
 			auto nodeSharedTack = htmlNodeSharedTack.back( );
@@ -272,7 +271,7 @@ Vector_HtmlNodeSPtr_Shared HtmlDoc::analysisDoubleNode( const HtmlDoc_Shared &ht
 				break;
 			nodeSharedTack->nodeType = Html_Node_Type::SingleNode;
 			htmlNodeSharedTack.pop_back( );
-			// Ìø¹ı¿ªÍ·½Úµã
+			// è·³è¿‡å¼€å¤´èŠ‚ç‚¹
 			if( htmlNodeSharedTack.size( ) > 0 )
 				nodeSharedTack->setParent( htmlNodeSharedTack.back( ) );
 			else
@@ -399,49 +398,41 @@ HtmlDoc::~HtmlDoc( ) {
 Vector_HtmlNodeSPtr_Shared HtmlDoc::analysisBrotherNode( ) {
 	if( analysisOver )
 		return analysisOver;
-	analysisOver = std::make_shared< Vector_HtmlNodeSPtr >( );// ÓĞ¸¸½Úµã
-	Vector_HtmlNodeSPtr_Shared analysisNone( new Vector_HtmlNodeSPtr ); // ÎŞ¸¸½Úµã
+	analysisOver = std::make_shared< Vector_HtmlNodeSPtr >( );// æœ‰çˆ¶èŠ‚ç‚¹
+	Vector_HtmlNodeSPtr_Shared noneParent( new Vector_HtmlNodeSPtr ); // æ— çˆ¶èŠ‚ç‚¹
 	auto htmlNodes = htmlDocNode.get( );
 	bool isOverAnalysis = false;
 	for( auto &htmlNodeSPtr : *htmlNodes ) {
-		// Ğ£Ñé¸¸½Úµã½âÎö
+		// æ ¡éªŒçˆ¶èŠ‚ç‚¹è§£æ
 		for( auto &overAnalysis : *analysisOver )
-			if( overAnalysis.get( ) == htmlNodeSPtr.get( ) ) {
+			if( *overAnalysis.get( ) == *htmlNodeSPtr.get( ) ) { // å¦‚æœå·²ç»è§£æå®Œæ¯•ï¼Œåˆ™è·³è¿‡èŠ‚ç‚¹
 				isOverAnalysis = true;
 				break;
 			}
-		if( isOverAnalysis ) {
+		if( isOverAnalysis ) { // è·³è¿‡å·²ç»è§£æå®Œæ¯•çš„èŠ‚ç‚¹
 			isOverAnalysis = false;
 			continue;
 		}
-		// Ğ£ÑéÎŞ¸¸½Úµã
-		for( auto &overAnalysis : *analysisNone )
-			if( overAnalysis.get( ) == htmlNodeSPtr.get( ) ) {
-				isOverAnalysis = true;
-				break;
-			}
-		if( isOverAnalysis ) {
-			isOverAnalysis = false;
-			continue;
-		}
-
 
 		auto parent = htmlNodeSPtr->parent;
-		if( parent ) { // ´æÔÚ¸¸½Úµã²Å´æÔÚĞÖµÜ½Úµã
-			analysisOver->emplace_back( htmlNodeSPtr ); // ±£´æµ½¸¸½ÚµãÁĞ±íµ±ÖĞ
-			// ±éÀú¸¸½ÚµãÒıÓÃµÄ×Ó½Úµã£¬²¢°Ñ¸Ã½ÚµãÒıÓÃµ½ĞÖµÜ½Úµãµ±ÖĞ£¨Ìø¹ı×ÔÉí½Úµã£©
+		if( parent ) { // å­˜åœ¨çˆ¶èŠ‚ç‚¹æ‰å­˜åœ¨å…„å¼ŸèŠ‚ç‚¹
+			analysisOver->emplace_back( htmlNodeSPtr ); // ä¿å­˜åˆ°çˆ¶èŠ‚ç‚¹åˆ—è¡¨å½“ä¸­
+			// éå†çˆ¶èŠ‚ç‚¹å¼•ç”¨çš„å­èŠ‚ç‚¹ï¼Œå¹¶æŠŠè¯¥èŠ‚ç‚¹å¼•ç”¨åˆ°å…„å¼ŸèŠ‚ç‚¹å½“ä¸­ï¼ˆè·³è¿‡è‡ªèº«èŠ‚ç‚¹ï¼‰
 			for( auto &parentSubChildren : *parent->subChildren )
-				if( parentSubChildren.get( ) != htmlNodeSPtr.get( ) )
+				if( *parentSubChildren.get( ) != *htmlNodeSPtr.get( ) )
 					htmlNodeSPtr->brother->emplace_back( parentSubChildren );
 			continue;
 		}
-		analysisNone->emplace_back( htmlNodeSPtr ); // ±£´æµ½ÎŞ¸ù½ÚµãÁĞ±íµ±ÖĞ
+		noneParent->emplace_back( htmlNodeSPtr ); // ä¿å­˜åˆ°æ— æ ¹èŠ‚ç‚¹åˆ—è¡¨å½“ä¸­
 	}
-	// ±éÀúÎŞ¸ù½Úµã
-	for( auto &htmlNodeSPtr : *analysisNone ) {
-		// Ğ£Ñé¸¸½Úµã½âÎö
+	if( noneParent->size( ) == 0 )
+		return analysisOver;
+	auto cloneNoneParent = *noneParent;
+	// éå†æ— æ ¹èŠ‚ç‚¹
+	for( auto &htmlNodeSPtr : *noneParent ) {
+		// æ ¡éªŒçˆ¶èŠ‚ç‚¹è§£æ
 		for( auto &overAnalysis : *analysisOver )
-			if( overAnalysis.get( ) == htmlNodeSPtr.get( ) ) {
+			if( *overAnalysis.get( ) == *htmlNodeSPtr.get( ) ) {
 				isOverAnalysis = true;
 				break;
 			}
@@ -450,9 +441,9 @@ Vector_HtmlNodeSPtr_Shared HtmlDoc::analysisBrotherNode( ) {
 			continue;
 		}
 		analysisOver->emplace_back( htmlNodeSPtr );
-		// ±éÀúÓÑÁÚ½Úµã
-		for( auto &brotherNode : *htmlNodeSPtr->brother )
-			if( htmlNodeSPtr.get( ) != brotherNode.get( ) )
+		// éå†å‹é‚»èŠ‚ç‚¹
+		for( auto &brotherNode : cloneNoneParent )
+			if( *htmlNodeSPtr.get( ) != *brotherNode.get( ) )
 				htmlNodeSPtr->brother->emplace_back( brotherNode );
 	}
 	return analysisOver;
@@ -475,29 +466,29 @@ HtmlString_Shared HtmlDoc::getNodeContent( const HtmlNode_Shared &node_shared ) 
 	return result;
 }
 HtmlString_Shared HtmlDoc::getNodeName( const HtmlNode_Shared &node_shared ) const {
-	wchar_t currentChar = zero; // ÁÙÊ±×Ö·û
-	auto c_w_str = node_shared->czWStr->c_str( ) + node_shared->ptrOffset; // ×Ö·û´®Ö¸Ïò×ø±ê
+	wchar_t currentChar = zero; // ä¸´æ—¶å­—ç¬¦
+	auto c_w_str = node_shared->czWStr->c_str( ) + node_shared->ptrOffset; // å­—ç¬¦ä¸²æŒ‡å‘åæ ‡
 	size_t index = 0;
-	for( ; index < node_shared->ptrCWtrLen; ++index ) { // ÕÒµ½ < ºóÃæµÄ·Ç¿Õ
+	for( ; index < node_shared->ptrCWtrLen; ++index ) { // æ‰¾åˆ° < åé¢çš„éç©º
 		currentChar = c_w_str[ index ];
 		if( currentChar == nodeStartChar || HtmlStringTools::isJumpSpace( currentChar ) )
 			continue;
 		break;
 	}
-	c_w_str = c_w_str + index; // Ö¸ÏòµÚÒ»¸ö·Ç¿Õ×Ö·û
-	auto ptrCStrLen = node_shared->ptrCWtrLen - index; // Ëõ¼õ³¤¶È
-	for( index = 0; index < ptrCStrLen; ++index ) { // ÕÒµ½µÚÒ»¸ö¿Õ»òÕß / > µÈ×Ö·û
+	c_w_str = c_w_str + index; // æŒ‡å‘ç¬¬ä¸€ä¸ªéç©ºå­—ç¬¦
+	auto ptrCStrLen = node_shared->ptrCWtrLen - index; // ç¼©å‡é•¿åº¦
+	for( index = 0; index < ptrCStrLen; ++index ) { // æ‰¾åˆ°ç¬¬ä¸€ä¸ªç©ºæˆ–è€… / > ç­‰å­—ç¬¦
 		currentChar = c_w_str[ index ];
 		if( HtmlStringTools::isJumpSpace( currentChar ) || currentChar == nodeEndChar || currentChar == forwardSlash )
 			break;
 	}
-	if( currentChar == forwardSlash ) { // Èç¹ûÅöµ½Ğ±¸Ü /(½ÚµãÊÇÎ²½Úµã)
-		for( ; index < ptrCStrLen; ++index ) { // ÕÒµ½µÚÒ»¸ö·Ç¿Õ»òÕß > µÈ×Ö·û
+	if( currentChar == forwardSlash ) { // å¦‚æœç¢°åˆ°æ–œæ  /(èŠ‚ç‚¹æ˜¯å°¾èŠ‚ç‚¹)
+		for( ; index < ptrCStrLen; ++index ) { // æ‰¾åˆ°ç¬¬ä¸€ä¸ªéç©ºæˆ–è€… > ç­‰å­—ç¬¦
 			currentChar = c_w_str[ index ];
 			if( !HtmlStringTools::isJumpSpace( currentChar ) ) {
 				++index;
 				c_w_str = c_w_str + index;
-				for( index = 0; index < ptrCStrLen; ++index ) { // ÕÒµ½µÚÒ»¸ö¿Õ»òÕß > µÈ×Ö·û
+				for( index = 0; index < ptrCStrLen; ++index ) { // æ‰¾åˆ°ç¬¬ä¸€ä¸ªç©ºæˆ–è€… > ç­‰å­—ç¬¦
 					currentChar = c_w_str[ index ];
 					if( HtmlStringTools::isJumpSpace( currentChar ) || currentChar == nodeEndChar )
 						break;
@@ -544,27 +535,27 @@ HtmlString_Shared HtmlDoc::getNodeContentText( const HtmlNode_Shared &node_share
 		return getNodeContent( node_shared );
 	auto startNode = node_shared->startNode;
 	auto endNode = node_shared->endNode;
-	auto offset = startNode->ptrOffset + startNode->ptrCWtrLen; // ¿ªÊ¼½ÚµãµÄ½áÊøÎ»ÖÃ
-	auto wstrPtr = htmlWCStr->c_str( ); // ×Ö·û´®Ö¸Õë
+	auto offset = startNode->ptrOffset + startNode->ptrCWtrLen; // å¼€å§‹èŠ‚ç‚¹çš„ç»“æŸä½ç½®
+	auto wstrPtr = htmlWCStr->c_str( ); // å­—ç¬¦ä¸²æŒ‡é’ˆ
 	if( node_shared->subChildren->size( ) == 0 ) {
 		HtmlString_Shared result( new HtmlString( wstrPtr + offset, endNode->ptrOffset - offset ) );
 		return result;
 	}
 	std::wstringstream stringstream;
-	auto iterator = startNode->subChildren->begin( ); // µü´úÆ÷
-	auto end = startNode->subChildren->end( ); // µü´úÆ÷ÖÕÖ¹Î»ÖÃ
+	auto iterator = startNode->subChildren->begin( ); // è¿­ä»£å™¨
+	auto end = startNode->subChildren->end( ); // è¿­ä»£å™¨ç»ˆæ­¢ä½ç½®
 	for( ; iterator != end; ++iterator ) {
 		auto &nodeShared = *iterator;
 		auto forPathName = getPath( nodeShared );
-		if( nodeShared->ptrOffset > offset ) { // ¼ì²é¿ªÊ¼Î»ÖÃ
+		if( nodeShared->ptrOffset > offset ) { // æ£€æŸ¥å¼€å§‹ä½ç½®
 			// <a> A... <b> </b> </a>
-			// ½ØÈ¡ A../
+			// æˆªå– A../
 			auto wcstrStartPtr = wstrPtr + offset;
 			HtmlString subWString( wcstrStartPtr, nodeShared->ptrOffset - offset );
 			stringstream << subWString;
 		}
 		if( nodeShared->nodeType == Html_Node_Type::DoubleNode ) {
-			// Ñ­»·½Úµãµ±ÖĞµÄ½áÊøÎ»ÖÃ	
+			// å¾ªç¯èŠ‚ç‚¹å½“ä¸­çš„ç»“æŸä½ç½®	
 			size_t forPtrNodeEndIndex = nodeShared->endNode->ptrOffset + nodeShared->endNode->ptrCWtrLen;
 			if( forPtrNodeEndIndex > offset )
 				offset = forPtrNodeEndIndex + 1;
@@ -576,7 +567,7 @@ HtmlString_Shared HtmlDoc::getNodeContentText( const HtmlNode_Shared &node_share
 	}
 	if( endNode->ptrOffset > offset ) {
 		// <a> <b> </b> A... </a>
-		// ½ØÈ¡ A../
+		// æˆªå– A../
 		HtmlString subWString( wstrPtr + offset, endNode->ptrOffset - offset );
 		stringstream << subWString;
 	}

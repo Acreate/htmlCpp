@@ -9,7 +9,7 @@
 
 #include "../enum/HtmlNodeType/Html_Node_Type.h"
 
-namespace htmlTools {
+namespace cylHtmlTools {
 	class HTMLTOOLS_EXPORT HtmlDoc {
 	public: // 友元
 		friend class HtmlNode;
@@ -139,6 +139,13 @@ namespace htmlTools {
 		/// <param name="callFun">校验函数</param>
 		/// <returns>返回列表</returns>
 		Vector_HtmlNodeSPtr_Shared findNodes( const std::function< bool( HtmlNode_Shared & ) > &callFun );
+		bool operator==( const HtmlDoc &right ) const {
+			if( this == &right || htmlWCStr == right.htmlWCStr || htmlDocNode == right.htmlDocNode || thisStdShared == right.thisStdShared )
+				return true;
+			if( *htmlWCStr == *right.htmlWCStr )
+				return true;
+			return false;
+		}
 	private: // 无法使用个构造函数
 		HtmlDoc( );
 	public:

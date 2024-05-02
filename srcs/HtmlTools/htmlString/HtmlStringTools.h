@@ -5,7 +5,7 @@
 #include <locale>
 
 #include "../nameSpace/HtmlTools.h"
-namespace htmlTools {
+namespace cylHtmlTools {
 	class HTMLTOOLS_EXPORT HtmlStringTools {
 	public:
 		/// <summary>
@@ -60,6 +60,21 @@ namespace htmlTools {
 		/// <param name="right">有操作符</param>
 		/// <returns>相等返回 true</returns>
 		static bool equHtmlString( HtmlString &left, HtmlString &right );
+		/// <summary>
+		/// 删除左侧空白字符
+		/// </summary>
+		/// <param name="str">操作字符串</param>
+		static void removeLeftSpace( HtmlString &str );
+		/// <summary>
+		/// 删除右侧空白字符
+		/// </summary>
+		/// <param name="str">操作字符串</param>
+		static void removeRightSpace( HtmlString &str );
+		/// <summary>
+		/// 删除两侧空白字符
+		/// </summary>
+		/// <param name="str">操作字符串</param>
+		static void removeBothSpace( HtmlString &str );
 
 		enum RemoveSpaceStatus {
 			none = 0x00
@@ -72,10 +87,10 @@ namespace htmlTools {
 		/// 删除空白字符后比较两个字符串是否相等
 		/// </summary>
 		/// <param name="left">左操作符</param>
-		/// <param name="right">有操作符</param>
+		/// <param name="rightStr">有操作符</param>
 		/// <param name="removeSpaceStatus">删除空白字符的状态标识</param>
 		/// <returns>相等返回 true</returns>
-		static bool equRemoveSpaceOverHtmlString( HtmlString left, HtmlString right, RemoveSpaceStatus removeSpaceStatus = both );
+		static bool equRemoveSpaceOverHtmlString( HtmlString left, HtmlString rightStr, RemoveSpaceStatus removeSpaceStatus = both );
 	};
 
 }

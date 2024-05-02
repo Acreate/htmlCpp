@@ -5,11 +5,13 @@
 #include <string>
 #include <unordered_map>
 
+#include "../../htmlString/HtmlStringTools.h"
 #include "../../nameSpace/HtmlTools.h"
 
 #include "../enum/HtmlNodeType/Html_Node_Type.h"
+#include "../htmlDoc/HtmlDoc.h"
 
-namespace htmlTools {
+namespace cylHtmlTools {
 	class HTMLTOOLS_EXPORT HtmlNode {
 	public:
 		friend class HtmlDoc;
@@ -47,10 +49,19 @@ namespace htmlTools {
 		HtmlNode_Shared thisSharedPtr; // 当前节点
 		HtmlStringPairUnorderMap_Shared refNodeAttributes; // 当前节点的所有属性
 	private:
-		static void setParent(const HtmlNode_Shared &child, const HtmlNode_Shared &parent );
-	public:
+		static void setParent( const HtmlNode_Shared &child, const HtmlNode_Shared &parent );
+	public: // - 属性节点
 		void setParent( const HtmlNode_Shared &parent ) {
 			setParent( thisSharedPtr, parent );
+		}
+		HtmlNode_Shared getParent( ) const {
+			return parent;
+		}
+		Vector_HtmlNodeSPtr_Shared getChildren( ) const {
+			return subChildren;
+		}
+		Vector_HtmlNodeSPtr_Shared getBrother( ) const {
+			return brother;
 		}
 	public:
 		HtmlNode( );
@@ -136,7 +147,19 @@ namespace htmlTools {
 		/// <param name="max_index">遍历的结束下标</param>
 		/// <param name="index_count">遍历的个数</param>
 		/// <returns>配对列表</returns>
-		static Vector_HtmlNodeSPtr_Shared parseHtmlNodeCharPair(const HtmlDoc_Shared &html_doc_shared, size_t start_index, const size_t max_index, size_t &index_count );
+		static Vector_HtmlNodeSPtr_Shared parseHtmlNodeCharPair( const HtmlDoc_Shared &html_doc_shared, size_t start_index, const size_t max_index, size_t &index_count );
+	public: // 比较
+		bool operator==( const HtmlNode &rightNode ) const {
+			if( this == &rightNode || thisSharedPtr == rightNode.thisSharedPtr )
+				return true;
+			if( ptrOffset == rightNode.ptrOffset && ptrCWtrLen == rightNode.ptrCWtrLen && htmldocShared == rightNode.htmldocShared && *czWStr == *rightNode.czWStr )
+				return true;
+			return false;
+		}
+
+		bool operator!=( const HtmlNode &right ) const {
+			return !( this->operator==( right ) );
+		}
 	};
 
 }

@@ -3,7 +3,7 @@
 #pragma once
 
 #include "../../../nameSpace/HtmlTools.h"
-namespace htmlTools {
+namespace cylHtmlTools {
 	enum class HTMLTOOLS_EXPORT Html_Node_Type {
 		None,
 		DoubleNode,
