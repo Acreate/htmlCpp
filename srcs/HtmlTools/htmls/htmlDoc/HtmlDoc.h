@@ -5,11 +5,11 @@
 #include <memory>
 #include <string>
 
-#include "../../nameSpace/HtmlTools.h"
+#include "../../nameSpace/cylHtmlTools.h"
 
 #include "../enum/HtmlNodeType/Html_Node_Type.h"
 
-namespace htmlTools {
+namespace cylHtmlTools {
 	class HTMLTOOLS_EXPORT HtmlDoc {
 	public: // 友元
 		friend class HtmlNode;
@@ -139,6 +139,13 @@ namespace htmlTools {
 		/// <param name="callFun">校验函数</param>
 		/// <returns>返回列表</returns>
 		Vector_HtmlNodeSPtr_Shared findNodes( const std::function< bool( HtmlNode_Shared & ) > &callFun );
+		bool operator==( const HtmlDoc &right ) const {
+			if( this == &right || htmlWCStr == right.htmlWCStr || htmlDocNode == right.htmlDocNode || thisStdShared == right.thisStdShared )
+				return true;
+			if( *htmlWCStr == *right.htmlWCStr )
+				return true;
+			return false;
+		}
 	private: // 无法使用个构造函数
 		HtmlDoc( );
 	public:
@@ -211,7 +218,7 @@ namespace htmlTools {
 		/// <param name="node_shared">查找的节点</param>
 		/// <param name="callFunction">校验函数</param>
 		/// <returns>命中列表</returns>
-		bool findAttribute( const HtmlNode_Shared &node_shared, const std::function< bool( const HtmlStringPairUnorderMap_Shared & ) > callFunction ) const;
+		bool findAttribute( const HtmlNode_Shared &node_shared, const std::function< bool( const UMap_HtmlStringK_HtmlStringV_Shared & ) > callFunction ) const;
 		/// <summary>
 		/// 查找子节点<br/>
 		/// 查找过程需要调用校验函数，当校验函数返回true时，则判断该节点可命中<br/>
