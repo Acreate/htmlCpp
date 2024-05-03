@@ -12,7 +12,7 @@ bool HtmlStringTools::isSpace( HtmlChar currentChar ) {
 bool HtmlStringTools::jumpSingleQuotation( const HtmlChar *buff, const size_t buff_size, size_t start_index, size_t &get_quoation_position_end, std::vector< std::pair< size_t, size_t > > &get_quotation_position_s ) {
 	if( buff[ start_index ] != charValue::singleQuotation )
 		return false;
-	size_t quotationFirstIndex = start_index, quotationEndIndex = 0;
+	size_t quotationFirstIndex = start_index;
 	for( ++start_index; start_index < buff_size; ++start_index )
 		if( buff[ start_index ] == charValue::singleQuotation )
 			break;
@@ -36,7 +36,7 @@ bool HtmlStringTools::jumpSingleQuotation( const HtmlChar *buff, const size_t bu
 bool HtmlStringTools::jumpDoubleQuotation( const HtmlChar *buff, const size_t buff_size, size_t start_index, size_t &get_quoation_position_end, std::vector< std::pair< size_t, size_t > > &get_quotation_position_s ) {
 	if( buff[ start_index ] != charValue::doubleQuotation )
 		return false;
-	size_t quotationFirstIndex = start_index, quotationEndIndex = 0;
+	size_t quotationFirstIndex = start_index;
 	for( ++start_index; start_index < buff_size; ++start_index )
 		if( buff[ start_index ] == charValue::doubleQuotation )
 			break;
@@ -56,6 +56,11 @@ bool HtmlStringTools::jumpDoubleQuotation( const HtmlChar *buff, const size_t bu
 	get_quotation_position_s.emplace_back( std::make_pair( quotationFirstIndex, get_quoation_position_end ) );
 	return true;
 }
+bool HtmlStringTools::isQuotation( const HtmlChar &char_value ) {
+	if( char_value == charValue::doubleQuotation || char_value == charValue::singleQuotation )
+		return true;
+	return false;
+}
 
 bool HtmlStringTools::jumpQuotation( const HtmlChar *buff, const size_t buff_size, size_t start_index, size_t &get_quoation_position_end, std::vector< std::pair< size_t, size_t > > &get_quotation_position_s ) {
 	if( buff[ start_index ] == charValue::doubleQuotation ) {
@@ -68,7 +73,7 @@ bool HtmlStringTools::jumpQuotation( const HtmlChar *buff, const size_t buff_siz
 bool HtmlStringTools::isRouteChar( HtmlChar currentChar ) {
 	return currentChar == charValue::forwardSlash || currentChar == charValue::backSlash;
 }
-bool HtmlStringTools::jimpSace( const HtmlChar *foreachWCStr, size_t foreachMaxIndex, size_t *startIndex ) {
+bool HtmlStringTools::jumpSace( const HtmlChar *foreachWCStr, size_t foreachMaxIndex, size_t *startIndex ) {
 	for( ; *startIndex < foreachMaxIndex; ++( *startIndex ) )
 		if( !isSpace( foreachWCStr[ *startIndex ] ) )
 			return true;

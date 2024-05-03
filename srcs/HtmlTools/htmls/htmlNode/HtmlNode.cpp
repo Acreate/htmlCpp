@@ -14,7 +14,7 @@ HtmlNode::HtmlNode( ) : parent( nullptr ), subChildren( new Vector_HtmlNodeSPtr 
 HtmlNode::~HtmlNode( ) {
 }
 
-HtmlStringPairUnorderMap_Shared HtmlNode::analysisAttribute( ) {
+UMap_HtmlStringK_HtmlStringV_Shared HtmlNode::analysisAttribute( ) {
 	if( refNodeAttributes ) {
 		if( nodeType == Html_Node_Type::DoubleNode && endNode.get( ) == this ) {
 			endNode->refNodeAttributes = startNode->refNodeAttributes;
@@ -22,7 +22,7 @@ HtmlStringPairUnorderMap_Shared HtmlNode::analysisAttribute( ) {
 		}
 		return refNodeAttributes;
 	}
-	refNodeAttributes = std::make_shared< HtmlStringPairUnorderMap >( );
+	refNodeAttributes = std::make_shared< UMap_HtmlStringK_HtmlStringV >( );
 
 	auto startWStrPtr = this->czWStr->c_str( ) + ptrOffset;
 	size_t equIndex = 0, endIndex = ptrCWtrLen;
@@ -183,7 +183,7 @@ HtmlString_Shared HtmlNode::getPath( ) const {
 HtmlString_Shared HtmlNode::getNodeContentText( ) const {
 	return htmldocShared->getNodeContentText( thisSharedPtr );
 }
-bool HtmlNode::findAttribute( const std::function< bool( const HtmlStringPairUnorderMap_Shared & ) > callFunction ) const {
+bool HtmlNode::findAttribute( const std::function< bool( const UMap_HtmlStringK_HtmlStringV_Shared & ) > callFunction ) const {
 	return htmldocShared->findAttribute( thisSharedPtr, callFunction );
 }
 Vector_HtmlNodeSPtr_Shared HtmlNode::xpath( const HtmlString &xpath ) {

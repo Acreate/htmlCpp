@@ -38,6 +38,12 @@ namespace cylHtmlTools {
 		/// <returns>成功返回 true</returns>
 		static bool jumpDoubleQuotation( const HtmlChar *buff, size_t buff_size, size_t start_index, size_t &get_quoation_position_end, std::vector< std::pair< size_t, size_t > > &get_quotation_position_s );
 		/// <summary>
+		/// 是否是引号(单引号'或者双引号")
+		/// </summary>
+		/// <param name="char_value">判断字符</param>
+		/// <returns>引号返回 true</returns>
+		static bool isQuotation( const HtmlChar &char_value );
+		/// <summary>
 		/// 获取缓冲的的匹配引号位置<br/>
 		/// buff[start_index] 必须等于 charValue::doubleQuotation 或者 charValue::singleQuotation，否则返回 false
 		/// </summary>
@@ -62,7 +68,7 @@ namespace cylHtmlTools {
 		/// <param name="foreachMaxIndex">结束位置</param>
 		/// <param name="startIndex">开始位置，如果成功时，该值返回非空坐标</param>
 		/// <returns>成功返回 true</returns>
-		static bool jimpSace( const HtmlChar *foreachWCStr, size_t foreachMaxIndex, size_t *startIndex );
+		static bool jumpSace( const HtmlChar *foreachWCStr, size_t foreachMaxIndex, size_t *startIndex );
 		/// <summary>
 		/// 获取下个反斜杠的相对位置<br/>
 		/// startIndex 存储最后的下标位置
@@ -86,6 +92,15 @@ namespace cylHtmlTools {
 		/// <returns>成功返回 true</returns>
 		static bool findNextWStringPotion( const HtmlChar *w_c_ptr, size_t src_w_c_str_len, size_t startIndex, const HtmlChar *find_w_c_string, size_t find_w_c_str_len, size_t maxIndex, size_t *result );
 
+		/// <summary>
+		/// 比较两个字符串是否相等
+		/// </summary>
+		/// <param name="left">左操作符</param>
+		/// <param name="right">有操作符</param>
+		/// <returns>相等返回 true</returns>
+		inline static bool equHtmlString( const HtmlString_Shared &left, const HtmlString_Shared &right ) {
+			return equHtmlString( *left, *right );
+		}
 		/// <summary>
 		/// 比较两个字符串是否相等
 		/// </summary>
@@ -119,11 +134,31 @@ namespace cylHtmlTools {
 		/// <summary>
 		/// 删除空白字符后比较两个字符串是否相等
 		/// </summary>
-		/// <param name="left">左操作符</param>
+		/// <param name="leftStr">左操作符</param>
 		/// <param name="rightStr">有操作符</param>
 		/// <param name="removeSpaceStatus">删除空白字符的状态标识</param>
 		/// <returns>相等返回 true</returns>
-		static bool equRemoveSpaceOverHtmlString( HtmlString left, HtmlString rightStr, RemoveSpaceStatus removeSpaceStatus = both );
+		inline static bool equRemoveSpaceOverHtmlString( HtmlString *leftStr, HtmlString *rightStr, RemoveSpaceStatus removeSpaceStatus = both ) {
+			return equRemoveSpaceOverHtmlString( *leftStr, *rightStr, removeSpaceStatus );
+		}
+		/// <summary>
+		/// 删除空白字符后比较两个字符串是否相等
+		/// </summary>
+		/// <param name="leftStr">左操作符</param>
+		/// <param name="rightStr">有操作符</param>
+		/// <param name="removeSpaceStatus">删除空白字符的状态标识</param>
+		/// <returns>相等返回 true</returns>
+		inline static bool equRemoveSpaceOverHtmlString( HtmlString_Shared &leftStr, HtmlString_Shared &rightStr, RemoveSpaceStatus removeSpaceStatus = both ) {
+			return equRemoveSpaceOverHtmlString( *leftStr, *rightStr, removeSpaceStatus );
+		}
+		/// <summary>
+		/// 删除空白字符后比较两个字符串是否相等
+		/// </summary>
+		/// <param name="leftStr">左操作符</param>
+		/// <param name="rightStr">有操作符</param>
+		/// <param name="removeSpaceStatus">删除空白字符的状态标识</param>
+		/// <returns>相等返回 true</returns>
+		static bool equRemoveSpaceOverHtmlString( HtmlString leftStr, HtmlString rightStr, RemoveSpaceStatus removeSpaceStatus = both );
 	};
 
 }

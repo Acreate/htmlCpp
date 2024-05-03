@@ -5,11 +5,53 @@
 #include "../../htmlString/HtmlStringTools.h"
 #include "XDirAttribute.h"
 using namespace cylHtmlTools;
-XDir::XDir_Attribute_Status XDir::insertXDirAttributeInfo( const HtmlString &dir_set_name, const HtmlString &xdir_set_type_name, const HtmlString &xDir_set_attribute_value ) {
-	return { };
+inline void appendVector( Vector_HtmlStringSPtr_Shared &src, Vector_HtmlStringSPtr_Shared &des ) {
+	for( auto &value : *des ) {
+		auto iterator = src->begin( );
+		auto end = src->end( );
+		for( ; iterator != end; ++iterator )
+			if( HtmlStringTools::equRemoveSpaceOverHtmlString( *iterator->get( ), *value.get( ) ) )
+				break;
+		if( iterator == end )
+			src->emplace_back( value );
+	}
 }
-XDir::XDir_Attribute_Status XDir::tryAttributeGet( const HtmlString &dir_set_name, const HtmlString &xdir_set_type_name, Vector_HtmlStringSPtr &xDir_result_attribute_value ) {
-	return { };
+XDir::XDir_Attribute_Status XDir::insertXDirAttributeInfo( const HtmlString &dir_set_name, XDirAttribute_Shared &xdir_info ) {
+	auto mapIterator = attributesMap->begin( );
+	auto mapEnd = attributesMap->end( );
+	for( ; mapIterator != mapEnd; ++mapEnd )
+		if( HtmlStringTools::equRemoveSpaceOverHtmlString( mapIterator->first, dir_set_name ) ) { // 存在
+			auto &attributes = mapIterator->second;
+			auto iterator = attributes->begin( );
+			auto end = attributes->end( );
+			auto name = *xdir_info->name;
+			for( ; iterator != end; ++iterator )
+				if( HtmlStringTools::equRemoveSpaceOverHtmlString( *iterator->get( )->name, name ) ) {
+					appendVector( iterator->get( )->values, xdir_info->values );
+					return Append_Element;
+				}
+			if( iterator == end )
+				attributes->emplace_back( xdir_info );
+			return Add_Element;
+		}
+	if( mapIterator == mapEnd ) {
+		Vector_XDirAttributeSPtr_Shared vectorXDirAttributeSPtrShared( std::make_shared< Vector_XDirAttributeSPtr >( ) );
+		vectorXDirAttributeSPtrShared->emplace_back( xdir_info );
+		attributesMap->emplace( dir_set_name, vectorXDirAttributeSPtrShared );
+		return Add_Array;
+	}
+	return None;
+}
+XDir::XDir_Attribute_Status XDir::tryAttributeGet( const HtmlString &dir_set_name, Vector_XDirAttributeSPtr &xDir_result_attribute_value ) const {
+	auto mapIterator = attributesMap->begin( );
+	auto mapEnd = attributesMap->end( );
+	for( ; mapIterator != mapEnd; ++mapEnd )
+		if( HtmlStringTools::equRemoveSpaceOverHtmlString( mapIterator->first, dir_set_name ) ) { // 存在
+			xDir_result_attribute_value = *mapIterator->second;
+			return XDir_Attribute_Status::Get_Array;
+		}
+
+	return None;
 }
 /// <summary>
 /// 找到下一个字符串<br/>
@@ -64,7 +106,7 @@ inline bool findStr(
 /// <returns>解析个数</returns>
 inline size_t parseXDirAttributes( const HtmlChar *buff, const size_t buff_size,
 	Vector_XDirAttributeSPtr_Shared &save_vector_xdirattribute_s ) {
-	size_t parseCount = 0;
+	size_t parseCount = save_vector_xdirattribute_s->size( );
 	HtmlChar charValue;
 	size_t index = 0;
 	size_t nameLeft, nameRight;
@@ -112,9 +154,10 @@ inline size_t parseXDirAttributes( const HtmlChar *buff, const size_t buff_size,
 		}
 	}
 
-	return parseCount;
+	return save_vector_xdirattribute_s->size( ) - parseCount;
 }
 XDir::XDir( const HtmlString &param ) {
+	attributesMap = std::make_shared< UMap_HtmlStringK_VectorSPtr_XDirAttributeSPtrV >( );
 	size_t length = param.length( );
 	if( length == 0 )
 		return;
@@ -122,26 +165,24 @@ XDir::XDir( const HtmlString &param ) {
 	HtmlChar value; // 当前校验值
 	HtmlChar *buff = new HtmlChar[ length + 1 ]; // 缓存指针
 	size_t buffIndex = 0; // 缓存下标
-	Vector_XDirAttributeSPtr_Shared attributesResult; // 存储解析后的属性
+	Vector_XDirAttributeSPtr_Shared attributesResult( std::make_shared< Vector_XDirAttributeSPtr >( ) ); // 存储解析后的属性
 	for( size_t index = 0; index < length; ++index ) {
 		value = data[ index ];
-		if( value == L'[' ) { // 找到 ]
+		if( value == charValue::leftSquareBracket ) { // 找到 ]
 			HtmlString xdirName( buff, buffIndex );
 			namesList.emplace_back( xdirName );
 			buffIndex = 0;
 			++index;
 			for( ; index < length; ++index ) {
 				value = data[ index ];
-				if( value == L']' ) { // 找到 ]
+				if( value == charValue::rightSquareBracket ) { // 找到 ]
 					if( buffIndex > 0 ) {
 						// 分解属性
 						attributesResult->clear( );
 						auto projectCount = parseXDirAttributes( buff, buffIndex, attributesResult );
-						if( projectCount ) {
-							HtmlString attributeTypeName;
-							HtmlString attributeTypeValue;
-							insertXDirAttributeInfo( xdirName, attributeTypeName, attributeTypeValue );
-						}
+						if( projectCount )
+							for( auto &xdir : *attributesResult )
+								insertXDirAttributeInfo( xdirName, xdir );
 						buffIndex = 0;
 					}
 					break;
@@ -182,22 +223,180 @@ bool XDir::hasName( const HtmlString &dir_name ) const {
 }
 
 
-bool XDir::hasAttribute( const HtmlStringPairUnorderMap_Shared &attribute, const HtmlString &nodeName ) {
+bool equNameAttribute( const UMap_HtmlStringK_HtmlStringV_Shared &pairs, const HtmlString &node_name, const HtmlString &first, Vector_XDirAttributeSPtr_Shared &dir_attributes ) {
+	if( !HtmlStringTools::equRemoveSpaceOverHtmlString( node_name, first ) )
+		return false;
+	auto dirAttributes = dir_attributes.get( ); // 节点的所有属性
+	if( dirAttributes->size( ) == 0 ) // 没有需要匹配的属性
+		return true;
+	if( pairs->size( ) == 0 )
+		return false;
 
+	for( auto &value : *dirAttributes ) {
+		auto dirAttributeName = *value.get( )->getName( );
+		auto iterator = pairs->begin( );
+		auto end = pairs->end( );
+		do {
+			auto &className = iterator->first;
+			if( HtmlStringTools::equRemoveSpaceOverHtmlString( className, dirAttributeName ) ) {
+				const auto &classValue = iterator->second;
+				auto name = std::make_shared< HtmlString >( className );
+				// todo 
+				auto attributeValues = XDirAttribute::converXDirAttributeValues( classValue.data( ), classValue.size( ), name );
+
+				if( value->isIncludeOtherXDirAttributes( *attributeValues ) )
+					return true;
+			}
+			++iterator;
+			if( iterator == end ) // 节点无法满足匹配需求（没有属性）
+				return false;;
+		} while( true );
+	}
+	return false;
+}
+
+
+bool XDir::hasAttribute( const UMap_HtmlStringK_HtmlStringV_Shared &attribute, const HtmlString &nodeName ) {
+	auto iterator = attributesMap->begin( );
+	auto end = attributesMap->end( );
+	if( iterator == end )
+		return true;
+	do {
+		if( equNameAttribute( attribute, nodeName, iterator->first, iterator->second ) )
+			return true;
+		++iterator;
+		if( iterator == end )
+			break;
+	} while( true );
+	return false;
+}
+bool tryGet( const UMap_HtmlStringK_VectorSPtr_XDirAttributeSPtrV_Shared &pairs, const HtmlString &name, Vector_HtmlStringSPtr &vector ) {
+	auto oldSize = vector.size( );
+	auto mapIterator = pairs->begin( );
+	auto mapEnd = pairs->end( );
+	for( ; mapIterator != mapEnd; ++mapIterator ) {
+		if( HtmlStringTools::equRemoveSpaceOverHtmlString( mapIterator->first, name ) ) {
+			auto &vectorSPtr = mapIterator->second;
+			auto iterator = vectorSPtr->begin( );
+			auto end = vectorSPtr->end( );
+			for( ; iterator != end; ++iterator ) {
+				auto resultVectorIterator = vector.begin( );
+				auto resultVectorEnd = vector.end( );
+				HtmlString serializeHtmlString = iterator->get( )->serializeToHtmlString( );
+				for( ; resultVectorIterator != resultVectorEnd; ++resultVectorIterator )
+					if( HtmlStringTools::equRemoveSpaceOverHtmlString( *resultVectorIterator->get( ), serializeHtmlString ) )
+						break;
+				if( resultVectorIterator == resultVectorEnd )
+					vector.emplace_back( std::make_shared< HtmlString >( serializeHtmlString ) );
+			}
+		}
+	}
+	if( vector.size( ) - oldSize > 0 )
+		return true;
+	return false;
+}
+
+inline bool jion( const Vector_HtmlStringSPtr_Shared &html_string_s_ptr, HtmlString &result, const HtmlString &joint ) {
+	auto iterator = html_string_s_ptr->begin( );
+	auto end = html_string_s_ptr->end( );
+	if( iterator == end )
+		return false;
+
+	do {
+		result.append( *iterator->get( ) );
+		++iterator;
+		if( iterator == end )
+			break;
+		result.append( joint );
+	} while( true );
 	return true;
 }
+/// <summary>
+/// 从 x_dir_attribute_s 序列化字符串到 result_htmlString
+/// </summary>
+/// <param name="x_dir_attribute_s">序列数据对象列表</param>
+/// <param name="result">返回属性名称与值的键值对列表</param>
+/// <param name="joint">拼接对象</param>
+/// <returns>序列化个数</returns>
+inline size_t Vector_XDirAttributeSPtrToHtmlString( Vector_XDirAttributeSPtr &x_dir_attribute_s,
+	std::unordered_map< HtmlString, HtmlString > &result,
+	const HtmlString &joint ) {
+	auto iterator = x_dir_attribute_s.begin( );
+	auto end = x_dir_attribute_s.end( );
+	if( iterator == end )
+		return 0;
+	size_t count = 1;
+	HtmlString resultNameHtmlString;
+	HtmlString resultValueHtmlString;
+	HtmlString doubleQuotation( 1, charValue::doubleQuotation );
+	do {
+		resultNameHtmlString = *iterator->get( )->getName( );
+		const auto &ptr = iterator->get( )->getValues( );
+
+		HtmlString subCallResult;
+
+		jion( ptr, subCallResult, joint );
+		if( ptr->size( ) > 1 )
+			subCallResult = doubleQuotation + subCallResult + doubleQuotation;
+		result.emplace( resultNameHtmlString, subCallResult );
+		++iterator;
+		if( iterator == end )
+			break;
+		++count;
+	} while( true );
+
+	return count;
+}
+
+
 HtmlString XDir::getXDirName( ) const {
+	auto nameListIterator = namesList.begin( );
+	auto nameListEnd = namesList.end( );
+	if( nameListIterator == nameListEnd )
+		return HtmlString( );
 	HtmlString result;
-	for( auto &name : namesList ) {
+	HtmlString at( 1, charValue::at );
+	HtmlString equ( 1, charValue::equ );
+	HtmlString spaceValue( 2, charValue::doubleQuotation );
+	HtmlString space( 1, charValue::space );
+	HtmlString leftSquareBracket( 1, charValue::leftSquareBracket );
+	HtmlString rightSquareBracket( 1, charValue::rightSquareBracket );
+
+	do {
+		auto &name = *nameListIterator;
+		Vector_XDirAttributeSPtr xDirResultAttributeValues;
 		result.append( name );
-		//Vector_HtmlStringSPtr outHtmlStringShared;
-		//if( tryGet( attributesList, name, outHtmlStringShared ) ) { // 存在
-		//	result.append( L"[" );
-		//	for( auto &attribute : outHtmlStringShared )
-		//		result.append( *attribute );
-		//	result.append( L"]" );
-		//}
-	}
+		if( tryAttributeGet( name, xDirResultAttributeValues ) == Get_Array ) {
+			std::unordered_map< HtmlString, HtmlString > resultMap;
+			auto serializeCount = Vector_XDirAttributeSPtrToHtmlString( xDirResultAttributeValues, resultMap, space );
+			result.append( leftSquareBracket );
+			if( serializeCount > 0 ) {
+				result.append( at );
+				auto iterator = resultMap.begin( );
+				if( serializeCount > 1 ) {
+					auto end = resultMap.end( );
+					do {
+						result.append( iterator->first );
+						result.append( equ );
+						result.append( iterator->second );
+						++iterator;
+						if( iterator == end )
+							break;
+					} while( true );
+				} else {
+					result.append( iterator->first );
+					result.append( equ );
+					result.append( iterator->second );
+				}
+			}
+			result.append( rightSquareBracket );
+		}
+		++nameListIterator;
+		if( nameListIterator == nameListEnd )
+			break;
+		result.append( space );
+	} while( true );
+
 	return result;
 }
 

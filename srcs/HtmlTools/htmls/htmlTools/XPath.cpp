@@ -56,11 +56,9 @@ static void findItem( Vector_HtmlNodeSPtr_Shared buff, XDir_Shared &subPath, Vec
 		if( nodeIterator == nodeEnd )
 			break;
 		auto nodeWsName = *nodeIterator->get( )->getNodeName( );
-		if( subPath->hasName( nodeWsName ) ) {
-			HtmlStringPairUnorderMap_Shared analysisAttribute = nodeIterator->get( )->analysisAttribute( );
-			if( subPath->hasAttribute( analysisAttribute, nodeWsName ) )
+		if( subPath->hasName( nodeWsName ) )
+			if( subPath->hasAttribute( nodeIterator->get( )->analysisAttribute( ), nodeWsName ) )
 				buff->emplace_back( *nodeIterator );
-		}
 		++nodeIterator;
 	}
 }
@@ -136,9 +134,7 @@ Vector_HtmlNodeSPtr_Shared XPath::relativeBuider( HtmlNode_Shared &html_node_sha
 			result->emplace_back( node );
 	return result;
 }
-Vector_HtmlNodeSPtr_Shared XPath::anyBuider( Vector_HtmlNodeSPtr &html_node_shared ) {
-	return { };
-}
+
 XPath::XPath( ) {
 
 }
@@ -258,23 +254,42 @@ Vector_HtmlNodeSPtr XPath::matchesHtmlDocAllNodes( Vector_HtmlNodeSPtr &currentF
 	for( ; currentFindNodesBegin != currentFindNodesEnd; ++currentFindNodesBegin ) {
 		auto findNodes = currentFindNodesBegin->get( )->htmldocShared->findNodes( [&]( HtmlNode_Shared &node ) ->bool {
 			auto nodeName = *node->getNodeName( );
-			bool equRemoveSpaceOverHtmlString = HtmlStringTools::equRemoveSpaceOverHtmlString( nodeName, path );
-			if( equRemoveSpaceOverHtmlString )
+			if( x_dir->hasName( nodeName ) )
 				if( x_dir->hasAttribute( node->analysisAttribute( ), nodeName ) )
 					return true;
 			return false;
 		} );
-		for( auto &findNode : *findNodes ) {
-			auto buffIterator = buff.begin( );
-			auto buffEnd = buff.end( );
-			for( ; buffIterator != buffEnd; ++buffIterator )
-				if( *buffIterator->get( ) == *findNode.get( ) )
-					break;
-			if( buffIterator == buffEnd )
-				buff.emplace_back( findNode );
-		}
+		if( findNodes )
+			for( auto &findNode : *findNodes ) {
+				auto buffIterator = buff.begin( );
+				auto buffEnd = buff.end( );
+				for( ; buffIterator != buffEnd; ++buffIterator )
+					if( *buffIterator->get( ) == *findNode.get( ) )
+						break;
+				if( buffIterator == buffEnd )
+					buff.emplace_back( findNode );
+			}
 	}
 	return buff;
+}
+HtmlString XPath::getHtmlString( ) const {
+	HtmlString result;
+	auto iterator = dirListSPtr.begin( );
+	auto end = dirListSPtr.end( );
+	if( iterator == end )
+		return result;
+
+	do {
+		auto subStr = iterator->get( )->getXDirName( );
+		++iterator;
+		if( iterator == end ) {
+			result = result.append( subStr );
+			break;
+		}
+		result = result.append( subStr ) + charValue::forwardSlash;
+	} while( true );
+
+	return result;
 }
 
 Vector_HtmlNodeSPtr_Shared XPath::buider( Vector_HtmlNodeSPtr_Shared &html_node_shared_s ) {
@@ -322,21 +337,6 @@ Vector_HtmlNodeSPtr_Shared XPath::buider( Vector_HtmlNodeSPtr_Shared &html_node_
 	if( iterator == end )  // 无法继续下去
 		return resultShared;
 
-	currentFindNodes.clear( );
-	for( auto &node : *resultShared ) { // 获取子节点
-		for( auto &subNode : *node->getChildren( ) ) {
-			auto finNodeBegin = currentFindNodes.begin( );
-			auto finNodeEnd = currentFindNodes.end( );
-			for( ; finNodeBegin != finNodeEnd; ++finNodeBegin )
-				if( *finNodeBegin->get( ) == *subNode.get( ) )
-					break;
-			if( finNodeBegin == finNodeEnd )
-				currentFindNodes.emplace_back( subNode );
-		}
-	}
-
-	// todo : 节点路径遍历
-
 	// 根据 dirListSPtr 操作列表
 	do {
 		resultShared->clear( );
@@ -355,21 +355,20 @@ Vector_HtmlNodeSPtr_Shared XPath::buider( Vector_HtmlNodeSPtr_Shared &html_node_
 			currentFindNodes = pathControlDirName( currentFindNodes, xdir, Cd_None, dirControlType );
 			dirControlType = Cd_None;
 		}
-
 		++iterator;
-		if( iterator == end ) {
-			for( auto &node : currentFindNodes ) {
-				auto resultIterator = resultShared->begin( );
-				auto resultEnd = resultShared->end( );
-				for( ; resultIterator != resultEnd; ++resultIterator )
-					if( *resultIterator->get( ) == *node )
-						break;
-				if( resultIterator == resultEnd )
-					resultShared->emplace_back( node );
-			}
-			return resultShared;
-		}
+		if( iterator == end )
+			break;
 	} while( true );
+	resultShared->clear( );
+	for( auto &node : currentFindNodes ) {
+		auto resultIterator = resultShared->begin( );
+		auto resultEnd = resultShared->end( );
+		for( ; resultIterator != resultEnd; ++resultIterator )
+			if( *resultIterator->get( ) == *node )
+				break;
+		if( resultIterator == resultEnd )
+			resultShared->emplace_back( node );
+	}
 	return resultShared;
 }
 Vector_HtmlNodeSPtr_Shared XPath::buider( HtmlDoc_Shared &html_doc_shared ) {
@@ -379,31 +378,4 @@ Vector_HtmlNodeSPtr_Shared XPath::buider( HtmlDoc_Shared &html_doc_shared ) {
 	if( resultShared->size( ) == 0 )
 		return nullptr;
 	return resultShared;
-}
-
-XPath::operator HtmlString( ) const {
-	HtmlString result;
-	auto iterator = dirListSPtr.begin( );
-	auto end = dirListSPtr.end( );
-	if( iterator != end ) {
-		auto subStr = iterator->get( )->getXDirName( );
-		if( subStr.length( ) == 1 ) {
-			if( HtmlStringTools::isRouteChar( subStr[ 0 ] ) ) {
-				++iterator;
-				result = result.append( subStr );
-				if( iterator == end )
-					return result;
-			}
-		}
-		do {
-			subStr = iterator->get( )->getXDirName( );
-			++iterator;
-			if( iterator == end ) {
-				result = result.append( subStr );
-				break;
-			}
-			result = result.append( subStr ) + charValue::forwardSlash;
-		} while( true );
-	}
-	return result;
 }

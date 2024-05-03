@@ -71,19 +71,35 @@ namespace cylHtmlTools {
 	/// <summary>
 	/// 字符串配对的列表映射
 	/// </summary>
-	using HtmlStringPairUnorderMap = std::unordered_map< HtmlString, HtmlString >;
+	using UMap_HtmlStringK_HtmlStringV = std::unordered_map< HtmlString, HtmlString >;
 	/// <summary>
 	/// 字符串配对的列表映射 的共享指针
 	/// </summary>
-
-	using HtmlStringPairUnorderMap_Shared = std::shared_ptr< HtmlStringPairUnorderMap >;
+	using UMap_HtmlStringK_HtmlStringV_Shared = std::shared_ptr< UMap_HtmlStringK_HtmlStringV >;
 
 	// std::unordered_map< HtmlString, Vector_HtmlStringSPtr_Shared >
-	using HtmlStringMapToVectorHtmlStrSPtr = std::unordered_map< HtmlString, Vector_HtmlStringSPtr_Shared >;
+	using UMap_HtmlK_VectorSPtr_HtmlStringSPtrV = std::unordered_map< HtmlString, Vector_HtmlStringSPtr_Shared >;
 
+	/// <summary>
+	/// std::shared_ptr< XDirAttribute >
+	/// </summary>
 	using XDirAttribute_Shared = std::shared_ptr< XDirAttribute >;
+	/// <summary>
+	/// std::vector< std::shared_ptr< XDirAttribute > >
+	/// </summary>
 	using Vector_XDirAttributeSPtr = std::vector< XDirAttribute_Shared >;
+	/// <summary>
+	/// std::shared_ptr< std::vector< std::shared_ptr< XDirAttribute > > >
+	/// </summary>
 	using Vector_XDirAttributeSPtr_Shared = std::shared_ptr< Vector_XDirAttributeSPtr >;
+	/// <summary>
+	/// std::unordered_map< HtmlString, std::shared_ptr< std::vector< std::shared_ptr< XDirAttribute > > > >
+	/// </summary>
+	using UMap_HtmlStringK_VectorSPtr_XDirAttributeSPtrV = std::unordered_map< HtmlString, Vector_XDirAttributeSPtr_Shared >;
+	/// <summary>
+	///  std::shared_ptr< std::unordered_map< HtmlString, std::shared_ptr< std::vector< std::shared_ptr< XDirAttribute > > > > >
+	/// </summary>
+	using UMap_HtmlStringK_VectorSPtr_XDirAttributeSPtrV_Shared = std::shared_ptr< UMap_HtmlStringK_VectorSPtr_XDirAttributeSPtrV >;
 
 }
 namespace cylHtmlTools {
@@ -99,6 +115,10 @@ namespace cylHtmlTools {
 		static constexpr HtmlChar dot = L'.'; // 点
 		static constexpr HtmlChar zero = L'\0'; // 字符串结束符
 		static constexpr HtmlChar at = L'@'; // 服务器位置符号
+		static constexpr HtmlChar space = L' '; // 空格符
+		static constexpr HtmlChar tab = L'\t'; // 制表符
+		static constexpr HtmlChar leftSquareBracket = L'['; // 左中括号
+		static constexpr HtmlChar rightSquareBracket = L']'; // 右中括号
 	}
 }
 #endif // XMLTOOLS_H_H_HEAD__FILE__

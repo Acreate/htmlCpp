@@ -47,7 +47,7 @@ namespace cylHtmlTools {
 		Vector_HtmlNodeSPtr_Shared brother; // 友邻(同级/兄弟)节点
 		Vector_HtmlNodeSPtr_Shared subChildren; // 子节点
 		HtmlNode_Shared thisSharedPtr; // 当前节点
-		HtmlStringPairUnorderMap_Shared refNodeAttributes; // 当前节点的所有属性
+		UMap_HtmlStringK_HtmlStringV_Shared refNodeAttributes; // 当前节点的所有属性
 	private:
 		static void setParent( const HtmlNode_Shared &child, const HtmlNode_Shared &parent );
 	public: // - 属性节点
@@ -72,7 +72,7 @@ namespace cylHtmlTools {
 		/// 键值对配置的属性列表
 		/// </summary>
 		/// <returns>属性映射表</returns>
-		HtmlStringPairUnorderMap_Shared analysisAttribute( );
+		UMap_HtmlStringK_HtmlStringV_Shared analysisAttribute( );
 		/// <summary>
 		/// 获取整个节点
 		/// </summary>
@@ -125,7 +125,7 @@ namespace cylHtmlTools {
 		/// 命中时，可携返回
 		/// <param name="callFunction">校验函数</param>
 		/// <returns>命中列表</returns>
-		bool findAttribute( const std::function< bool( const HtmlStringPairUnorderMap_Shared & ) > callFunction ) const;
+		bool findAttribute( const std::function< bool( const UMap_HtmlStringK_HtmlStringV_Shared & ) > callFunction ) const;
 		/// <summary>
 		/// 使用 xpath 查找元素
 		/// </summary>
