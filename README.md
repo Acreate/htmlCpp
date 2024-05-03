@@ -46,11 +46,61 @@ Vector_HtmlNodeSPtr_Shared HtmlTools::HtmlDoc::analysisBrotherNode( );
 Vector_HtmlNodeSPtr_Shared HtmlTools::HtmlDoc::getNodes( const std::function< bool( const HtmlNode_Shared &node ) > &callFun );
 ```
 
-### 模块
 
-#### 库
 
-HtmlTools
+## 库
+
+### cylHtmlTools::XPath
+
+实现 xptah路径查找
+
+#### 首要路径
+
+../
+
+​	上级目录，获取父级节点的所有友邻节点
+
+./ 
+
+​	当前目录，获取当前节点的所有友邻节点
+
+any
+
+​	任意节点，将会搜索任意名称为 any 节点名称的节点
+
+/ 
+
+​	根节点，返回根部节点
+
+#### 案例
+
+//body
+
+​	根节点下的 body 节点
+
+./body
+
+​	当前节点中搜索所有友邻节点，并且返回 bdoy 节点
+
+../body
+
+​	父级节点当中搜索 body 节点
+
+div
+
+​	所有名为 div 的节点
+
+div[@class='hd']
+
+​	所有属性为 class=‘hd’ 的 div 节点
+
+div[@class='hd cf']/div
+
+所有拥有属性为 class=‘hd’ 的 div 父节点的 div 节点
+
+​	
+
+
 
 #### 测试调用
 
