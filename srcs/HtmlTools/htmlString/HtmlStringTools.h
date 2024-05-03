@@ -4,8 +4,9 @@
 
 #include <locale>
 
-#include "../nameSpace/HtmlTools.h"
-namespace htmlTools {
+
+#include "../nameSpace/cylHtmlTools.h"
+namespace cylHtmlTools {
 	class HTMLTOOLS_EXPORT HtmlStringTools {
 	public:
 		/// <summary>
@@ -14,7 +15,47 @@ namespace htmlTools {
 		/// </summary>
 		/// <param name="currentChar">检测的字符</param>
 		/// <returns>true 表示空字符</returns>
-		static bool isJumpSpace( HtmlChar currentChar );
+		static bool isSpace( HtmlChar currentChar );
+		/// <summary>
+		/// 获取匹配单引号的结束位置<br/>
+		/// buff[start_index] 必须等于 charValue::singleQuotation
+		/// </summary>
+		/// <param name="buff">缓冲</param>
+		/// <param name="buff_size">缓冲大小</param>
+		/// <param name="start_index">开始位置</param>
+		/// <param name="get_quoation_position_end">返回的单引号结束位置</param>
+		/// <param name="get_quotation_position_s">返回的引号配对</param>
+		/// <returns>成功返回 true</returns>
+		static bool jumpSingleQuotation( const HtmlChar *buff, size_t buff_size, size_t start_index, size_t &get_quoation_position_end, std::vector< std::pair< size_t, size_t > > &get_quotation_position_s );
+		/// <summary>
+		/// 获取匹配双引号的结束位置<br/>
+		/// buff[start_index] 必须等于 charValue::doubleQuotation
+		/// </summary>
+		/// <param name="buff">缓冲</param>
+		/// <param name="buff_size">缓冲大小</param>
+		/// <param name="start_index">开始位置</param>
+		/// <param name="get_quoation_position_end">返回的双引号结束位置</param>
+		/// <param name="get_quotation_position_s">返回的引号配对</param>
+		/// <returns>成功返回 true</returns>
+		static bool jumpDoubleQuotation( const HtmlChar *buff, size_t buff_size, size_t start_index, size_t &get_quoation_position_end, std::vector< std::pair< size_t, size_t > > &get_quotation_position_s );
+		/// <summary>
+		/// 是否是引号(单引号'或者双引号")
+		/// </summary>
+		/// <param name="char_value">判断字符</param>
+		/// <returns>引号返回 true</returns>
+		static bool isQuotation( const HtmlChar &char_value );
+		/// <summary>
+		/// 获取缓冲的的匹配引号位置<br/>
+		/// buff[start_index] 必须等于 charValue::doubleQuotation 或者 charValue::singleQuotation，否则返回 false
+		/// </summary>
+		/// <param name="buff">缓冲</param>
+		/// <param name="buff_size">缓冲大小</param>
+		/// <param name="start_index">开始位置</param>
+		/// <param name="get_quoation_position_end">最后的引号匹配位置</param>
+		/// <param name="get_quotation_position_s">引号匹配列表（包含嵌套）</param>
+		/// <returns>不存在返回 faluse</returns>
+		static bool jumpQuotation( const HtmlChar *buff, const size_t buff_size, size_t start_index, size_t &get_quoation_position_end, std::vector< std::pair< size_t, size_t > > &get_quotation_position_s );
+
 		/// <summary>
 		/// 是否路径符(包含 '/' 与 '\')
 		/// </summary>
@@ -29,7 +70,8 @@ namespace htmlTools {
 		/// <param name="foreachMaxIndex">结束位置</param>
 		/// <param name="startIndex">开始位置，如果成功时，该值返回非空坐标</param>
 		/// <returns>成功返回 true</returns>
-		static bool jimpSace( const HtmlChar *foreachWCStr, size_t foreachMaxIndex, size_t *startIndex );
+		static bool jumpSace( const HtmlChar *foreachWCStr, size_t foreachMaxIndex, size_t *startIndex );
+
 		/// <summary>
 		/// 获取下个反斜杠的相对位置<br/>
 		/// startIndex 存储最后的下标位置
@@ -59,7 +101,32 @@ namespace htmlTools {
 		/// <param name="left">左操作符</param>
 		/// <param name="right">有操作符</param>
 		/// <returns>相等返回 true</returns>
-		static bool equHtmlString( HtmlString &left, HtmlString &right );
+		inline static bool equHtmlString( const HtmlString_Shared &left, const HtmlString_Shared &right ) {
+			return equHtmlString( *left, *right );
+		}
+		/// <summary>
+		/// 比较两个字符串是否相等
+		/// </summary>
+		/// <param name="left">左操作符</param>
+		/// <param name="right">有操作符</param>
+		/// <returns>相等返回 true</returns>
+		static bool equHtmlString( const HtmlString &left, const HtmlString &right );
+		/// <summary>
+		/// 删除左侧空白字符
+		/// </summary>
+		/// <param name="str">操作字符串</param>
+		static void removeLeftSpace( HtmlString &str );
+		/// <summary>
+		/// 删除右侧空白字符
+		/// </summary>
+		/// <param name="str">操作字符串</param>
+		static void removeRightSpace( HtmlString &str );
+		/// <summary>
+		/// 删除两侧空白字符
+		/// </summary>
+		/// <param name="str">操作字符串</param>
+		static void removeBothSpace( HtmlString &str );
+
 
 		enum RemoveSpaceStatus {
 			none = 0x00
@@ -71,11 +138,31 @@ namespace htmlTools {
 		/// <summary>
 		/// 删除空白字符后比较两个字符串是否相等
 		/// </summary>
-		/// <param name="left">左操作符</param>
-		/// <param name="right">有操作符</param>
+		/// <param name="leftStr">左操作符</param>
+		/// <param name="rightStr">有操作符</param>
 		/// <param name="removeSpaceStatus">删除空白字符的状态标识</param>
 		/// <returns>相等返回 true</returns>
-		static bool equRemoveSpaceOverHtmlString( HtmlString left, HtmlString right, RemoveSpaceStatus removeSpaceStatus = both );
+		inline static bool equRemoveSpaceOverHtmlString( HtmlString *leftStr, HtmlString *rightStr, RemoveSpaceStatus removeSpaceStatus = both ) {
+			return equRemoveSpaceOverHtmlString( *leftStr, *rightStr, removeSpaceStatus );
+		}
+		/// <summary>
+		/// 删除空白字符后比较两个字符串是否相等
+		/// </summary>
+		/// <param name="leftStr">左操作符</param>
+		/// <param name="rightStr">有操作符</param>
+		/// <param name="removeSpaceStatus">删除空白字符的状态标识</param>
+		/// <returns>相等返回 true</returns>
+		inline static bool equRemoveSpaceOverHtmlString( HtmlString_Shared &leftStr, HtmlString_Shared &rightStr, RemoveSpaceStatus removeSpaceStatus = both ) {
+			return equRemoveSpaceOverHtmlString( *leftStr, *rightStr, removeSpaceStatus );
+		}
+		/// <summary>
+		/// 删除空白字符后比较两个字符串是否相等
+		/// </summary>
+		/// <param name="leftStr">左操作符</param>
+		/// <param name="rightStr">有操作符</param>
+		/// <param name="removeSpaceStatus">删除空白字符的状态标识</param>
+		/// <returns>相等返回 true</returns>
+		static bool equRemoveSpaceOverHtmlString( HtmlString leftStr, HtmlString rightStr, RemoveSpaceStatus removeSpaceStatus = both );
 	};
 
 }

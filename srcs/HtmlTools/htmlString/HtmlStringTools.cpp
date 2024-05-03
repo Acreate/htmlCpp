@@ -4,16 +4,80 @@
 #include <string>
 #include <codecvt>
 #include <locale>
-using namespace htmlTools;
-bool HtmlStringTools::isJumpSpace( HtmlChar currentChar ) {
+
+using namespace cylHtmlTools;
+bool HtmlStringTools::isSpace( HtmlChar currentChar ) {
 	return iswspace( currentChar ) || iswcntrl( currentChar ) || iswcntrl( currentChar );
+}
+
+bool HtmlStringTools::jumpSingleQuotation( const HtmlChar *buff, const size_t buff_size, size_t start_index, size_t &get_quoation_position_end, std::vector< std::pair< size_t, size_t > > &get_quotation_position_s ) {
+	if( buff[ start_index ] != charValue::singleQuotation )
+		return false;
+	size_t quotationFirstIndex = start_index;
+	for( ++start_index; start_index < buff_size; ++start_index )
+		if( buff[ start_index ] == charValue::singleQuotation )
+			break;
+		else if( buff[ start_index ] == charValue::doubleQuotation ) {
+			if( !jumpDoubleQuotation( buff, buff_size, start_index, get_quoation_position_end, get_quotation_position_s ) )
+				break;
+			start_index = get_quoation_position_end;
+		} else if( buff[ start_index ] == charValue::backSlash ) { // 是否出现转义字符
+			auto newIndex = start_index + 1;
+			if( buff[ newIndex ] == charValue::doubleQuotation
+				|| buff[ newIndex ] == charValue::singleQuotation ) //转义字符则跳过一次
+				start_index += 2;
+		}
+	if( start_index == buff_size ) // 超出下标
+		return false;
+	get_quoation_position_end = start_index;
+	get_quotation_position_s.emplace_back( std::make_pair( quotationFirstIndex, get_quoation_position_end ) );
+	return true;
+}
+
+bool HtmlStringTools::jumpDoubleQuotation( const HtmlChar *buff, const size_t buff_size, size_t start_index, size_t &get_quoation_position_end, std::vector< std::pair< size_t, size_t > > &get_quotation_position_s ) {
+	if( buff[ start_index ] != charValue::doubleQuotation )
+		return false;
+	size_t quotationFirstIndex = start_index;
+	for( ++start_index; start_index < buff_size; ++start_index )
+		if( buff[ start_index ] == charValue::doubleQuotation )
+			break;
+		else if( buff[ start_index ] == charValue::singleQuotation ) {
+			if( !jumpSingleQuotation( buff, buff_size, start_index, get_quoation_position_end, get_quotation_position_s ) )
+				break;
+			start_index = get_quoation_position_end;
+		} else if( buff[ start_index ] == charValue::backSlash ) { // 是否出现转义字符
+			auto newIndex = start_index + 1;
+			if( buff[ newIndex ] == charValue::doubleQuotation
+				|| buff[ newIndex ] == charValue::singleQuotation ) //转义字符则跳过一次
+				start_index += 2;
+		}
+	if( start_index == buff_size )// 超出下标
+		return false;
+	get_quoation_position_end = start_index;
+	get_quotation_position_s.emplace_back( std::make_pair( quotationFirstIndex, get_quoation_position_end ) );
+	return true;
+}
+bool HtmlStringTools::isQuotation( const HtmlChar &char_value ) {
+	if( char_value == charValue::doubleQuotation || char_value == charValue::singleQuotation )
+		return true;
+	return false;
+}
+
+bool HtmlStringTools::jumpQuotation( const HtmlChar *buff, const size_t buff_size, size_t start_index, size_t &get_quoation_position_end, std::vector< std::pair< size_t, size_t > > &get_quotation_position_s ) {
+	if( buff[ start_index ] == charValue::doubleQuotation ) {
+		return jumpDoubleQuotation( buff, buff_size, start_index, get_quoation_position_end, get_quotation_position_s );
+	} else if( buff[ start_index ] == charValue::singleQuotation ) {
+		return jumpSingleQuotation( buff, buff_size, start_index, get_quoation_position_end, get_quotation_position_s );
+	} else
+		return false;
 }
 bool HtmlStringTools::isRouteChar( HtmlChar currentChar ) {
 	return currentChar == charValue::forwardSlash || currentChar == charValue::backSlash;
 }
-bool HtmlStringTools::jimpSace( const HtmlChar *foreachWCStr, size_t foreachMaxIndex, size_t *startIndex ) {
+bool HtmlStringTools::jumpSace( const HtmlChar *foreachWCStr, size_t foreachMaxIndex, size_t *startIndex ) {
 	for( ; *startIndex < foreachMaxIndex; ++( *startIndex ) )
-		if( !isJumpSpace( foreachWCStr[ *startIndex ] ) )
+		if( !isSpace( foreachWCStr[ *startIndex ] ) )
+
 			return true;
 	return false;
 }
@@ -52,7 +116,8 @@ bool HtmlStringTools::findNextWStringPotion( const HtmlChar *w_c_ptr, size_t src
 	}
 	return false;
 }
-bool HtmlStringTools::equHtmlString( HtmlString &left, HtmlString &right ) {
+
+bool HtmlStringTools::equHtmlString( const HtmlString &left, const HtmlString &right ) {
 	size_t leftLen = left.length( );
 	size_t rightLen = right.length( );
 	if( leftLen != rightLen )
@@ -63,93 +128,66 @@ bool HtmlStringTools::equHtmlString( HtmlString &left, HtmlString &right ) {
 	return true;
 }
 
+void HtmlStringTools::removeLeftSpace( HtmlString &str ) {
+	size_t index = 0, leftLen = str.length( );
+	for( ; index < leftLen; ++index )
+		if( !isSpace( str[ index ] ) )
+			break;
+	if( index == leftLen )
+		str = HtmlString( );
+	else
+		str = str.substr( index );
+}
+void HtmlStringTools::removeRightSpace( HtmlString &str ) {
+	// 删除 left 字符串
+	size_t leftLen = str.length( );
+	while( 0 < leftLen ) {
+		if( !HtmlStringTools::isSpace( str[ leftLen - 1 ] ) ) {
+			str = str.substr( 0, leftLen );
+			break;
+		}
+		if( leftLen == 0 ) {
+			str = HtmlString( );
+			break;
+		}
+		--leftLen;
+	}
+}
 
-bool HtmlStringTools::equRemoveSpaceOverHtmlString( HtmlString left, HtmlString right, RemoveSpaceStatus removeSpaceStatus ) {
+void HtmlStringTools::removeBothSpace( HtmlString &str ) {
+	// 删除 str 字符串
+	size_t index = 0, leftLen = str.length( );
+	for( ; index < leftLen; ++index )
+		if( !isSpace( str[ index ] ) ) {
+			while( index < leftLen ) {
+				if( !isSpace( str[ leftLen - 1 ] ) ) {
+					str = str.substr( index, leftLen - index );
+					break;
+				}
+				if( leftLen == index ) {
+					str = HtmlString( );
+					break;
+				}
+				--leftLen;
+			}
+			break;
+		}
+}
+bool HtmlStringTools::equRemoveSpaceOverHtmlString( HtmlString leftStr, HtmlString rightStr, RemoveSpaceStatus removeSpaceStatus ) {
 	switch( removeSpaceStatus ) {
-	case RemoveSpaceStatus::left : {
-		// 删除 left 字符串
-		size_t index = 0, leftLen = left.length( ), rightLen = right.length( );
-		for( ; index < leftLen; ++index )
-			if( !isJumpSpace( left[ index ] ) )
-				break;
-		if( index == leftLen )
-			left = HtmlString( );
-		else
-			left = left.substr( index );
+	case left :
+		removeLeftSpace( leftStr );
+		removeLeftSpace( rightStr );
+		break;
+	case right :
+		removeRightSpace( leftStr );
+		removeRightSpace( rightStr );
+		break;
+	case both :
+		removeBothSpace( leftStr );
+		removeBothSpace( rightStr );
+		break;
+	}
+	return equHtmlString( leftStr, rightStr );
 
-		// 删除 right 字符串
-		for( index = 0; index < rightLen; ++index )
-			if( !isJumpSpace( right[ index ] ) )
-				break;
-		if( index == rightLen )
-			right = HtmlString( );
-		else
-			right = right.substr( index );
-	}
-	case RemoveSpaceStatus::right : {
-		// 删除 left 字符串
-		size_t leftLen = left.length( ), rightLen = right.length( );
-		while( 0 < leftLen ) {
-			if( !isJumpSpace( left[ leftLen ] ) )
-				break;
-			if( leftLen == 0 )
-				break;
-			--leftLen;
-		}
-		if( 0 == leftLen )
-			left = HtmlString( );
-		else
-			left = left.substr( 0, leftLen );
-
-		// 删除 right 字符串
-		while( 0 < rightLen ) {
-			if( !isJumpSpace( right[ rightLen ] ) )
-				break;
-			if( rightLen == 0 )
-				break;
-			--rightLen;
-		}
-		if( 0 == rightLen )
-			right = HtmlString( );
-		else
-			right = right.substr( 0, rightLen );
-	}
-	case RemoveSpaceStatus::both : {
-		// 删除 left 字符串
-		size_t index = 0, leftLen = left.length( ), rightLen = right.length( );
-		for( ; index < leftLen; ++index )
-			if( !isJumpSpace( left[ index ] ) ) {
-				while( index < leftLen ) {
-					if( !isJumpSpace( left[ leftLen ] ) )
-						break;
-					if( leftLen == index )
-						break;
-					--leftLen;
-				}
-				break;
-			}
-		if( index == leftLen )
-			left = HtmlString( );
-		else
-			left = left.substr( index, leftLen - index );
-
-		// 删除 right 字符串
-		for( index = 0; index < rightLen; ++index )
-			if( !isJumpSpace( right[ index ] ) ) {
-				while( index < rightLen ) {
-					if( !isJumpSpace( right[ rightLen ] ) )
-						break;
-					if( rightLen == index )
-						break;
-					--rightLen;
-				}
-				break;
-			}
-		if( index == rightLen )
-			right = HtmlString( );
-		else
-			right = right.substr( index, rightLen - index );
-	}
-	}
-	return equHtmlString( left, right );
 }
