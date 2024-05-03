@@ -29,6 +29,8 @@ namespace cylHtmlTools {
 	class HTMLTOOLS_EXPORT XPath;
 	// 工具目录
 	class HTMLTOOLS_EXPORT XDir;
+	// 工具目录属性
+	class HTMLTOOLS_EXPORT XDirAttribute;
 	// std::shared_ptr< XDir > 封装
 	using XDir_Shared = std::shared_ptr< XDir >;
 	//  std::vector< std::shared_ptr< XDir >> 封装
@@ -78,6 +80,10 @@ namespace cylHtmlTools {
 
 	// std::unordered_map< HtmlString, Vector_HtmlStringSPtr_Shared >
 	using HtmlStringMapToVectorHtmlStrSPtr = std::unordered_map< HtmlString, Vector_HtmlStringSPtr_Shared >;
+
+	using XDirAttribute_Shared = std::shared_ptr< XDirAttribute >;
+	using Vector_XDirAttributeSPtr = std::vector< XDirAttribute_Shared >;
+	using Vector_XDirAttributeSPtr_Shared = std::shared_ptr< Vector_XDirAttributeSPtr >;
 
 }
 namespace cylHtmlTools {

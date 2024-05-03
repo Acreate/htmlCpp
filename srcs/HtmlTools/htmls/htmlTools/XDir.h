@@ -2,7 +2,7 @@
 #define XDIR_H_H_HEAD__FILE__
 #pragma once
 
-#include "../../nameSpace/HtmlTools.h"
+#include "../../nameSpace/cylHtmlTools.h"
 namespace cylHtmlTools {
 	class HTMLTOOLS_EXPORT XDir {
 	public:
@@ -10,7 +10,7 @@ namespace cylHtmlTools {
 	private:
 		std::list< HtmlString > namesList;
 		HtmlStringMapToVectorHtmlStrSPtr attributesList;
-		std::shared_ptr< std::unordered_map< HtmlString, HtmlStringPairUnorderMap > > attributesMap;
+		std::shared_ptr< std::unordered_map< HtmlString, Vector_XDirAttributeSPtr_Shared > > attributesMap;
 	public:
 		XDir( const cylHtmlTools::HtmlString &param );
 		virtual ~XDir( );

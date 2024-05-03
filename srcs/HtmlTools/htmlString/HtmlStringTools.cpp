@@ -8,42 +8,62 @@ using namespace cylHtmlTools;
 bool HtmlStringTools::isSpace( HtmlChar currentChar ) {
 	return iswspace( currentChar ) || iswcntrl( currentChar ) || iswcntrl( currentChar );
 }
-bool HtmlStringTools::jumpQuotation( HtmlChar *buff, const size_t buff_size, size_t start_index, size_t &get_quoation_position_end, std::vector< std::pair< size_t, size_t > > &get_quotation_position_s ) {
-	size_t doubleQuotationFirstIndex = 0, doubleQuotationEndIndex = 0;
-	do {
-		if( buff[ start_index ] == charValue::doubleQuotation ) {
-			for( ++start_index; start_index < buff_size; ++start_index )
-				if( buff[ start_index ] == charValue::doubleQuotation )
-					break;
-				else if( buff[ start_index ] == charValue::singleQuotation ) {
-					if( !jumpQuotation( buff, buff_size, start_index, get_quoation_position_end, get_quotation_position_s ) )
-						break;
-					start_index = get_quoation_position_end;
-				}
-			if( start_index == buff_size )
-				break;
-			doubleQuotationEndIndex = start_index;
-			get_quotation_position_s.emplace_back( std::make_pair( doubleQuotationFirstIndex, doubleQuotationEndIndex ) );
-		} else if( buff[ start_index ] == charValue::singleQuotation ) {
-			for( ++start_index; start_index < buff_size; ++start_index )
-				if( buff[ start_index ] == charValue::singleQuotation )
-					break;
-				else if( buff[ start_index ] == charValue::doubleQuotation ) {
-					if( !jumpQuotation( buff, buff_size, start_index, get_quoation_position_end, get_quotation_position_s ) )
-						break;
-					start_index = get_quoation_position_end;
-				}
-			if( start_index == buff_size )
-				break;
-			doubleQuotationEndIndex = start_index;
-			get_quotation_position_s.emplace_back( std::make_pair( doubleQuotationFirstIndex, doubleQuotationEndIndex ) );
-		} else
-			return false;
-	} while( false );
 
-	if( doubleQuotationFirstIndex > doubleQuotationEndIndex )
+bool HtmlStringTools::jumpSingleQuotation( const HtmlChar *buff, const size_t buff_size, size_t start_index, size_t &get_quoation_position_end, std::vector< std::pair< size_t, size_t > > &get_quotation_position_s ) {
+	if( buff[ start_index ] != charValue::singleQuotation )
 		return false;
+	size_t quotationFirstIndex = start_index, quotationEndIndex = 0;
+	for( ++start_index; start_index < buff_size; ++start_index )
+		if( buff[ start_index ] == charValue::singleQuotation )
+			break;
+		else if( buff[ start_index ] == charValue::doubleQuotation ) {
+			if( !jumpDoubleQuotation( buff, buff_size, start_index, get_quoation_position_end, get_quotation_position_s ) )
+				break;
+			start_index = get_quoation_position_end;
+		} else if( buff[ start_index ] == charValue::backSlash ) { // 是否出现转义字符
+			auto newIndex = start_index + 1;
+			if( buff[ newIndex ] == charValue::doubleQuotation
+				|| buff[ newIndex ] == charValue::singleQuotation ) //转义字符则跳过一次
+				start_index += 2;
+		}
+	if( start_index == buff_size ) // 超出下标
+		return false;
+	get_quoation_position_end = start_index;
+	get_quotation_position_s.emplace_back( std::make_pair( quotationFirstIndex, get_quoation_position_end ) );
 	return true;
+}
+
+bool HtmlStringTools::jumpDoubleQuotation( const HtmlChar *buff, const size_t buff_size, size_t start_index, size_t &get_quoation_position_end, std::vector< std::pair< size_t, size_t > > &get_quotation_position_s ) {
+	if( buff[ start_index ] != charValue::doubleQuotation )
+		return false;
+	size_t quotationFirstIndex = start_index, quotationEndIndex = 0;
+	for( ++start_index; start_index < buff_size; ++start_index )
+		if( buff[ start_index ] == charValue::doubleQuotation )
+			break;
+		else if( buff[ start_index ] == charValue::singleQuotation ) {
+			if( !jumpSingleQuotation( buff, buff_size, start_index, get_quoation_position_end, get_quotation_position_s ) )
+				break;
+			start_index = get_quoation_position_end;
+		} else if( buff[ start_index ] == charValue::backSlash ) { // 是否出现转义字符
+			auto newIndex = start_index + 1;
+			if( buff[ newIndex ] == charValue::doubleQuotation
+				|| buff[ newIndex ] == charValue::singleQuotation ) //转义字符则跳过一次
+				start_index += 2;
+		}
+	if( start_index == buff_size )// 超出下标
+		return false;
+	get_quoation_position_end = start_index;
+	get_quotation_position_s.emplace_back( std::make_pair( quotationFirstIndex, get_quoation_position_end ) );
+	return true;
+}
+
+bool HtmlStringTools::jumpQuotation( const HtmlChar *buff, const size_t buff_size, size_t start_index, size_t &get_quoation_position_end, std::vector< std::pair< size_t, size_t > > &get_quotation_position_s ) {
+	if( buff[ start_index ] == charValue::doubleQuotation ) {
+		return jumpDoubleQuotation( buff, buff_size, start_index, get_quoation_position_end, get_quotation_position_s );
+	} else if( buff[ start_index ] == charValue::singleQuotation ) {
+		return jumpSingleQuotation( buff, buff_size, start_index, get_quoation_position_end, get_quotation_position_s );
+	} else
+		return false;
 }
 bool HtmlStringTools::isRouteChar( HtmlChar currentChar ) {
 	return currentChar == charValue::forwardSlash || currentChar == charValue::backSlash;

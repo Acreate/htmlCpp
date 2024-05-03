@@ -2,7 +2,7 @@
 #define HTML_NODE_TYPE_H_H_HEAD__FILE__
 #pragma once
 
-#include "../../../nameSpace/HtmlTools.h"
+#include "../../../nameSpace/cylHtmlTools.h"
 namespace cylHtmlTools {
 	enum class HTMLTOOLS_EXPORT Html_Node_Type {
 		None,
