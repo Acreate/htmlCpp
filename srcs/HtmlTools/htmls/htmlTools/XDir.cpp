@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include "../../htmlString/HtmlStringTools.h"
+
 #include "XDirAttribute.h"
 using namespace cylHtmlTools;
 inline void appendVector( Vector_HtmlStringSPtr_Shared &src, Vector_HtmlStringSPtr_Shared &des ) {

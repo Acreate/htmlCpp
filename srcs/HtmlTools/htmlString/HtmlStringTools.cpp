@@ -4,6 +4,7 @@
 #include <string>
 #include <codecvt>
 #include <locale>
+
 using namespace cylHtmlTools;
 bool HtmlStringTools::isSpace( HtmlChar currentChar ) {
 	return iswspace( currentChar ) || iswcntrl( currentChar ) || iswcntrl( currentChar );
@@ -114,6 +115,7 @@ bool HtmlStringTools::findNextWStringPotion( const HtmlChar *w_c_ptr, size_t src
 	}
 	return false;
 }
+
 bool HtmlStringTools::equHtmlString( const HtmlString &left, const HtmlString &right ) {
 	size_t leftLen = left.length( );
 	size_t rightLen = right.length( );

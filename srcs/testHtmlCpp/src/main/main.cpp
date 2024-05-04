@@ -12,6 +12,7 @@
 #include "htmls/htmlTools/XPath.h"
 #include "htmlString/HtmlStringTools.h"
 
+
 /// <summary>
 /// 根查找
 /// </summary>
@@ -49,9 +50,8 @@ bool getValue( std::wstringstream &stringstream, cylHtmlTools::HtmlDoc_Shared ht
 /// <param name="html_nodes"></param>
 /// <param name="xpath"></param>
 /// <returns></returns>
+
 bool getValue( std::wstringstream &stringstream, cylHtmlTools::Vector_HtmlNodeSPtr_Shared &html_nodes, cylHtmlTools::XPath &xpath ) {
-
-
 	auto vectorHtmlNodeSPtrShared = xpath.buider( html_nodes );
 	if( !vectorHtmlNodeSPtrShared )
 		return false;
@@ -173,13 +173,13 @@ int main( int argc, char *argv[ ] ) {
 		param->emplace_back( node );
 		std::wcout << *node->getPath( ) << std::endl;
 	}
-	xpath = cylHtmlTools::XPath( L"./body/div/div/div/div[@class='hd']/ul/li/a" );
+	xpath = cylHtmlTools::XPath( L"./html" );
 	std::wcout << std::endl << std::endl << xpath.getHtmlString( ) << std::endl << "\t" "-----------------" << std::endl;
 	if( !getValue( stringstream, param, xpath ) )
 		std::cout << "没有找到" << std::endl;
 	std::cout << topstr << std::endl;
 
-	xpath = cylHtmlTools::XPath( L"../body/div/div/div/div[@class='hd']/ul/li/a" );
+	xpath = cylHtmlTools::XPath( L"../html" );
 	std::wcout << std::endl << std::endl << xpath.getHtmlString( ) << std::endl << "\t" "-----------------" << std::endl;
 	param->clear( );
 	for( auto &node : *nodeSPtrShared ) {

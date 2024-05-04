@@ -4,6 +4,7 @@
 
 #include <locale>
 
+
 #include "../nameSpace/cylHtmlTools.h"
 namespace cylHtmlTools {
 	class HTMLTOOLS_EXPORT HtmlStringTools {
@@ -54,6 +55,8 @@ namespace cylHtmlTools {
 		/// <param name="get_quotation_position_s">引号匹配列表（包含嵌套）</param>
 		/// <returns>不存在返回 faluse</returns>
 		static bool jumpQuotation( const HtmlChar *buff, const size_t buff_size, size_t start_index, size_t &get_quoation_position_end, std::vector< std::pair< size_t, size_t > > &get_quotation_position_s );
+
+
 		/// <summary>
 		/// 是否路径符(包含 '/' 与 '\')
 		/// </summary>
@@ -69,6 +72,7 @@ namespace cylHtmlTools {
 		/// <param name="startIndex">开始位置，如果成功时，该值返回非空坐标</param>
 		/// <returns>成功返回 true</returns>
 		static bool jumpSace( const HtmlChar *foreachWCStr, size_t foreachMaxIndex, size_t *startIndex );
+
 		/// <summary>
 		/// 获取下个反斜杠的相对位置<br/>
 		/// startIndex 存储最后的下标位置
