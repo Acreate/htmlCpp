@@ -127,7 +127,6 @@ namespace cylHtmlTools {
 		/// <param name="str">操作字符串</param>
 		static void removeBothSpace( HtmlString &str );
 
-
 		enum RemoveSpaceStatus {
 			none = 0x00
 			, left = 0x01

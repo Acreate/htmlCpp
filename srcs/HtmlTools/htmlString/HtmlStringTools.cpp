@@ -77,7 +77,6 @@ bool HtmlStringTools::isRouteChar( HtmlChar currentChar ) {
 bool HtmlStringTools::jumpSace( const HtmlChar *foreachWCStr, size_t foreachMaxIndex, size_t *startIndex ) {
 	for( ; *startIndex < foreachMaxIndex; ++( *startIndex ) )
 		if( !isSpace( foreachWCStr[ *startIndex ] ) )
-
 			return true;
 	return false;
 }
@@ -189,5 +188,4 @@ bool HtmlStringTools::equRemoveSpaceOverHtmlString( HtmlString leftStr, HtmlStri
 		break;
 	}
 	return equHtmlString( leftStr, rightStr );
-
 }
