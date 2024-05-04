@@ -20,7 +20,6 @@
 /// <param name="xpath"></param>
 /// <returns></returns>
 bool getValue( std::wstringstream &stringstream, cylHtmlTools::HtmlDoc_Shared htmlDoc, cylHtmlTools::XPath &xpath ) {
-
 	auto htmlNodeRoots = htmlDoc->getHtmlNodeRoots( );
 	auto vectorHtmlNodeSPtrShared = xpath.buider( htmlNodeRoots );
 	if( !vectorHtmlNodeSPtrShared )
@@ -82,7 +81,6 @@ bool getValue( std::wstringstream &stringstream, cylHtmlTools::Vector_HtmlNodeSP
 	return true;
 }
 int main( int argc, char *argv[ ] ) {
-
 	std::locale locale("zh_CN.UTF8");
 	std::locale::global( locale );
 	std::wcout.imbue( locale );
@@ -95,7 +93,6 @@ int main( int argc, char *argv[ ] ) {
 	std::wifstream ifstream( path, std::ios::binary | std::ios::in );
 	if( !ifstream.is_open( ) )
 		return -2;
-	ifstream.imbue( locale );
 	std::wstringstream stringstream;
 	stringstream.imbue( locale );
 	do {
@@ -300,6 +297,7 @@ int main( int argc, char *argv[ ] ) {
 	ofstream.open( path, std::ios::binary | std::ios::out | std::ios::trunc );
 	if( !ofstream.is_open( ) )
 		return -2;
+
 	auto mystr = stringstream.str( );
 	ofstream << mystr;
 	ofstream.close( );

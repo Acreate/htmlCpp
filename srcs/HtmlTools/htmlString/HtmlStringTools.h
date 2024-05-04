@@ -55,8 +55,6 @@ namespace cylHtmlTools {
 		/// <param name="get_quotation_position_s">引号匹配列表（包含嵌套）</param>
 		/// <returns>不存在返回 faluse</returns>
 		static bool jumpQuotation( const HtmlChar *buff, const size_t buff_size, size_t start_index, size_t &get_quoation_position_end, std::vector< std::pair< size_t, size_t > > &get_quotation_position_s );
-
-
 		/// <summary>
 		/// 是否路径符(包含 '/' 与 '\')
 		/// </summary>
