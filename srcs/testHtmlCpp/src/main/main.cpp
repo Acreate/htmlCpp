@@ -12,7 +12,6 @@
 #include "htmls/htmlTools/XPath.h"
 #include "htmlString/HtmlStringTools.h"
 
-
 /// <summary>
 /// 根查找
 /// </summary>
@@ -84,7 +83,10 @@ bool getValue( std::wstringstream &stringstream, cylHtmlTools::Vector_HtmlNodeSP
 }
 int main( int argc, char *argv[ ] ) {
 
-
+	std::locale locale("zh_CN.UTF8");
+	std::locale::global( locale );
+	std::wcout.imbue( locale );
+	std::cout.imbue( locale );
 	std::string fString( u8"%s/%s/%s" );
 	char path[ 4096 ]{ 0 };
 	int len = snprintf( path, sizeof( path ), fString.c_str( ), std::string( Project_Run_bin ).c_str( ), u8"writeFile", u8"www.121ds.cc.html" );
@@ -93,7 +95,9 @@ int main( int argc, char *argv[ ] ) {
 	std::wifstream ifstream( path, std::ios::binary | std::ios::in );
 	if( !ifstream.is_open( ) )
 		return -2;
+	ifstream.imbue( locale );
 	std::wstringstream stringstream;
+	stringstream.imbue( locale );
 	do {
 		std::wstring getStr;
 		auto &getline = std::getline( ifstream, getStr );
@@ -296,12 +300,7 @@ int main( int argc, char *argv[ ] ) {
 	ofstream.open( path, std::ios::binary | std::ios::out | std::ios::trunc );
 	if( !ofstream.is_open( ) )
 		return -2;
-
-	std::locale locale( "zh_CN.UTF8" );
-	std::locale lc_old = std::locale::global( locale );
 	auto mystr = stringstream.str( );
-	stringstream.imbue( locale );
-	ofstream.imbue( locale );
 	ofstream << mystr;
 	ofstream.close( );
 	return 0;
