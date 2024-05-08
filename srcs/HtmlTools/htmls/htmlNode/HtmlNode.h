@@ -119,13 +119,15 @@ namespace cylHtmlTools {
 		/// 节点之间的内容会相对应的转换
 		/// </summary>
 		HtmlString_Shared getNodeContentText( ) const;
+
 		/// <summary>
 		/// 查找节点属性<br/>
 		/// 查找过程需要调用校验函数，当校验函数返回true时，则判断该节点可命中<br/>
 		/// 命中时，可携返回
+		/// </summary>
 		/// <param name="callFunction">校验函数</param>
 		/// <returns>命中列表</returns>
-		bool findAttribute( const std::function< bool( const UMap_HtmlStringK_HtmlStringV_Shared & ) > callFunction ) const;
+		UMap_HtmlStringK_HtmlStringV_Shared findAttribute( const std::function< bool( const HtmlString &, const HtmlString & ) > &callFunction ) const;
 		/// <summary>
 		/// 使用 xpath 查找元素
 		/// </summary>

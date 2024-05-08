@@ -22,7 +22,7 @@ UMap_HtmlStringK_HtmlStringV_Shared HtmlNode::analysisAttribute( ) {
 		}
 		return refNodeAttributes;
 	}
-	refNodeAttributes = std::make_shared< UMap_HtmlStringK_HtmlStringV >( );
+	refNodeAttributes = std::make_shared< UMap_HtmlStringK_HtmlString >( );
 
 	auto startWStrPtr = this->czWStr->c_str( ) + ptrOffset;
 	size_t equIndex = 0, endIndex = ptrCWtrLen;
@@ -185,7 +185,7 @@ HtmlString_Shared HtmlNode::getPath( ) const {
 HtmlString_Shared HtmlNode::getNodeContentText( ) const {
 	return htmldocShared->getNodeContentText( thisSharedPtr );
 }
-bool HtmlNode::findAttribute( const std::function< bool( const UMap_HtmlStringK_HtmlStringV_Shared & ) > callFunction ) const {
+UMap_HtmlStringK_HtmlStringV_Shared HtmlNode::findAttribute( const std::function< bool( const HtmlString &, const HtmlString & ) > &callFunction ) const {
 	return htmldocShared->findAttribute( thisSharedPtr, callFunction );
 }
 Vector_HtmlNodeSPtr_Shared HtmlNode::xpath( const HtmlString &xpath ) {

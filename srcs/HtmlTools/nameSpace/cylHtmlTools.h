@@ -71,11 +71,11 @@ namespace cylHtmlTools {
 	/// <summary>
 	/// 字符串配对的列表映射
 	/// </summary>
-	using UMap_HtmlStringK_HtmlStringV = std::unordered_map< HtmlString, HtmlString >;
+	using UMap_HtmlStringK_HtmlString = std::unordered_map< HtmlString, HtmlString >;
 	/// <summary>
 	/// 字符串配对的列表映射 的共享指针
 	/// </summary>
-	using UMap_HtmlStringK_HtmlStringV_Shared = std::shared_ptr< UMap_HtmlStringK_HtmlStringV >;
+	using UMap_HtmlStringK_HtmlStringV_Shared = std::shared_ptr< UMap_HtmlStringK_HtmlString >;
 
 	// std::unordered_map< HtmlString, Vector_HtmlStringSPtr_Shared >
 	using UMap_HtmlK_VectorSPtr_HtmlStringSPtrV = std::unordered_map< HtmlString, Vector_HtmlStringSPtr_Shared >;
