@@ -60,7 +60,7 @@ Vector_HtmlStringSPtr_Shared XDirAttribute::converXDirAttributeValues( const Htm
 							auto iterator = resultVectorSPtr->begin( );
 							auto end = resultVectorSPtr->end( );
 							for( ; iterator != end; ++iterator )
-								if( *iterator == *end )
+								if( *iterator->get(  ) == *htmlStringPtr )
 									break;
 							if( iterator == end )
 								resultVectorSPtr->emplace_back( htmlStringPtr );
