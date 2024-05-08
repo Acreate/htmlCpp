@@ -25,6 +25,7 @@ bool getValue( std::wstringstream &stringstream, cylHtmlTools::HtmlDoc_Shared ht
 	if( !vectorHtmlNodeSPtrShared )
 		return false;
 	stringstream << xpath.getHtmlString( ) << L":\n";
+	stringstream << L"\t" << L"======== htmlDoc ===============" << std::endl;
 	for( auto &node : *vectorHtmlNodeSPtrShared ) {
 		auto name = *node->getNodeName( );
 		auto contentText = *node->getNodeContentText( );
@@ -81,7 +82,7 @@ bool getValue( std::wstringstream &stringstream, cylHtmlTools::Vector_HtmlNodeSP
 	return true;
 }
 int main( int argc, char *argv[ ] ) {
-	std::locale locale("zh_CN.UTF8");
+	std::locale locale( "zh_CN.UTF8" );
 	std::locale::global( locale );
 	std::wcout.imbue( locale );
 	std::cout.imbue( locale );
@@ -119,6 +120,7 @@ int main( int argc, char *argv[ ] ) {
 	// 测试调用
 	size_t endIndex = htmlContent->size( ), startIndex = 0;
 	auto htmlDoc = cylHtmlTools::HtmlDoc::parse( htmlContent, endIndex, startIndex );
+
 
 	stringstream = std::wstringstream( );
 	htmlDoc->findNodes( [=,&stringstream]( cylHtmlTools::HtmlNode_Shared &node )->bool {
@@ -287,6 +289,17 @@ int main( int argc, char *argv[ ] ) {
 			param->emplace_back( subNode );
 	}
 	if( !getValue( stringstream, param, xpath ) )
+		std::cout << "没有找到" << std::endl;
+	std::cout << topstr << std::endl;
+
+	xpath = cylHtmlTools::XPath( L"div[@class='hd']" );
+	std::wcout << std::endl << std::endl << xpath.getHtmlString( ) << std::endl << "\t" "-----------------" << std::endl;
+	param->clear( );
+	for( auto &node : *nodeSPtrShared ) {
+		for( auto &subNode : *node->getChildren( ) )
+			param->emplace_back( subNode );
+	}
+	if( !getValue( stringstream, htmlDoc, xpath ) )
 		std::cout << "没有找到" << std::endl;
 	std::cout << topstr << std::endl;
 

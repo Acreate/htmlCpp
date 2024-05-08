@@ -587,7 +587,7 @@ Vector_HtmlNodeSPtr_Shared HtmlDoc::matchChildrenNodes( const HtmlNode_Shared &n
 }
 Vector_HtmlNodeSPtr_Shared HtmlDoc::xpath( const HtmlString &xpath ) {
 	XPath xPath( xpath );
-	return xPath.buider( thisStdShared );
+	return xPath.buider( this->htmlDocNode );
 }
 Vector_HtmlNodeSPtr_Shared HtmlDoc::getHtmlNodeRoots( ) {
 	if( htmlNodeSPtrRoots )

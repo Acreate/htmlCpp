@@ -217,7 +217,9 @@ XDir::XDir( const HtmlString &param ) {
 XDir::~XDir( ) {
 }
 bool XDir::hasName( const HtmlString &dir_name ) const {
-	for( auto &name : namesList )
+	if( namesList.size( ) == 0 )
+		return false;
+	for( auto &&name : namesList )
 		if( HtmlStringTools::equRemoveSpaceOverHtmlString( dir_name, name ) )
 			return true;
 	return false;

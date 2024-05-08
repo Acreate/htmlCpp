@@ -13,7 +13,7 @@
 
 namespace cylHtmlTools {
 	class HTMLTOOLS_EXPORT XPath {
-		Vector_XDirSPtr dirListSPtr; // 名称
+		Vector_XDirSPtr_Shared dirListSPtr; // 名称
 		HtmlString separator; // 分隔符
 	public:
 		XPath( const HtmlString &wstr );
@@ -34,7 +34,6 @@ namespace cylHtmlTools {
 		/// <param name="html_node_shared">节点列表</param>
 		/// <returns>匹配列表</returns>
 		Vector_HtmlNodeSPtr_Shared relativeBuider( HtmlNode_Shared &html_node_shared );
-
 	public: // 随机 xpath
 		/// <summary>
 		/// 从列表节点当中使用 xpath 查找节点<br/>
@@ -43,13 +42,6 @@ namespace cylHtmlTools {
 		/// <param name="html_node_shared_s">查找的列表</param>
 		/// <returns>节点列表</returns>
 		Vector_HtmlNodeSPtr_Shared buider( Vector_HtmlNodeSPtr_Shared &html_node_shared_s );
-		/// <summary>
-		/// 从文档对象当中使用 xpath 查找节点<br/>
-		/// 找不到则返回 nullptr
-		/// </summary>
-		/// <param name="html_doc_shared">查找的列表</param>
-		/// <returns>节点列表</returns>
-		Vector_HtmlNodeSPtr_Shared buider( HtmlDoc_Shared &html_doc_shared );
 		/// <summary>
 		/// 使用的 路径控制器属性
 		/// </summary>
@@ -79,13 +71,14 @@ namespace cylHtmlTools {
 		/// <returns>查找到的列表</returns>
 		Vector_HtmlNodeSPtr matchesHtmlDocAllNodes( Vector_HtmlNodeSPtr &currentFindNodes, XDir *x_dir, HtmlString &path );
 	public: // - 类型转换
-inline 		operator HtmlString( ) const {
-			return getHtmlString();
+		inline operator HtmlString( ) const {
+			return getHtmlString( );
 		}
 		/// <summary>
 		/// 获取字符串系列(包含属性)
 		/// </summary>
-		inline HtmlString getHtmlString( ) const ;
+		inline HtmlString getHtmlString( ) const;
+
 	};
 
 }
