@@ -59,6 +59,10 @@ Vector_HtmlNodeSPtr XPath::pathControlDirName( Vector_HtmlNodeSPtr &current_find
 	case Cd_Current :// 获取参数列表节点当中的友邻节点-如果存在
 		for( auto &node : current_find_nodes ) {
 			auto copyNode = node.get( );
+			// 跳过尾节点
+			if( copyNode->getNodeType( ) == Html_Node_Type::DoubleNode && copyNode == copyNode->getEndNode( ).get( ) )
+				continue;
+
 			for( auto &resultNode : result )
 				if( *resultNode.get( ) == *copyNode ) {
 					copyNode = nullptr;
@@ -69,6 +73,9 @@ Vector_HtmlNodeSPtr XPath::pathControlDirName( Vector_HtmlNodeSPtr &current_find
 				auto brotherVSPtr = copyNode->getBrother( );
 				for( auto &brother : *brotherVSPtr ) {
 					copyNode = brother.get( );
+					// 跳过尾节点
+					if( copyNode->getNodeType( ) == Html_Node_Type::DoubleNode && copyNode == copyNode->getEndNode( ).get( ) )
+						continue;
 					for( auto &resultNode : result )
 						if( *resultNode.get( ) == *copyNode ) {
 							copyNode = nullptr;
@@ -83,6 +90,10 @@ Vector_HtmlNodeSPtr XPath::pathControlDirName( Vector_HtmlNodeSPtr &current_find
 	case Cd_Parent : // 获取参数列表节点当中的上级节点-如果存在，则遍历友邻节点
 		for( auto &node : current_find_nodes ) {
 			auto htmlNode = node->getParent( ).get( );
+
+			// 跳过尾节点
+			if( htmlNode->getNodeType( ) == Html_Node_Type::DoubleNode && htmlNode == htmlNode->getEndNode( ).get( ) )
+				continue;
 			if( htmlNode ) {
 				for( auto &resultNode : result )
 					if( *resultNode.get( ) == *htmlNode ) {
@@ -94,6 +105,9 @@ Vector_HtmlNodeSPtr XPath::pathControlDirName( Vector_HtmlNodeSPtr &current_find
 					const auto &brothers = htmlNode->getBrother( );
 					for( auto &brother : *brothers ) {
 						htmlNode = brother.get( );
+						// 跳过尾节点
+						if( htmlNode->getNodeType( ) == Html_Node_Type::DoubleNode && htmlNode == htmlNode->getEndNode( ).get( ) )
+							continue;
 						for( auto &resultNode : result )
 							if( *resultNode.get( ) == *htmlNode ) {
 								htmlNode = nullptr;
@@ -111,6 +125,10 @@ Vector_HtmlNodeSPtr XPath::pathControlDirName( Vector_HtmlNodeSPtr &current_find
 			auto htmlNodeRoots = node->getHtmlNodeRoots( );
 			for( auto &rootNode : *htmlNodeRoots ) {
 				auto copyNode = rootNode.get( );
+
+				// 跳过尾节点
+				if( copyNode->getNodeType( ) == Html_Node_Type::DoubleNode && copyNode == copyNode->getEndNode( ).get( ) )
+					continue;
 				for( auto &resultNode : result )
 					if( *resultNode.get( ) == *copyNode ) {
 						copyNode = nullptr;
@@ -124,6 +142,10 @@ Vector_HtmlNodeSPtr XPath::pathControlDirName( Vector_HtmlNodeSPtr &current_find
 	case Cd_None : {
 		if( old_control_type == Cd_None ) // 上次节点控制符使用的是名称代表，则当前需要使用子目录
 			for( auto &findNode : current_find_nodes ) { // 获取检查节点
+				auto copyNode = findNode.get( );
+				// 跳过尾节点
+				if( copyNode->getNodeType( ) == Html_Node_Type::DoubleNode && copyNode == copyNode->getEndNode( ).get( ) )
+					continue;
 				for( auto &subNode : *findNode->getChildren( ) ) { // 获取子节点
 					auto iterator = result.begin( );
 					auto end = result.end( );
@@ -141,6 +163,10 @@ Vector_HtmlNodeSPtr XPath::pathControlDirName( Vector_HtmlNodeSPtr &current_find
 			}
 		else { // 上次节点控制符使用的是路径控制符，则当前需要使用当前目录
 			for( auto &findNode : current_find_nodes ) { // 获取检查节点
+				auto copyNode = findNode.get( );
+				// 跳过尾节点
+				if( copyNode->getNodeType( ) == Html_Node_Type::DoubleNode && copyNode == copyNode->getEndNode( ).get( ) )
+					continue;
 				auto iterator = result.begin( );
 				auto end = result.end( );
 				for( ; iterator != end; ++iterator )
@@ -158,7 +184,16 @@ Vector_HtmlNodeSPtr XPath::pathControlDirName( Vector_HtmlNodeSPtr &current_find
 	}
 	break;
 	}
-	return result;
+
+	Vector_HtmlNodeSPtr buff;
+	for( auto &node : result ) {
+		auto copyNode = node.get( );
+		// 跳过尾节点
+		if( copyNode->getNodeType( ) == Html_Node_Type::DoubleNode && copyNode == copyNode->getEndNode( ).get( ) )
+			continue;
+		buff.emplace_back( node );
+	}
+	return buff;
 }
 
 Vector_HtmlNodeSPtr XPath::matchesHtmlDocAllNodes( Vector_HtmlNodeSPtr &currentFindNodes, XDir *x_dir, HtmlString &path ) {
@@ -167,6 +202,8 @@ Vector_HtmlNodeSPtr XPath::matchesHtmlDocAllNodes( Vector_HtmlNodeSPtr &currentF
 	auto currentFindNodesEnd = currentFindNodes.end( );
 	for( ; currentFindNodesBegin != currentFindNodesEnd; ++currentFindNodesBegin ) {
 		auto findNodes = currentFindNodesBegin->get( )->htmldocShared->findNodes( [&]( HtmlNode_Shared &node ) ->bool {
+			if( node->getNodeType( ) == Html_Node_Type::DoubleNode && node.get( ) == node->getEndNode( ).get( ) ) // 跳过尾节点
+				return false;
 			auto nodeName = *node->getNodeName( );
 			if( x_dir->hasName( nodeName ) )
 				if( x_dir->hasAttribute( node->analysisAttribute( ), nodeName ) )

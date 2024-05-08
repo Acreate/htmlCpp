@@ -175,6 +175,8 @@ size_t HtmlNode::getPtrCWtrLen( ) const {
 	return ptrCWtrLen;
 }
 HtmlString_Shared HtmlNode::getIncludeNodeContent( ) const {
+	if( nodeType == Html_Node_Type::DoubleNode )
+		return htmldocShared->getIncludeNodeContent( startNode );
 	return htmldocShared->getIncludeNodeContent( thisSharedPtr );
 }
 HtmlString_Shared HtmlNode::getPath( ) const {
