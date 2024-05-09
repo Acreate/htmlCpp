@@ -163,7 +163,42 @@ namespace cylHtmlTools {
 		/// <returns>解析完毕的列表</returns>
 		Vector_HtmlNodeSPtr_Shared analysisAttributesNode( );
 	public: // 节点获取属性
-
+		/// <summary>
+		/// 是否是开始节点
+		/// </summary>
+		/// <param name="node_shared">校验节点</param>
+		/// <returns>开始节点为 true</returns>
+		inline bool isStartNode( const HtmlNode_Shared &node_shared ) const;
+		/// <summary>
+		/// 是否是结束节点
+		/// </summary>
+		/// <param name="node_shared">校验节点</param>
+		/// <returns>结束节点为true</returns>
+		inline bool isEndNode( const HtmlNode_Shared &node_shared ) const;
+		/// <summary>
+		/// 是否是双节点
+		/// </summary>
+		/// <param name="node_shared">校验节点</param>
+		/// <returns>双节点返回 true</returns>
+		inline bool isDoubleNodeType( const HtmlNode_Shared &node_shared ) const;
+		/// <summary>
+		/// 是否是开始节点
+		/// </summary>
+		/// <param name="node">校验节点</param>
+		/// <returns>开始节点为 true</returns>
+		inline bool isStartNode( const HtmlNode &node ) const;
+		/// <summary>
+		/// 是否是结束节点
+		/// </summary>
+		/// <param name="node">校验节点</param>
+		/// <returns>结束节点为true</returns>
+		inline bool isEndNode( const HtmlNode &node ) const;
+		/// <summary>
+		/// 是否是双节点
+		/// </summary>
+		/// <param name="node">校验节点</param>
+		/// <returns>双节点返回 true</returns>
+		inline bool isDoubleNodeType( const HtmlNode &node ) const;
 		/// <summary>
 		/// 获取整个节点
 		/// </summary>

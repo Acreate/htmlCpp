@@ -140,6 +140,22 @@ namespace cylHtmlTools {
 		/// </summary>
 		/// <returns>根节点列表</returns>
 		Vector_HtmlNodeSPtr_Shared getHtmlNodeRoots( );
+	public: // - 校验节点
+		/// <summary>
+		/// 是否是开始节点
+		/// </summary>
+		/// <returns>开始节点为 true</returns>
+		inline bool isStartNode( ) const;
+		/// <summary>
+		/// 是否是结束节点
+		/// </summary>
+		/// <returns>结束节点为true</returns>
+		inline bool isEndNode( ) const;
+		/// <summary>
+		/// 是否是双节点
+		/// </summary>
+		/// <returns>双节点返回 true</returns>
+		inline bool isDoubleNodeType( ) const;
 	private:
 		/// <summary>
 		/// 生成 < 与 > 的配对
@@ -154,6 +170,10 @@ namespace cylHtmlTools {
 		bool operator==( const HtmlNode &rightNode ) const {
 			if( this == &rightNode || thisSharedPtr == rightNode.thisSharedPtr )
 				return true;
+			if( isEndNode( ) )
+				return *this->startNode.get( ) == rightNode;
+			if( rightNode.isEndNode( ) )
+				return *this == *rightNode.startNode;
 			if( ptrOffset == rightNode.ptrOffset && ptrCWtrLen == rightNode.ptrCWtrLen && htmldocShared == rightNode.htmldocShared && *czWStr == *rightNode.czWStr )
 				return true;
 			return false;

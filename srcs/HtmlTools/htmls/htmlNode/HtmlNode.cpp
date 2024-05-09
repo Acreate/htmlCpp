@@ -197,6 +197,15 @@ Vector_HtmlNodeSPtr_Shared HtmlNode::xpath( const HtmlString &xpath ) {
 Vector_HtmlNodeSPtr_Shared HtmlNode::getHtmlNodeRoots( ) {
 	return htmldocShared->getHtmlNodeRoots( );
 }
+bool HtmlNode::isStartNode( ) const {
+	return htmldocShared->isStartNode( *this );
+}
+bool HtmlNode::isEndNode( ) const {
+	return htmldocShared->isEndNode( *this );
+}
+bool HtmlNode::isDoubleNodeType( ) const {
+	return htmldocShared->isDoubleNodeType( *this );
+}
 Vector_HtmlNodeSPtr_Shared HtmlNode::parseHtmlNodeCharPair( const HtmlDoc_Shared &html_doc_shared, size_t start_index, const size_t max_index, size_t &index_count ) {
 	Vector_HtmlNodeSPtr_Shared result( new Vector_HtmlNodeSPtr );
 	bool findCharResut = false;
