@@ -152,6 +152,8 @@ HtmlString_Shared HtmlNode::getNodeContent( ) const {
 	return htmldocShared->getNodeContent( thisSharedPtr );
 }
 HtmlString_Shared HtmlNode::getNodeName( ) const {
+	if( isEndNode( ) )
+		return htmldocShared->getNodeName( startNode );
 	return htmldocShared->getNodeName( thisSharedPtr );
 }
 Html_Node_Type HtmlNode::getNodeType( ) const {
@@ -175,7 +177,7 @@ size_t HtmlNode::getPtrCWtrLen( ) const {
 	return ptrCWtrLen;
 }
 HtmlString_Shared HtmlNode::getIncludeNodeContent( ) const {
-	if( nodeType == Html_Node_Type::DoubleNode )
+	if( isEndNode( ) )
 		return htmldocShared->getIncludeNodeContent( startNode );
 	return htmldocShared->getIncludeNodeContent( thisSharedPtr );
 }

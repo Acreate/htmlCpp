@@ -3,7 +3,6 @@
 #include <algorithm>
 #include <iostream>
 
-
 #include "XDir.h"
 #include "../../htmlString/HtmlStringTools.h"
 #include "../htmlNode/HtmlNode.h"
@@ -203,7 +202,7 @@ Vector_HtmlNodeSPtr XPath::matchesHtmlDocAllNodes( Vector_HtmlNodeSPtr &currentF
 	auto currentFindNodesEnd = currentFindNodes.end( );
 	for( ; currentFindNodesBegin != currentFindNodesEnd; ++currentFindNodesBegin ) {
 		auto findNodes = currentFindNodesBegin->get( )->htmldocShared->findNodes( [&]( HtmlNode_Shared &node ) ->bool {
-			if( node->getNodeType( ) == Html_Node_Type::DoubleNode && node.get( ) == node->getEndNode( ).get( ) ) // 跳过尾节点
+			if( node->isEndNode( ) ) // 跳过尾节点
 				return false;
 			auto nodeName = *node->getNodeName( );
 			if( x_dir->hasName( nodeName ) )
@@ -274,7 +273,8 @@ Vector_HtmlNodeSPtr_Shared XPath::buider( Vector_HtmlNodeSPtr_Shared &html_node_
 		currentFindNodes = matchesHtmlDocAllNodes( currentFindNodes, xdir, dirName );
 		dirControlType = Cd_None;
 	}
-
+	if( currentFindNodes.size( ) == 0 ) // 没有找到任何节点
+		return nullptr;
 	++iterator; // 下一个节点
 	for( auto &node : currentFindNodes ) {
 		auto resultIterator = resultShared->begin( );
@@ -306,9 +306,12 @@ Vector_HtmlNodeSPtr_Shared XPath::buider( Vector_HtmlNodeSPtr_Shared &html_node_
 			currentFindNodes = pathControlDirName( currentFindNodes, xdir, Cd_None, dirControlType );
 			dirControlType = Cd_None;
 		}
+		if( currentFindNodes.size( ) == 0 ) // 没有找到任何节点
+			return nullptr;
 		++iterator;
 		if( iterator == end )
 			break;
+
 	} while( true );
 	resultShared->clear( );
 	for( auto &node : currentFindNodes ) {
