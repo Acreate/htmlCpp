@@ -272,6 +272,13 @@ namespace cylHtmlTools {
 		Vector_HtmlNodeSPtr_Shared xpath( const HtmlString &xpath );
 
 		/// <summary>
+		/// 使用 xpath 查找元素-会匹配所有节点
+		/// </summary>
+		/// <param name="xpath">xpath</param>
+		/// <returns>节点列表</returns>
+		Vector_HtmlNodeSPtr_Shared xpathAllNode( const HtmlString &xpath );
+
+		/// <summary>
 		/// 获取所有根节点
 		/// </summary>
 		/// <returns>根节点列表</returns>
