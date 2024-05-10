@@ -543,7 +543,7 @@ size_t HtmlDoc::nodeSize( const HtmlNode_Shared &node_shared ) const {
 size_t HtmlDoc::getPtrOffset( const HtmlNode_Shared &node_shared ) const { return node_shared->ptrOffset; }
 size_t HtmlDoc::getPtrCWtrLen( const HtmlNode_Shared &node_shared ) const { return node_shared->ptrCWtrLen; }
 HtmlString_Shared HtmlDoc::getIncludeNodeContent( const HtmlNode_Shared &node_shared ) const {
-	if( isDoubleNodeType( node_shared ) && node_shared->startNode )
+	if( isEndNode( node_shared ) && node_shared->startNode )
 		return getIncludeNodeContent( node_shared->startNode );
 	return std::make_shared< HtmlString >( node_shared->czWStr->c_str( ) + node_shared->ptrOffset, nodeSize( node_shared ) );
 }
