@@ -2,7 +2,7 @@
 
 
 #include "../htmlDoc/HtmlDoc.h"
-#include "../htmlTools/XPath.h"
+#include "../htmlTools/XPath/XPath.h"
 #include "../../htmlString/HtmlStringTools.h"
 #include <sstream>
 

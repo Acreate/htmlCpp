@@ -1,8 +1,8 @@
 ﻿#ifndef XDIRATTRIBUTE_H_H_HEAD__FILE__
 #define XDIRATTRIBUTE_H_H_HEAD__FILE__
 #pragma once
-#include "../../htmlString/HtmlStringTools.h"
-#include "../../nameSpace/cylHtmlTools.h"
+#include "../../../htmlString/HtmlStringTools.h"
+#include "../../../nameSpace/cylHtmlTools.h"
 namespace cylHtmlTools {
 	class HTMLTOOLS_EXPORT XDirAttribute {
 	public:

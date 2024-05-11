@@ -3,10 +3,10 @@
 #include <algorithm>
 #include <iostream>
 
-#include "XDir.h"
-#include "../../htmlString/HtmlStringTools.h"
-#include "../htmlNode/HtmlNode.h"
-#include "../htmlDoc/HtmlDoc.h"
+#include "../XDir/XDir.h"
+#include "../../../htmlString/HtmlStringTools.h"
+#include "../../htmlNode/HtmlNode.h"
+#include "../../htmlDoc/HtmlDoc.h"
 
 using namespace cylHtmlTools;
 using namespace cylHtmlTools::charValue;

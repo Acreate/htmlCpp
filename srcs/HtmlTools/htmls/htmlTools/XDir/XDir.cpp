@@ -2,9 +2,9 @@
 
 #include <iostream>
 
-#include "../../htmlString/HtmlStringTools.h"
+#include "../../../htmlString/HtmlStringTools.h"
 
-#include "XDirAttribute.h"
+#include "../XDirAttribute/XDirAttribute.h"
 using namespace cylHtmlTools;
 inline void appendVector( Vector_HtmlStringSPtr_Shared &src, Vector_HtmlStringSPtr_Shared &des ) {
 	for( auto &value : *des ) {

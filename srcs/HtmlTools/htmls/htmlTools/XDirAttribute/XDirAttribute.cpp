@@ -1,6 +1,6 @@
 ﻿#include "XDirAttribute.h"
 
-#include "../../htmlString/HtmlStringTools.h"
+#include "../../../htmlString/HtmlStringTools.h"
 using namespace cylHtmlTools;
 XDirAttribute::XDirAttribute( const HtmlString_Shared &in_name, const Vector_HtmlStringSPtr_Shared &in_values ) {
 	name = in_name;

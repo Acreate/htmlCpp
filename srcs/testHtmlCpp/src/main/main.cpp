@@ -9,7 +9,8 @@
 #include <string>
 #include <windows.h>
 
-#include "htmls/htmlTools/XPath.h"
+#include "htmls/htmlTools/XPath/XPath.h"
+#include <htmls/htmlTools/HtmlWorkThread/HtmlWorkThread.h>
 #include "htmlString/HtmlStringTools.h"
 
 /// <summary>
@@ -49,7 +50,6 @@ bool getValue( std::wstringstream &stringstream, cylHtmlTools::HtmlDoc_Shared ht
 /// <param name="html_nodes"></param>
 /// <param name="xpath"></param>
 /// <returns></returns>
-
 bool getValue( std::wstringstream &stringstream, cylHtmlTools::Vector_HtmlNodeSPtr_Shared &html_nodes, cylHtmlTools::XPath &xpath ) {
 	auto vectorHtmlNodeSPtrShared = xpath.buider( html_nodes );
 	if( !vectorHtmlNodeSPtrShared )
@@ -81,11 +81,13 @@ bool getValue( std::wstringstream &stringstream, cylHtmlTools::Vector_HtmlNodeSP
 	stringstream << std::endl << std::endl;
 	return true;
 }
-int main( int argc, char *argv[ ] ) {
-	std::locale locale( "zh_CN.UTF8" );
-	std::locale::global( locale );
-	std::wcout.imbue( locale );
-	std::cout.imbue( locale );
+
+/// <summary>
+/// HtmlDoc 案例
+/// </summary>
+/// <param name="locale">输出编码</param>
+/// <returns>非 0 表示异常</returns>
+int testHtmlDoc( std::locale locale = std::locale( ) ) {
 	std::string fString( u8"%s/%s/%s" );
 	char path[ 4096 ]{ 0 };
 	int len = snprintf( path, sizeof( path ), fString.c_str( ), std::string( Project_Run_bin ).c_str( ), u8"writeFile", u8"www.121ds.cc.html" );
@@ -127,18 +129,18 @@ int main( int argc, char *argv[ ] ) {
 		auto htmlNodeType = node->getNodeType( );
 		cylHtmlTools::HtmlString type;
 		switch( htmlNodeType ) {
-		case cylHtmlTools::Html_Node_Type::DoubleNode :
-			type = L"DoubleNode";
-			break;
-		case cylHtmlTools::Html_Node_Type::SingleNode :
-			type = L"SingleNode";
-			break;
-		case cylHtmlTools::Html_Node_Type::AnnotationNode :
-			type = L"AnnotationNode";
-			break;
-		case cylHtmlTools::Html_Node_Type::None :
-			type = L"None";
-			break;
+			case cylHtmlTools::Html_Node_Type::DoubleNode :
+				type = L"DoubleNode";
+				break;
+			case cylHtmlTools::Html_Node_Type::SingleNode :
+				type = L"SingleNode";
+				break;
+			case cylHtmlTools::Html_Node_Type::AnnotationNode :
+				type = L"AnnotationNode";
+				break;
+			case cylHtmlTools::Html_Node_Type::None :
+				type = L"None";
+				break;
 		}
 		auto nodeName = *node->getNodeName( );
 		auto path = *node->getPath( );
@@ -315,4 +317,36 @@ int main( int argc, char *argv[ ] ) {
 	ofstream << mystr;
 	ofstream.close( );
 	return 0;
+}
+/// <summary>
+/// 线程案例
+/// </summary>
+void testHtmlThread( ) {
+	cylHtmlTools::HtmlWorkThread::Start_Thread_Run startThreadRun = [=]( const cylHtmlTools::HtmlWorkThread *html_work_thread, const std::thread *run_std_cpp_thread, std::mutex *html_work_thread_mutex, std::mutex *std_cpp_thread_mutex, void *data ) {
+		std::this_thread::sleep_for( std::chrono::seconds( 3 ) );
+		std::cout << u8"开始一个线程" << std::endl;
+	};
+	cylHtmlTools::HtmlWorkThread::Current_Thread_Run currentThreadRun = [=]( const cylHtmlTools::HtmlWorkThread *html_work_thread, const std::thread *run_std_cpp_thread, std::mutex *html_work_thread_mutex, std::mutex *std_cpp_thread_mutex, void *data, const time_t *startTime ) {
+		std::this_thread::sleep_for( std::chrono::seconds( 3 ) );
+		std::cout << u8"线程正在工作" << std::endl;
+	};
+	cylHtmlTools::HtmlWorkThread::Finish_Thread_Run finishThreadRun = [=]( const cylHtmlTools::HtmlWorkThread *html_work_thread, const std::thread *run_std_cpp_thread, std::mutex *html_work_thread_mutex, std::mutex *std_cpp_thread_mutex, void *data ) {
+		std::this_thread::sleep_for( std::chrono::seconds( 3 ) );
+		std::cout << u8"结束一个线程" << std::endl;
+	};
+
+	cylHtmlTools::HtmlWorkThread thread( startThreadRun, currentThreadRun, finishThreadRun, nullptr );
+	thread.start( );
+	while( thread.isRun( ) ) {
+		std::cout << u8"等待线程结束" << std::endl;
+		std::this_thread::sleep_for( std::chrono::seconds( 1 ) );
+	}
+}
+int main( int argc, char *argv[ ] ) {
+	std::locale locale( "zh_CN.UTF8" );
+	std::locale::global( locale );
+	std::wcout.imbue( locale );
+	std::cout.imbue( locale );
+	testHtmlThread( );
+	return testHtmlDoc( locale );
 }

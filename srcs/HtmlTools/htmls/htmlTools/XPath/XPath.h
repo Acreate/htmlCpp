@@ -6,10 +6,10 @@
 #include <string>
 #include <list>
 
-#include "../../nameSpace/cylHtmlTools.h"
+#include "../../../nameSpace/cylHtmlTools.h"
 #include <ostream>
 
-#include "../../htmlString/HtmlStringTools.h"
+#include "../../../htmlString/HtmlStringTools.h"
 
 namespace cylHtmlTools {
 	class HTMLTOOLS_EXPORT XPath {
