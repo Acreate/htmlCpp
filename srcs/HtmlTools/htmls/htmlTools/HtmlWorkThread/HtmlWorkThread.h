@@ -55,7 +55,12 @@ namespace cylHtmlTools {
 		/// <param name="current_thread_run">线程正式工作的回调函数</param>
 		/// <param name="data">传递的数据指针</param>
 		HtmlWorkThread( const Start_Thread_Run &start_thread_run, const Current_Thread_Run &current_thread_run, const Finish_Thread_Run &finish_thread_run, TDataType *data );
+		/// <summary>
+		/// 初始化一个对象
+		/// </summary>
+		HtmlWorkThread( );
 		virtual ~HtmlWorkThread( );
+	public:// - 属性
 		/// <summary>
 		/// 重新初始化线程
 		/// </summary>
@@ -66,9 +71,46 @@ namespace cylHtmlTools {
 		/// <returns>成功返回 true</returns>
 		bool reInit( const Start_Thread_Run &start_thread_run, const Current_Thread_Run &current_thread_run, const Finish_Thread_Run &finish_thread_run, TDataType *data );
 		/// <summary>
-		/// 线程开始工作
+		/// 获取开始回调
 		/// </summary>
-		void start( );
+		/// <returns>开始回调</returns>
+		Start_Thread_Run getStartThreadRun( ) const { return startThreadRun; }
+		/// <summary>
+		/// 设置开始回调
+		/// </summary>
+		/// <param name="start_thread_run">开始回调</param>
+		void setStartThreadRun( const Start_Thread_Run &start_thread_run ) { startThreadRun = start_thread_run; }
+		/// <summary>
+		/// 获取运行回调
+		/// </summary>
+		/// <returns>运行回调</returns>
+		Current_Thread_Run getCurrentThreadRun( ) const { return currentThreadRun; }
+		/// <summary>
+		/// 设置运行回调
+		/// </summary>
+		/// <param name="current_thread_run">运行回调</param>
+		void setCurrentThreadRun( const Current_Thread_Run &current_thread_run ) { currentThreadRun = current_thread_run; }
+		/// <summary>
+		/// 获取完成回调
+		/// </summary>
+		/// <returns>完成回调</returns>
+		Finish_Thread_Run getFinishThreadRun( ) const { return finishThreadRun; }
+		/// <summary>
+		/// 设置完成回调
+		/// </summary>
+		/// <param name="finish_thread_run">完成回调</param>
+		void setFinishThreadRun( const Finish_Thread_Run &finish_thread_run ) { finishThreadRun = finish_thread_run; }
+		/// <summary>
+		/// 获取数值指针
+		/// </summary>
+		/// <returns>数据指针</returns>
+		TDataType * getData( ) const { return data; }
+		/// <summary>
+		/// 设置数据指针
+		/// </summary>
+		/// <param name="data">数据指针</param>
+		void setData( TDataType *const data ) { this->data = data; }
+	public:	// 状态
 		/// <summary>
 		/// 是否正在运行
 		/// </summary>
@@ -79,6 +121,12 @@ namespace cylHtmlTools {
 		/// </summary>
 		/// <returns>结束返回 true</returns>
 		bool isFinish( ) const;
+	public: // 工作
+		/// <summary>
+		/// 线程开始工作
+		/// </summary>
+		void start( );
+
 		/// <summary>
 		/// 等待线程结束
 		/// </summary>
@@ -124,7 +172,12 @@ namespace cylHtmlTools {
 		/// <param name="current_thread_run">线程正式工作的回调函数</param>
 		/// <param name="data">传递的数据指针</param>
 		HtmlWorkThread( const Start_Thread_Run &start_thread_run, const Current_Thread_Run &current_thread_run, const Finish_Thread_Run &finish_thread_run, std::shared_ptr< TDataType > &data );
+		/// <summary>
+		/// 初始化一个对象
+		/// </summary>
+		HtmlWorkThread( );
 		virtual ~HtmlWorkThread( );
+	public: // 属性
 		/// <summary>
 		/// 重新初始化线程
 		/// </summary>
@@ -135,9 +188,46 @@ namespace cylHtmlTools {
 		/// <returns>成功返回 true</returns>
 		bool reInit( const Start_Thread_Run &start_thread_run, const Current_Thread_Run &current_thread_run, const Finish_Thread_Run &finish_thread_run, std::shared_ptr< TDataType > &data );
 		/// <summary>
-		/// 线程开始工作
+		/// 获取开始回调
 		/// </summary>
-		void start( );
+		/// <returns>开始回调</returns>
+		Start_Thread_Run getStartThreadRun( ) const { return startThreadRun; }
+		/// <summary>
+		/// 设置开始回调
+		/// </summary>
+		/// <param name="start_thread_run">开始回调</param>
+		void setStartThreadRun( const Start_Thread_Run &start_thread_run ) { startThreadRun = start_thread_run; }
+		/// <summary>
+		/// 获取运行回调
+		/// </summary>
+		/// <returns>运行回调</returns>
+		Current_Thread_Run getCurrentThreadRun( ) const { return currentThreadRun; }
+		/// <summary>
+		/// 设置运行回调
+		/// </summary>
+		/// <param name="current_thread_run">运行回调</param>
+		void setCurrentThreadRun( const Current_Thread_Run &current_thread_run ) { currentThreadRun = current_thread_run; }
+		/// <summary>
+		/// 获取完成回调
+		/// </summary>
+		/// <returns>完成回调</returns>
+		Finish_Thread_Run getFinishThreadRun( ) const { return finishThreadRun; }
+		/// <summary>
+		/// 设置完成回调
+		/// </summary>
+		/// <param name="finish_thread_run">完成回调</param>
+		void setFinishThreadRun( const Finish_Thread_Run &finish_thread_run ) { finishThreadRun = finish_thread_run; }
+		/// <summary>
+		/// 获取数值指针
+		/// </summary>
+		/// <returns>数据指针</returns>
+		std::shared_ptr< TDataType > getData( ) const { return data; }
+		/// <summary>
+		/// 设置数据指针
+		/// </summary>
+		/// <param name="data">数据指针</param>
+		void setData( const std::shared_ptr< TDataType > &data ) { this->data = data; }
+	public: // - 状态
 		/// <summary>
 		/// 是否正在运行
 		/// </summary>
@@ -148,6 +238,11 @@ namespace cylHtmlTools {
 		/// </summary>
 		/// <returns>结束返回 true</returns>
 		bool isFinish( ) const;
+	public: // - 工作
+		/// <summary>
+		/// 线程开始工作
+		/// </summary>
+		void start( );
 		/// <summary>
 		/// 等待线程结束
 		/// </summary>

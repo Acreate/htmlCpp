@@ -321,6 +321,21 @@ int testHtmlDoc( std::locale locale = std::locale( ) ) {
 /// <summary>
 /// 线程案例
 /// </summary>
+void testHtmlThreadNull( ) {
+	std::cout << u8"testHtmlThreadNull 开始测试线程空线程: " << std::endl;
+
+	cylHtmlTools::HtmlWorkThread< int * > thread;
+	thread.start( );
+	while( thread.isRun( ) ) {
+		std::cout << u8"等待线程结束" << std::endl;
+		std::this_thread::sleep_for( std::chrono::seconds( 1 ) );
+	}
+
+	std::cout << u8"空线程已经实现完成，正在进行数值校验输出" << std::endl;
+}
+/// <summary>
+/// 线程案例
+/// </summary>
 void testHtmlThread( ) {
 	int coun = 22;
 	std::cout << u8"testHtmlThread 开始测试线程功能 :(准备数据) : " << coun << std::endl;
@@ -359,6 +374,21 @@ void testHtmlThread( ) {
 	}
 
 	std::cout << u8"工作已经实现完成，正在进行数值校验输出 : " << coun << std::endl;
+}
+/// <summary>
+/// 线程案例
+/// </summary>
+void testHtmlThreadSharedNull( ) {
+	std::cout << u8"testHtmlThreadSharedNull 开始测试空线程功能" << std::endl;
+
+	cylHtmlTools::HtmlWorkThread< std::shared_ptr< int > > thread;
+	thread.start( );
+	while( thread.isRun( ) ) {
+		std::cout << u8"等待线程结束" << std::endl;
+		std::this_thread::sleep_for( std::chrono::seconds( 1 ) );
+	}
+
+	std::cout << u8"空线程功能已经实现完成，正在进行数值校验输出 " << std::endl;
 }
 /// <summary>
 /// 线程案例
@@ -407,7 +437,9 @@ int main( int argc, char *argv[ ] ) {
 	std::locale::global( locale );
 	std::wcout.imbue( locale );
 	std::cout.imbue( locale );
+	testHtmlThreadNull( );
 	testHtmlThread( );
+	testHtmlThreadSharedNull( );
 	testHtmlThreadShared( );
 	return testHtmlDoc( locale );
 }
