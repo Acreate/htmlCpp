@@ -6,7 +6,7 @@
 #include <thread>
 
 template< class TDataType >
-cylHtmlTools::HtmlWorkThread< TDataType * >::HtmlWorkThread( const Start_Thread_Run< TDataType * > &start_thread_run, const Current_Thread_Run< TDataType * > &current_thread_run, const Finish_Thread_Run< TDataType * > &finish_thread_run, TDataType *data ) {
+cylHtmlTools::HtmlWorkThread< TDataType * >::HtmlWorkThread( const Start_Thread_Run &start_thread_run, const Current_Thread_Run &current_thread_run, const Finish_Thread_Run &finish_thread_run, TDataType *data ) {
 	this->workStatus = Init;
 	mutexHtmlWorkThread = new std::mutex( );
 	mutexStdThread = new std::mutex( );
@@ -27,7 +27,7 @@ cylHtmlTools::HtmlWorkThread< TDataType * >::~HtmlWorkThread( ) {
 	}
 }
 template< class TDataType >
-bool cylHtmlTools::HtmlWorkThread< TDataType * >::reInit( const Start_Thread_Run< TDataType * > &start_thread_run, const Current_Thread_Run< TDataType * > &current_thread_run, const Finish_Thread_Run< TDataType * > &finish_thread_run, TDataType *data ) {
+bool cylHtmlTools::HtmlWorkThread< TDataType * >::reInit( const Start_Thread_Run &start_thread_run, const Current_Thread_Run &current_thread_run, const Finish_Thread_Run &finish_thread_run, TDataType *data ) {
 	if( isRun( ) || this->workStatus == None )
 		return false;
 	this->mutexHtmlWorkThread->lock( );

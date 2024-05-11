@@ -322,9 +322,9 @@ int testHtmlDoc( std::locale locale = std::locale( ) ) {
 /// 线程案例
 /// </summary>
 void testHtmlThread( ) {
-
 	int coun = 22;
-	cylHtmlTools::HtmlWorkThread< int * >::Start_Thread_Run< int * > startThreadRun = [=]( const cylHtmlTools::HtmlWorkThread< int * > *html_work_thread, const std::thread *run_std_cpp_thread, std::mutex *html_work_thread_mutex, std::mutex *std_cpp_thread_mutex, int *data ) {
+	std::cout << u8"开始测试线程功能 :(准备数据) : " << coun << std::endl;
+	cylHtmlTools::HtmlWorkThread< int * >::Start_Thread_Run startThreadRun = [=]( const cylHtmlTools::HtmlWorkThread< int * > *html_work_thread, const std::thread *run_std_cpp_thread, std::mutex *html_work_thread_mutex, std::mutex *std_cpp_thread_mutex, int *data ) {
 		std::this_thread::sleep_for( std::chrono::seconds( 3 ) );
 		std::cout << u8"开始一个线程 :(发现数据) : " << *data << std::endl;
 	};
@@ -332,7 +332,7 @@ void testHtmlThread( ) {
 	// 测试回调
 	startThreadRun( nullptr, nullptr, nullptr, nullptr, &coun );
 
-	cylHtmlTools::HtmlWorkThread< int * >::Current_Thread_Run< int * > currentThreadRun = [=]( const cylHtmlTools::HtmlWorkThread< int * > *html_work_thread, const std::thread *run_std_cpp_thread, std::mutex *html_work_thread_mutex, std::mutex *std_cpp_thread_mutex, int *data, const time_t *startTime ) {
+	cylHtmlTools::HtmlWorkThread< int * >::Current_Thread_Run currentThreadRun = [=]( const cylHtmlTools::HtmlWorkThread< int * > *html_work_thread, const std::thread *run_std_cpp_thread, std::mutex *html_work_thread_mutex, std::mutex *std_cpp_thread_mutex, int *data, const time_t *startTime ) {
 		std::this_thread::sleep_for( std::chrono::seconds( 3 ) );
 		std::cout << u8"线程正在工作 :(发现数据) : " << *data << std::endl;
 		*data = 777;
@@ -341,7 +341,7 @@ void testHtmlThread( ) {
 	// 测试回调
 	currentThreadRun( nullptr, nullptr, nullptr, nullptr, &coun, nullptr );
 
-	cylHtmlTools::HtmlWorkThread< int * >::Finish_Thread_Run< int * > finishThreadRun = [=]( const cylHtmlTools::HtmlWorkThread< int * > *html_work_thread, const std::thread *run_std_cpp_thread, std::mutex *html_work_thread_mutex, std::mutex *std_cpp_thread_mutex, int *data ) {
+	cylHtmlTools::HtmlWorkThread< int * >::Finish_Thread_Run finishThreadRun = [=]( const cylHtmlTools::HtmlWorkThread< int * > *html_work_thread, const std::thread *run_std_cpp_thread, std::mutex *html_work_thread_mutex, std::mutex *std_cpp_thread_mutex, int *data ) {
 		std::this_thread::sleep_for( std::chrono::seconds( 3 ) );
 		std::cout << u8"结束一个线程 :(发现数据) : " << *data << std::endl;
 	};
@@ -366,6 +366,5 @@ int main( int argc, char *argv[ ] ) {
 	std::wcout.imbue( locale );
 	std::cout.imbue( locale );
 	testHtmlThread( );
-	return 0;
 	return testHtmlDoc( locale );
 }
