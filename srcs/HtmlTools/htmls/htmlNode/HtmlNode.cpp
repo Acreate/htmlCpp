@@ -9,7 +9,9 @@
 using namespace cylHtmlTools;
 using namespace cylHtmlTools::charValue;
 
-HtmlNode::HtmlNode( ) : parent( nullptr ), subChildren( new Vector_HtmlNodeSPtr ), brother( new Vector_HtmlNodeSPtr ) {
+HtmlNode::HtmlNode( ) : parent( nullptr )
+, subChildren( new Vector_HtmlNodeSPtr )
+, brother( new Vector_HtmlNodeSPtr ) {
 }
 HtmlNode::~HtmlNode( ) {
 }
@@ -249,6 +251,7 @@ void HtmlNode::setParent( const HtmlNode_Shared &child, const HtmlNode_Shared &p
 			}
 		}
 	}
-	parent->subChildren->emplace_back( child );
+	if( parent )
+		parent->subChildren->emplace_back( child );
 	child->parent = parent;
 }

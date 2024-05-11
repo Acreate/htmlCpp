@@ -7,7 +7,7 @@
 
 using namespace cylHtmlTools;
 bool HtmlStringTools::isSpace( HtmlChar currentChar ) {
-	return iswspace( currentChar ) || iswcntrl( currentChar ) || iswcntrl( currentChar );
+	return iswspace( currentChar ) || iswcntrl( currentChar );
 }
 
 bool HtmlStringTools::jumpSingleQuotation( const HtmlChar *buff, const size_t buff_size, size_t start_index, size_t &get_quoation_position_end, std::vector< std::pair< size_t, size_t > > &get_quotation_position_s ) {
@@ -174,18 +174,18 @@ void HtmlStringTools::removeBothSpace( HtmlString &str ) {
 }
 bool HtmlStringTools::equRemoveSpaceOverHtmlString( HtmlString leftStr, HtmlString rightStr, RemoveSpaceStatus removeSpaceStatus ) {
 	switch( removeSpaceStatus ) {
-	case left :
-		removeLeftSpace( leftStr );
-		removeLeftSpace( rightStr );
-		break;
-	case right :
-		removeRightSpace( leftStr );
-		removeRightSpace( rightStr );
-		break;
-	case both :
-		removeBothSpace( leftStr );
-		removeBothSpace( rightStr );
-		break;
+		case left :
+			removeLeftSpace( leftStr );
+			removeLeftSpace( rightStr );
+			break;
+		case right :
+			removeRightSpace( leftStr );
+			removeRightSpace( rightStr );
+			break;
+		case both :
+			removeBothSpace( leftStr );
+			removeBothSpace( rightStr );
+			break;
 	}
 	return equHtmlString( leftStr, rightStr );
 }
