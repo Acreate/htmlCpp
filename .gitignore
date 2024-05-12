@@ -12,6 +12,9 @@ _deps
 /.vs
 builder
 out
-cmake_to_c_cpp_header_env.h
-cmake_to_c_cpp_header_env.h
+
+
+*_macro.h
+*_env.h
 *_export.h
+
