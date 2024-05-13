@@ -29,14 +29,14 @@ namespace cylHtmlTools {
 	class HTMLTOOLS_EXPORT XPath;
 	// 工具目录
 	class HTMLTOOLS_EXPORT XDir;
-	
+
 	// 工具目录属性
 	class HTMLTOOLS_EXPORT XDirAttribute;
 
 	// 工作线程
 	template< class TDataType >
 	class HTMLTOOLS_EXPORT HtmlWorkThread;
-	
+
 	// std::shared_ptr< XDir > 封装
 	using XDir_Shared = std::shared_ptr< XDir >;
 	//  std::vector< std::shared_ptr< XDir >> 封装
@@ -99,7 +99,7 @@ namespace cylHtmlTools {
 	/// </summary>
 	using Vector_XDirAttributeSPtr_Shared = std::shared_ptr< Vector_XDirAttributeSPtr >;
 	/// <summary>
-	/// std::unordered_map< HtmlString, std::shared_ptr< std::vector< std::shared_ptr< XDirAttribute > > > >
+	///  std::unordered_map< HtmlString, std::shared_ptr< std::vector< std::shared_ptr< XDirAttribute > > > >
 	/// </summary>
 	using UMap_HtmlStringK_VectorSPtr_XDirAttributeSPtrV = std::unordered_map< HtmlString, Vector_XDirAttributeSPtr_Shared >;
 	/// <summary>

@@ -2,9 +2,15 @@
 
 #include "../../../htmlString/HtmlStringTools.h"
 using namespace cylHtmlTools;
+XDirAttribute::XDirAttribute( const HtmlString_Shared &in_name ) {
+	name = in_name;
+	values = std::make_shared< Vector_HtmlStringSPtr >( );
+}
+XDirAttribute::XDirAttribute( const HtmlString &in_name ) : XDirAttribute( std::make_shared< HtmlString >( in_name ) ) {
+}
 XDirAttribute::XDirAttribute( const HtmlString_Shared &in_name, const Vector_HtmlStringSPtr_Shared &in_values ) {
 	name = in_name;
-	if( in_values )
+	if( in_values ) // 防止第二参数为 nullptr
 		values = in_values;
 	else
 		values = std::make_shared< Vector_HtmlStringSPtr >( );

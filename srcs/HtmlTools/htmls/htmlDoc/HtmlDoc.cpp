@@ -13,6 +13,9 @@
 #include <sstream>
 #include <string>
 
+#include "../htmlTools/XDir/XDir.h"
+#include "../htmlTools/XDirAttribute/XDirAttribute.h"
+
 using namespace cylHtmlTools;
 using namespace cylHtmlTools::charValue;
 
@@ -602,6 +605,75 @@ HtmlString_Shared HtmlDoc::getNodeContentText( const HtmlNode_Shared &node_share
 	}
 	auto mystr = stringstream.str( );
 	HtmlString_Shared result( new HtmlString( mystr ) );
+	return result;
+}
+XDir_Shared HtmlDoc::converXDirSptr( const HtmlNode_Shared &node_shared ) { // todo 实现转换
+	if( node_shared->nodeType == Html_Node_Type::AnnotationNode )
+		return nullptr; // todo  注释未实现
+	if( isEndNode( node_shared ) )
+		return converXDirSptr( node_shared->startNode );
+	auto startHtmlCharPtr = htmlWCStr->c_str( ) + node_shared->ptrOffset + 1; // 跳过 < 符号
+	auto newLen = node_shared->ptrCWtrLen - 2; // 不包含 > 符号
+	size_t nameIndex = 0;
+	// 过滤空格
+	for( ; nameIndex < newLen; ++nameIndex )
+		if( !HtmlStringTools::isSpace( startHtmlCharPtr[ nameIndex ] ) )
+			break;
+	size_t nameLen = nameIndex;
+	// 查找名称
+	for( ; nameLen < newLen; ++nameLen )
+		if( HtmlStringTools::isSpace( startHtmlCharPtr[ nameLen ] ) )
+			break;
+	nameLen -= nameIndex;
+	HtmlString xdirName( startHtmlCharPtr + nameIndex, nameLen ); // 找到名称
+	nameIndex += nameLen;
+	// 过滤空格
+	for( ; nameIndex < newLen; ++nameIndex )
+		if( !HtmlStringTools::isSpace( startHtmlCharPtr[ nameIndex ] ) )
+			break;
+	Vector_XDirAttributeSPtr_Shared xDirAttributes = converNodeAttributeToXDirAttributes( startHtmlCharPtr + nameIndex, newLen - nameIndex );
+	return std::make_shared< XDir >( xdirName, xDirAttributes );
+}
+Vector_XDirAttributeSPtr_Shared HtmlDoc::converNodeAttributeToXDirAttributes(
+	const HtmlChar *conver_buff, const size_t conver_buff_len ) { // todo 未完成
+	Vector_XDirAttributeSPtr_Shared result( std::make_shared< Vector_XDirAttributeSPtr >( ) );
+	size_t index = 0;
+	size_t buffIndex = 0;
+	do {
+		if( HtmlStringTools::findNextHtmlCharPotion( conver_buff, conver_buff_len, charValue::equ, index ) ) { // 找到
+			auto attributeName = XDirAttribute::converXDirAttributeName( conver_buff + buffIndex, index );
+			++index;
+			buffIndex = index;
+			if( HtmlStringTools::findNextHtmlCharPotion( conver_buff, conver_buff_len, charValue::equ, buffIndex ) ) { // 再次查找
+				--buffIndex;
+				// 检测 = 前的空格
+				for( ; buffIndex > index; --buffIndex )
+					if( !HtmlStringTools::isSpace( conver_buff[ buffIndex ] ) )
+						break;
+				--buffIndex;
+				// 找到空格
+				for( ; buffIndex > index; --buffIndex )
+					if( HtmlStringTools::isSpace( conver_buff[ buffIndex ] ) )
+						break;
+				auto attributeValue = XDirAttribute::converXDirAttributeValues( conver_buff + index, buffIndex - index, attributeName );
+				result->emplace_back( std::make_shared< XDirAttribute >( attributeName, attributeValue ) );
+				index = buffIndex + 1;
+			} else { // 没有等号，则往后的全是值
+				auto attributeValue = XDirAttribute::converXDirAttributeValues( conver_buff + index, conver_buff_len - index, attributeName );
+				result->emplace_back( std::make_shared< XDirAttribute >( attributeName, attributeValue ) );
+				break;
+			}
+
+			if( index > conver_buff_len )
+				break;
+		} else {
+			auto attributeName = XDirAttribute::converXDirAttributeName( conver_buff + index, conver_buff_len - index );
+			result->emplace_back( std::make_shared< XDirAttribute >( attributeName ) );
+			break;
+		}
+	} while( true );
+	if( result->size( ) == 0 )
+		return nullptr;
 	return result;
 }
 

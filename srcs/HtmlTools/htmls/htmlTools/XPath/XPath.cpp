@@ -206,7 +206,8 @@ Vector_HtmlNodeSPtr XPath::matchesHtmlDocAllNodes( const Vector_HtmlNodeSPtr &cu
 			if( node->isEndNode( ) ) // 跳过尾节点
 				return false;
 			auto nodeName = *node->getNodeName( );
-			if( x_dir->hasAttribute( node->analysisAttribute( ), nodeName ) )
+			auto analysisAttribute = node->converXDirSptr( );
+			if( analysisAttribute && x_dir->isOtherXDirIncludeThisXDir( analysisAttribute ) )
 				return true;
 			return false;
 		} );

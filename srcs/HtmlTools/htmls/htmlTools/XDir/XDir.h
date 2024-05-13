@@ -20,7 +20,38 @@ namespace cylHtmlTools {
 		/// </summary>
 		UMap_HtmlStringK_VectorSPtr_XDirAttributeSPtrV_Shared attributesMap;
 	public:
+		/// <summary>
+		/// 使用 xptah 中的路径节点当做参数解析
+		/// </summary>
+		/// <param name="param">适配 xpath 当中的路径节点</param>
 		XDir( const cylHtmlTools::HtmlString &param );
+		/// <summary>
+		/// 使用名称与 XDirAttribute 实现初始化
+		/// </summary>
+		/// <param name="name">名称</param>
+		/// <param name="xdiattrbute_sptr">XDirAttribute 对象指针</param>
+		XDir( const cylHtmlTools::HtmlString &name, const XDirAttribute_Shared &xdiattrbute_sptr );
+
+		/// <summary>
+		/// 使用名称与 XDirAttribute 实现初始化
+		/// </summary>
+		/// <param name="name">名称</param>
+		/// <param name="xdiattrbute">XDirAttribute 对象</param>
+		XDir( const cylHtmlTools::HtmlString &name, const XDirAttribute &xdiattrbute );
+		/// <summary>
+		/// 使用名称与 XDirAttribute 实现初始化
+		/// </summary>
+		/// <param name="name">名称</param>
+		/// <param name="vector_xdiattrbutesptr_sptr">XDirAttribute 对象指针列表</param>
+		XDir( const cylHtmlTools::HtmlString &name, const Vector_XDirAttributeSPtr_Shared &vector_xdiattrbutesptr_sptr );
+
+		/// <summary>
+		/// 使用名称与 XDirAttribute 实现初始化
+		/// </summary>
+		/// <param name="name">名称</param>
+		/// <param name="vector_xdiattrbutesptr">XDirAttribute 对象指针列表</param>
+		XDir( const cylHtmlTools::HtmlString &name, const Vector_XDirAttributeSPtr &vector_xdiattrbutesptr );
+
 		virtual ~XDir( );
 	public: // 比较
 		bool hasName( const HtmlString &dir_name ) const;
@@ -45,6 +76,20 @@ namespace cylHtmlTools {
 		/// </summary>
 		/// <returns>具备 [] 属性的名称</returns>
 		HtmlString getXDirName( ) const;
+		/// <summary>
+		/// 比较左侧名称列表是否包含右侧名称列表
+		/// </summary>
+		/// <param name="left_xdir">超集</param>
+		/// <param name="right_xdir">子集</param>
+		/// <returns>true 表示 right_xdir 是 left_xdir 子集</returns>
+		static bool isLeftNameListIncludeRightXDirNameList( const XDir *left_xdir, const XDir_Shared &right_xdir );
+		/// <summary>
+		/// oter_xdir_sptr 是否包含 本对象 this ⊆ oter_xdir_sptr<br/>
+		/// this 是否是 oter_xdir_sptr 子集
+		/// </summary>
+		/// <param name="oter_xdir_sptr">检测超集</param>
+		/// <returns>该对象为子集，则返回 true</returns>
+		bool isOtherXDirIncludeThisXDir( const XDir_Shared &oter_xdir_sptr ) const;
 	public: // - 属性映射z
 		enum XDir_Attribute_Status {
 			Replace_Element // 替换元素

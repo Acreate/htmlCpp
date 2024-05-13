@@ -16,6 +16,8 @@ namespace cylHtmlTools {
 		HtmlString_Shared name;
 		Vector_HtmlStringSPtr_Shared values;
 	public:
+		XDirAttribute( const HtmlString_Shared &in_name );
+		XDirAttribute( const HtmlString &in_name );
 		XDirAttribute( const HtmlString_Shared &in_name, const Vector_HtmlStringSPtr_Shared &in_values );
 		XDirAttribute( const HtmlString &in_name, const Vector_HtmlStringSPtr &in_values );
 		XDirAttribute( const HtmlString &in_name, const std::vector< HtmlString > &in_values );
@@ -34,107 +36,103 @@ namespace cylHtmlTools {
 		}
 	public: // - 操作函数
 
+		/// <summary>
+		/// 比较 left_xdirAttribute_vector_ptr 是否包含 right_xdirAttribute_vector_ptr
+		/// </summary>
+		/// <param name="left_xdirAttribute_vector_ptr">超集</param>
+		/// <param name="right_xdirAttribute_vector_ptr">子集</param>
+		/// <returns>true 表示 left_xdirAttribute_vector_ptr 是 right_xdirAttribute_vector_ptr 的超集</returns>
+		static bool isLeftXDirAttributeValuesIncludeRightXDirAttributeValues( const Vector_HtmlStringSPtr *left_xdirAttribute_vector_ptr, const Vector_HtmlStringSPtr *right_xdirAttribute_vector_ptr ) {
+			return isLeftXDirAttributeValuesIncludeRightXDirAttributeValues( *left_xdirAttribute_vector_ptr, *right_xdirAttribute_vector_ptr );
+		}
+		/// <summary>
+		/// 比较 left_xdirAttribute_vector_ptr 是否包含 right_xdirAttribute_vector_ptr
+		/// </summary>
+		/// <param name="left_xdirAttribute_vector">超集</param>
+		/// <param name="right_xdirAttribute_vector">子集</param>
+		/// <returns>true 表示 left_xdirAttribute_vector_ptr 是 right_xdirAttribute_vector_ptr 的超集</returns>
+		static bool isLeftXDirAttributeValuesIncludeRightXDirAttributeValues( const Vector_HtmlStringSPtr &left_xdirAttribute_vector, const Vector_HtmlStringSPtr &right_xdirAttribute_vector ) {
+			size_t rightVectorSize = right_xdirAttribute_vector.size( );
+			if( rightVectorSize == 0 )  // 空集是任意集合的子集
+				return true;
+			size_t leftVectorSize = left_xdirAttribute_vector.size( );
+			if( leftVectorSize == 0 ) // 空集不能包含除空集以外的集合
+				return false;
+			// 获取所有右侧集合的元素
+			auto rightIterator = right_xdirAttribute_vector.begin( );
+			auto rightEnd = right_xdirAttribute_vector.end( );
+			do {
+				// 获取所有左侧集合的元素
+				auto leftIterator = left_xdirAttribute_vector.begin( );
+				auto leftEnd = left_xdirAttribute_vector.end( );
+				for( ; leftIterator != leftEnd; ++leftIterator )
+					if( HtmlStringTools::equRemoveSpaceOverHtmlString( *leftIterator->get( ), *rightIterator->get( ) ) )
+						break;
+				if( leftIterator == leftEnd ) // 如果遍历完成后都没有中断，则表示 左侧集合不包含当前 rightIterator 元素
+					return false;
+				++rightIterator;
+				if( rightIterator == rightEnd )
+					break;
+			} while( true );
+			return true;
+		}
 
 		/// <summary>
-		/// 该对象属性是否与值匹配
-		/// </summary>
-		/// <param name="other">匹配的值</param>
-		/// <returns>存在返回 true</returns>
-		bool XDirAttribute::isXDirAttributeIncludeOther( const HtmlString &other ) const {
-			size_t thisSize = values->size( );
-			if( thisSize < 1 ) // 空集
-				return false;
-			for( auto &value : *values ) // 存储的值列表存在一个则返回 true
-				if( HtmlStringTools::equRemoveSpaceOverHtmlString( *value, other ) )
-					return true;
-			return false;
-		}
-		/// <summary>
 		/// 该对象是否完全包含列表参数中的所有值
 		/// </summary>
 		/// <param name="others">列表值</param>
 		/// <returns>包含列表当中所有的值时，返回 true</returns>
-		bool XDirAttribute::isXDirAttributeIncludesOther( const Vector_HtmlStringSPtr &others ) const {
-			size_t thisSize = values->size( ),
-				otherSize = others.size( );
-			if( thisSize < otherSize ) // 集的元素小于被包含的集
-				return false;
-			for( auto &other : others ) {
-				auto thisValuesIterator = values->begin( );
-				auto thisValuesIteratorEnd = values->end( );
-				do {
-					if( HtmlStringTools::equRemoveSpaceOverHtmlString( *thisValuesIterator->get( ), *other.get( ) ) )
-						break;
-					++thisValuesIterator;
-					if( thisValuesIterator == thisValuesIteratorEnd )
-						break;
-				} while( true );
-				if( thisValuesIterator == thisValuesIteratorEnd )
-					return false;
-			}
-			return true;
+		bool XDirAttribute::isThisXDirAttributeValuesIncludeOtherXDirAttributeValues( const Vector_HtmlStringSPtr &others ) const {
+			return isLeftXDirAttributeValuesIncludeRightXDirAttributeValues( this->values.get( ), &others );
 		}
 		/// <summary>
-		/// 该对象是否完全包含列表参数中的所有值
+		/// 该对象是否完全包含列表参数中的所有值 values ⊇ others
 		/// </summary>
 		/// <param name="others">列表值</param>
 		/// <returns>包含列表当中所有的值时，返回 true</returns>
-		bool XDirAttribute::isXDirAttributeIncludesOther( const std::vector< HtmlString > &others ) const {
-			size_t thisSize = values->size( ),
-				otherSize = others.size( );
-			if( thisSize < otherSize ) // 集的元素小于被包含的集
-				return false;
-			for( auto &other : others ) {
-				auto thisValuesIterator = values->begin( );
-				auto thisValuesIteratorEnd = values->end( );
-				do {
-					if( HtmlStringTools::equRemoveSpaceOverHtmlString( *thisValuesIterator->get( ), other ) )
-						break;
-					++thisValuesIterator;
-					if( thisValuesIterator == thisValuesIteratorEnd )
-						break;
-				} while( true );
-				if( thisValuesIterator == thisValuesIteratorEnd )
-					return false;
-			}
-			return true;
+		bool XDirAttribute::isThisXDirAttributeValuesIncludeOtherXDirAttributeValues( const std::vector< HtmlString > &others ) const {
+			auto buffRight = std::make_shared< Vector_HtmlStringSPtr >( );
+			for( auto &subStr : others )
+				buffRight->emplace_back( std::make_shared< HtmlString >( subStr ) );
+			return isLeftXDirAttributeValuesIncludeRightXDirAttributeValues( *this->values.get( ), *buffRight );
 		}
 		/// <summary>
-		/// 该对象属性是否与值匹配
+		/// 该对象属性是否包含对应的值 other ∈ values
 		/// </summary>
-		/// <param name="other">匹配的值</param>
+		/// <param name="other">被包含的值</param>
 		/// <returns>存在返回 true</returns>
-		bool XDirAttribute::isIncludeOtherXDirAttribute( const HtmlString &other ) const {
+		bool XDirAttribute::isIncludeOtherXDirAttributeValue( const HtmlString &other ) const {
 			size_t thisSize = values->size( );
 			if( thisSize == 0 ) // 空集
 				return true;
 			if( thisSize > 1 ) // 超出集合个数
 				return false;
-			return HtmlStringTools::equRemoveSpaceOverHtmlString( *values->at( 0 ), other ); // 对比元素
+			for( auto &value : *values )
+				if( HtmlStringTools::equRemoveSpaceOverHtmlString( *value, other ) )// 对比元素
+					return true;
+			return false;
 		}
 		/// <summary>
 		/// 列表是否包含本对象的所有值<br/>
-		/// 列表可以不存在对象的值，但是对象的所有值必须存在列表当中
+		/// 列表可以不存在对象的值，但是对象的所有值必须存在列表当中 values ⊆ others
 		/// </summary>
 		/// <param name="others">校验包含的对象</param>
 		/// <returns>完全被包含返回 true</returns>
-		bool isIncludeOtherXDirAttributes( const std::vector< HtmlString > &others ) const {
-			if( this->values->size( ) == 0 ) // 任意集合包含空集
-				return true;
-			for( auto &value : *values ) {
-				auto valuesIterator = others.begin( );
-				auto valuesIteratorEnd = others.end( );
-				do {
-					if( HtmlStringTools::equRemoveSpaceOverHtmlString( *value, *valuesIterator ) )
-						break;
-					++valuesIterator;
-					if( valuesIterator == valuesIteratorEnd )
-						break;
-				} while( true );
-				if( valuesIterator == valuesIteratorEnd )
-					return false;
-			}
-			return true;
+		bool isOtherXDirAttributeValuesIncludeThisXDirAttributeValues( const std::vector< HtmlString > &others ) const {
+			auto buffLeft = std::make_shared< Vector_HtmlStringSPtr >( );
+			for( auto &subStr : others )
+				buffLeft->emplace_back( std::make_shared< HtmlString >( subStr ) );
+			return isLeftXDirAttributeValuesIncludeRightXDirAttributeValues( *buffLeft, *this->values.get( ) );
+		}
+
+		/// <summary>
+		/// 列表是否包含本对象的所有值<br/>
+		/// 列表可以不存在对象的值，但是对象的所有值必须存在列表当中 values ⊆ others
+		/// </summary>
+		/// <param name="others">校验包含的对象</param>
+		/// <returns>完全被包含返回 true</returns>
+		bool isOtherXDirAttributeValuesIncludeThisXDirAttributeValues( const std::vector< HtmlString_Shared > &others ) const {
+			return isLeftXDirAttributeValuesIncludeRightXDirAttributeValues( others, *this->values.get( ) );
 		}
 
 		/// <summary>
@@ -143,35 +141,8 @@ namespace cylHtmlTools {
 		/// </summary>
 		/// <param name="others">校验包含的对象</param>
 		/// <returns>完全被包含返回 true</returns>
-		bool isIncludeOtherXDirAttributes( const std::vector< HtmlString_Shared > &others ) const {
-			if( this->values->size( ) == 0 ) // 任意集合包含空集
-				return true;
-			for( auto &value : *values ) {
-				auto valuesIterator = others.begin( );
-				auto valuesIteratorEnd = others.end( );
-				auto leftStr = *value;
-				do {
-					auto rightStr = *valuesIterator->get( );
-					if( HtmlStringTools::equRemoveSpaceOverHtmlString( leftStr, rightStr ) )
-						break;
-					++valuesIterator;
-					if( valuesIterator == valuesIteratorEnd )
-						break;
-				} while( true );
-				if( valuesIterator == valuesIteratorEnd )
-					return false;
-			}
-			return true;
-		}
-
-		/// <summary>
-		/// 列表是否包含本对象的所有值<br/>
-		/// 列表可以不存在对象的值，但是对象的所有值必须存在列表当中
-		/// </summary>
-		/// <param name="others">校验包含的对象</param>
-		/// <returns>完全被包含返回 true</returns>
-		bool isIncludeOtherXDirAttributes( const XDirAttribute &others ) const {
-			return isIncludeOtherXDirAttributes( *others.values );
+		bool isOtherXDirAttributeValuesIncludeThisXDirAttributeValues( const XDirAttribute &others ) const {
+			return isOtherXDirAttributeValuesIncludeThisXDirAttributeValues( *others.values );
 		}
 	public: // - 解析函数
 		/// <summary>
@@ -252,7 +223,7 @@ namespace cylHtmlTools {
 		/// </summary>
 		/// <param name="name">判定名称</param>
 		/// <returns>需要切分返回 true</returns>
-		static bool isSplitAttributeName(const HtmlString& name);
+		static bool isSplitAttributeName( const HtmlString &name );
 	};
 }
 

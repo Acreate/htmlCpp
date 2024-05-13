@@ -140,6 +140,13 @@ namespace cylHtmlTools {
 		/// </summary>
 		/// <returns>根节点列表</returns>
 		Vector_HtmlNodeSPtr_Shared getHtmlNodeRoots( );
+		/// <summary>
+		/// 节点转换到 XDir 对象指针
+		/// </summary>
+		/// <returns>失败返回 nullptr</returns>
+		XDir_Shared converXDirSptr( ) {
+			return htmldocShared->converXDirSptr( thisSharedPtr );
+		}
 	public: // - 校验节点
 		/// <summary>
 		/// 是否是开始节点

@@ -118,6 +118,22 @@ XDir::XDir( const HtmlString &param ) {
 	}
 	delete buff;
 }
+XDir::XDir( const cylHtmlTools::HtmlString &name, const XDirAttribute_Shared &xdiattrbute_sptr ) {
+	namesList.emplace_back( name );
+	attributesMap = std::make_shared< UMap_HtmlStringK_VectorSPtr_XDirAttributeSPtrV >( );
+	auto dirAttributes = std::make_shared< Vector_XDirAttributeSPtr >( );
+	dirAttributes->emplace_back( xdiattrbute_sptr );
+	attributesMap->emplace( name, dirAttributes );
+}
+XDir::XDir( const cylHtmlTools::HtmlString &name, const XDirAttribute &xdiattrbute ) : XDir( name, std::make_shared< XDirAttribute >( xdiattrbute ) ) {
+}
+XDir::XDir( const cylHtmlTools::HtmlString &name, const Vector_XDirAttributeSPtr_Shared &vector_xdiattrbutesptr_sptr ) {
+	namesList.emplace_back( name );
+	attributesMap = std::make_shared< UMap_HtmlStringK_VectorSPtr_XDirAttributeSPtrV >( );
+	attributesMap->emplace( name, vector_xdiattrbutesptr_sptr );
+}
+XDir::XDir( const cylHtmlTools::HtmlString &name, const Vector_XDirAttributeSPtr &vector_xdiattrbutesptr ): XDir( name, std::make_shared< Vector_XDirAttributeSPtr >( vector_xdiattrbutesptr ) ) {
+}
 XDir::~XDir( ) {
 }
 bool XDir::hasName( const HtmlString &dir_name ) const {
@@ -149,8 +165,7 @@ bool equNameAttribute( const UMap_HtmlStringK_HtmlStringV_Shared &pairs, const H
 				const auto &classValue = iterator->second;
 				auto name = std::make_shared< HtmlString >( className );
 				auto attributeValues = XDirAttribute::converXDirAttributeValues( classValue.data( ), classValue.size( ), name );
-
-				if( value->isIncludeOtherXDirAttributes( *attributeValues ) )
+				if( value->isOtherXDirAttributeValuesIncludeThisXDirAttributeValues( *attributeValues ) )
 					return true;
 			}
 			++iterator;
@@ -305,6 +320,10 @@ HtmlString XDir::getXDirName( ) const {
 	} while( true );
 
 	return result;
+}
+bool XDir::isOtherXDirIncludeThisXDir( const XDir_Shared &oter_xdir_sptr ) const { // todo 未完成
+	auto otherNameList = oter_xdir_sptr->namesList.begin(  );
+	return false;
 }
 
 HtmlString XDir::getDirName( ) const {

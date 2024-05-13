@@ -23,7 +23,6 @@ namespace cylHtmlTools {
 		/// <param name="start_index">遍历下标</param>
 		/// <returns>true 表示存在</returns>
 		static bool findNextNodeEndChar( const HtmlString_Shared &std_c_w_string, size_t &max_index, size_t &start_index );
-
 		/// <summary>
 		/// 查找下一个节点开始符的位置
 		/// </summary>
@@ -32,7 +31,6 @@ namespace cylHtmlTools {
 		/// <param name="start_index">遍历下标</param>
 		/// <returns>true 表示存在</returns>
 		static bool findNextNodeStartChar( const HtmlString_Shared &std_c_w_string, size_t &max_index, size_t &start_index );
-
 		/// <summary>
 		/// 查找下一个节点的斜杠位置
 		/// </summary>
@@ -41,7 +39,6 @@ namespace cylHtmlTools {
 		/// <param name="start_index">遍历下标</param>
 		/// <returns>true 表示存在</returns>
 		static bool findNextNodeForwardSlash( const HtmlString_Shared &std_c_w_string, size_t &max_index, size_t &start_index );
-
 		/// <summary>
 		/// 判断节点是否为单节点
 		/// </summary>
@@ -50,7 +47,6 @@ namespace cylHtmlTools {
 		/// <param name="end_index">结束下标，始终指向节点结束字符 '>'</param>
 		/// <returns>true 表示单下标</returns>
 		static bool isSingelNode( const HtmlString_Shared &std_c_w_string, size_t &start_index, size_t &end_index );
-
 		/// <summary>
 		/// 判断节点是否为开始节点
 		/// </summary>
@@ -59,7 +55,6 @@ namespace cylHtmlTools {
 		/// <param name="end_index">结束下标，始终指向节点结束字符 '>'</param>
 		/// <returns>true 表示单下标</returns>
 		static bool isStartNode( const HtmlString_Shared &std_c_w_string, size_t &start_index, size_t &end_index );
-
 		/// <summary>
 		/// 判断节点是否为结束节点
 		/// </summary>
@@ -68,7 +63,6 @@ namespace cylHtmlTools {
 		/// <param name="end_index">结束下标，始终指向节点结束字符 '>'</param>
 		/// <returns>true 表示单下标</returns>
 		static bool isEndNode( const HtmlString_Shared &std_c_w_string, size_t &start_index, size_t &end_index );
-
 		/// <summary>
 		/// 判断节点是否为注释节点(包含 !DOCTYPE 节点)
 		/// </summary>
@@ -77,7 +71,6 @@ namespace cylHtmlTools {
 		/// <param name="end_index">结束下标，始终指向节点结束字符 '>'</param>
 		/// <returns>true 表示注释节点</returns>
 		static bool isAnnotation( const HtmlString_Shared &std_c_w_string, size_t &start_index, size_t &end_index );
-
 		/// <summary>
 		/// 解析双节点，匹配第一个指向的节点。
 		/// </summary>
@@ -88,6 +81,14 @@ namespace cylHtmlTools {
 		/// <param name="end_index">结束的节点列表下标</param>
 		/// <returns>匹配的节点列表</returns>
 		static Vector_HtmlNodeSPtr_Shared analysisDoubleNode( const HtmlDoc_Shared &html_doc_shared, HtmlNode_Shared html_start_node, Vector_HtmlNodeSPtr_Shared &html_node_char_pairs, size_t &start_index, size_t &end_index );
+	public: // 转化对象生成器
+		/// <summary>
+		/// 把一个节点属性转换到 XDirAttribute
+		/// </summary>
+		/// <param name="conver_buff">节点属性缓存</param>
+		/// <param name="conver_buff_len">缓存长度</param>
+		/// <returns>失败返回 nullptr</returns>
+		static Vector_XDirAttributeSPtr_Shared converNodeAttributeToXDirAttributes( const HtmlChar *conver_buff, const size_t conver_buff_len );
 	public: // 静态对象生成器
 		/// <summary>
 		/// 根据字符串内容生成节点列表
@@ -244,6 +245,12 @@ namespace cylHtmlTools {
 		/// 节点之间的内容会相对应的转换
 		/// </summary>
 		HtmlString_Shared getNodeContentText( const HtmlNode_Shared &node_shared ) const;
+		/// <summary>
+		/// 节点转换到 XDir 对象指针
+		/// </summary>
+		/// <param name="node_shared">被转换的节点对象指针</param>
+		/// <returns>失败返回 nullptr</returns>
+		XDir_Shared converXDirSptr( const HtmlNode_Shared &node_shared );
 		/// <summary>
 		/// 查找节点属性<br/>
 		/// 查找过程需要调用校验函数，当校验函数返回true时，则判断该节点可命中<br/>

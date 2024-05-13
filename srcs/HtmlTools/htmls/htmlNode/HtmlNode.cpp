@@ -201,6 +201,7 @@ Vector_HtmlNodeSPtr_Shared HtmlNode::xpath( const HtmlString &xpath ) {
 Vector_HtmlNodeSPtr_Shared HtmlNode::getHtmlNodeRoots( ) {
 	return htmldocShared->getHtmlNodeRoots( );
 }
+
 bool HtmlNode::isStartNode( ) const {
 	return htmldocShared->isStartNode( *this );
 }
