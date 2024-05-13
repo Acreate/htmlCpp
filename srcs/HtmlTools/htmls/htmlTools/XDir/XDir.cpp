@@ -321,10 +321,11 @@ HtmlString XDir::getXDirName( ) const {
 
 	return result;
 }
-bool XDir::isOtherXDirIncludeThisXDir( const XDir_Shared &oter_xdir_sptr ) const { // todo 未完成
-	auto otherNameList = oter_xdir_sptr->namesList.begin(  );
+bool XDir::isLeftXDirIncludeRightXDir( const XDir *left_xdir, const XDir *right_xdir ) { // todo 实现包含
+	
 	return false;
 }
+
 
 HtmlString XDir::getDirName( ) const {
 	HtmlString result;

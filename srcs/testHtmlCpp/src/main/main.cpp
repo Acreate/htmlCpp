@@ -462,7 +462,11 @@ size_t setFileAllWString( const char *path, const cylHtmlTools::HtmlString &stri
 	auto &&write = ofstream.write( stringstream.c_str( ), stringstream.size( ) );
 	return write.tellp( );
 }
-
+/// <summary>
+/// 测试 XDirAttribute
+/// </summary>
+/// <param name="test_paremt_name">XDirAttribute 名称</param>
+/// <param name="test_paremt_value">XDirAttribute 值</param>
 void testXAttribute( const cylHtmlTools::HtmlString &test_paremt_name, const cylHtmlTools::HtmlString &test_paremt_value ) {
 	cylHtmlTools::HtmlString_Shared xattributeName(
 		std::make_shared< cylHtmlTools::HtmlString >( test_paremt_name )
@@ -489,7 +493,10 @@ void testXAttribute( const cylHtmlTools::HtmlString &test_paremt_name, const cyl
 void testXAttribute( const cylHtmlTools::HtmlString &test_paremt ) {
 	testXAttribute( test_paremt, test_paremt );
 }
-
+/// <summary>
+/// 测试 XDir 对象
+/// </summary>
+/// <param name="test_paremt">生成 XDir 对象的参数</param>
 void testXDir( const cylHtmlTools::HtmlString &test_paremt ) {
 	cylHtmlTools::XDir xdir( test_paremt );
 	auto maps = xdir.getAttributeMaps( );
@@ -512,6 +519,10 @@ void testXDir( const cylHtmlTools::HtmlString &test_paremt ) {
 	}
 	std::wcout << L"===============" << std::endl;
 }
+/// <summary>
+/// 测试 XPath 对象
+/// </summary>
+/// <param name="test_paremt"> xpath 对象的参数</param>
 void testXPath( const cylHtmlTools::HtmlString &test_paremt ) {
 	cylHtmlTools::XPath xpath( test_paremt );
 
@@ -527,7 +538,6 @@ void testXPath( const cylHtmlTools::HtmlString &test_paremt ) {
 		auto maps = xdir->getAttributeMaps( );
 		auto iterator = maps.begin( );
 		auto end = maps.end( );
-		std::wcout << L"===============" << std::endl;
 		for( ; iterator != end; ++iterator ) {
 			std::wcout << L"获得路径名称:\"" << iterator->first << '\"' << std::endl;
 			for( auto &str : *iterator->second ) {
@@ -765,6 +775,7 @@ int main( int argc, char *argv[ ] ) {
 	testHtmlNodeAttributeConverToXDirAttribute( LR"(id="sitebox bs" class="cf de")" );
 	testHtmlNodeAttributeConverToXDirAttribute( LR"(id="sitebox bs" sitebox1 bs2 class="cf de")" );
 	testHtmlNodeAttributeConverToXDirAttribute( LR"(id="sitebox bs" sitebox1 bs2 class="cf de" cf3 de4)" );
+	return 0;
 	std::string fString( u8"%s/%s/%s" );
 	char path[ 4096 ]{ 0 };
 	int len = snprintf( path, sizeof( path ), fString.c_str( ), std::string( Project_Run_bin ).c_str( ), u8"writeFile", u8"wuxia.html" );
