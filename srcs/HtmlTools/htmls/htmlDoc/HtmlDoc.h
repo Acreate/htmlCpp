@@ -104,7 +104,6 @@ namespace cylHtmlTools {
 		/// 引用的 html 内容
 		/// </summary>
 		HtmlString_Shared htmlWCStr;
-
 		/// <summary>
 		/// 所有节点
 		/// </summary>
@@ -269,7 +268,7 @@ namespace cylHtmlTools {
 		/// </summary>
 		/// <param name="xpath">xpath</param>
 		/// <returns>节点列表</returns>
-		Vector_HtmlNodeSPtr_Shared xpath( const HtmlString &xpath );
+		Vector_HtmlNodeSPtr_Shared xpathRootNodes( const HtmlString &xpath );
 
 		/// <summary>
 		/// 使用 xpath 查找元素-会匹配所有节点

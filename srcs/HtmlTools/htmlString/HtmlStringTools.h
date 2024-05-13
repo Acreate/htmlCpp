@@ -73,7 +73,7 @@ namespace cylHtmlTools {
 		static bool jumpSace( const HtmlChar *foreachWCStr, size_t foreachMaxIndex, size_t *startIndex );
 
 		/// <summary>
-		/// 获取下个反斜杠的相对位置<br/>
+		/// 获取指定字符的位置<br/>
 		/// startIndex 存储最后的下标位置
 		/// </summary>
 		/// <param name="w_c_ptr">指向字符串检测的开始位置</param>
@@ -81,7 +81,7 @@ namespace cylHtmlTools {
 		/// <param name="find_w_c_char">查找的字符</param>
 		/// <param name="startIndex">字符串开始检查的下标，存储最后的下标位置</param>
 		/// <returns>成功返回 true</returns>
-		static bool findNextWCharPotion( const HtmlChar *w_c_ptr, size_t maxIndex, const HtmlChar find_w_c_char, size_t *startIndex );
+		static bool findNextHtmlCharPotion( const HtmlChar *w_c_ptr, size_t maxIndex, const HtmlChar find_w_c_char, size_t &startIndex );
 		/// <summary>
 		/// 查找匹配的字符串
 		/// </summary>
@@ -93,7 +93,7 @@ namespace cylHtmlTools {
 		/// <param name="maxIndex">查找最大的长度(startIndex >= maxIndex 返回)</param>
 		/// <param name="result">相对位置</param>
 		/// <returns>成功返回 true</returns>
-		static bool findNextWStringPotion( const HtmlChar *w_c_ptr, size_t src_w_c_str_len, size_t startIndex, const HtmlChar *find_w_c_string, size_t find_w_c_str_len, size_t maxIndex, size_t *result );
+		static bool findNextHtmlStringPotion( const HtmlChar *w_c_ptr, size_t src_w_c_str_len, size_t startIndex, const HtmlChar *find_w_c_string, size_t find_w_c_str_len, size_t maxIndex, size_t *result );
 
 		/// <summary>
 		/// 比较两个字符串是否相等
@@ -162,6 +162,13 @@ namespace cylHtmlTools {
 		/// <param name="removeSpaceStatus">删除空白字符的状态标识</param>
 		/// <returns>相等返回 true</returns>
 		static bool equRemoveSpaceOverHtmlString( HtmlString leftStr, HtmlString rightStr, RemoveSpaceStatus removeSpaceStatus = both );
+		/// <summary>
+		/// 根据字符切分字符串
+		/// </summary>
+		/// <param name="src_html_string">被切分的字符串</param>
+		/// <param name="split_char">切分字符</param>
+		/// <returns>切分完成后的字符串</returns>
+		static std::vector< HtmlString > split( const HtmlString &src_html_string, const HtmlChar split_char );
 	};
 
 }

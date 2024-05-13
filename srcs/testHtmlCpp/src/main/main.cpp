@@ -432,14 +432,72 @@ void testHtmlThreadShared( ) {
 
 	std::cout << u8"工作已经实现完成，正在进行数值校验输出 : " << *coun << std::endl;
 }
+
+std::wstringstream getFileAllWString( const char *path ) {
+	std::wstringstream stringstream;
+	std::wifstream ifstream( path, std::ios::binary | std::ios::in );
+	if( !ifstream.is_open( ) )
+		return stringstream;
+	do {
+		std::wstring getStr;
+		auto &getline = std::getline( ifstream, getStr );
+		if( getline.eof( ) )
+			break;
+		if( !getStr.empty( ) )
+			stringstream << getStr;
+		stringstream << L'\n';
+	} while( true );
+	std::shared_ptr< std::wstring > htmlContent( new std::wstring( stringstream.str( ) ) );
+	ifstream.close( );
+	return stringstream;
+
+}
+size_t setFileAllWString( const char *path, const cylHtmlTools::HtmlString &stringstream ) {
+	std::wofstream ofstream;
+	ofstream.open( path, std::ios::binary | std::ios::out | std::ios::trunc );
+	if( !ofstream.is_open( ) )
+		return 0;
+	auto &&write = ofstream.write( stringstream.c_str( ), stringstream.size( ) );
+	return write.tellp( );
+}
 int main( int argc, char *argv[ ] ) {
 	std::locale locale( "zh_CN.UTF8" );
 	std::locale::global( locale );
 	std::wcout.imbue( locale );
 	std::cout.imbue( locale );
-	testHtmlThreadNull( );
-	testHtmlThread( );
-	testHtmlThreadSharedNull( );
-	testHtmlThreadShared( );
-	return testHtmlDoc( locale );
+	//testHtmlThreadNull( );
+	//testHtmlThread( );
+	//testHtmlThreadSharedNull( );
+	//testHtmlThreadShared( );
+
+	//int htmlDoc = testHtmlDoc( locale );
+	//return htmlDoc;
+
+
+	std::string fString( u8"%s/%s/%s" );
+	char path[ 4096 ]{ 0 };
+	int len = snprintf( path, sizeof( path ), fString.c_str( ), std::string( Project_Run_bin ).c_str( ), u8"writeFile", u8"wuxia.html" );
+	if( len == 0 )
+		return 1;
+	auto wstringstream = getFileAllWString( path );
+	len = snprintf( path, sizeof( path ), fString.c_str( ), std::string( Cache_Path_Dir ).c_str( ), u8"", u8"wuxia.html" );
+	if( len == 0 )
+		return 2;
+	size_t fileAllWString = setFileAllWString( path, wstringstream.str( ) );
+
+	auto string = std::make_shared< cylHtmlTools::HtmlString >( wstringstream.str( ) );
+	size_t endIndex = string->size( ), startIndex = 0;
+	auto htmlDoc = cylHtmlTools::HtmlDoc::parse( string, endIndex, startIndex );
+	if( !htmlDoc )
+		return 3;
+	cylHtmlTools::HtmlString lrDivIdSitebox = LR"(div[@"id" bs		"a"="sitebox ds" ad "23" " 45"	" 78 " @class="2323"])";
+	cylHtmlTools::XPath xpath( lrDivIdSitebox );
+	auto htmlNodeSPtrShared = htmlDoc->xpathRootNodes( xpath );
+	if( !htmlNodeSPtrShared )
+		return 4;
+	for( auto &node : *htmlNodeSPtrShared ) {
+		std::wcout << *node->getIncludeNodeContent( );
+	}
+	return 0;
+
 }

@@ -27,7 +27,7 @@ namespace cylHtmlTools {
 		/// <param name="attribute">属性映射列表</param>
 		/// <param name="nodeName">节点名称</param>
 		/// <returns>存在匹配返回 true</returns>
-		bool hasAttribute( const UMap_HtmlStringK_HtmlStringV_Shared &attribute, const HtmlString &nodeName );
+		bool hasAttribute( const UMap_HtmlStringK_HtmlStringV_Shared &attribute, const HtmlString &nodeName ) const;
 	public: // 属性
 
 		/// <summary>

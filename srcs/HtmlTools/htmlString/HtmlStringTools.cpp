@@ -64,11 +64,11 @@ bool HtmlStringTools::isQuotation( const HtmlChar &char_value ) {
 }
 
 bool HtmlStringTools::jumpQuotation( const HtmlChar *buff, const size_t buff_size, size_t start_index, size_t &get_quoation_position_end, std::vector< std::pair< size_t, size_t > > &get_quotation_position_s ) {
-	if( buff[ start_index ] == charValue::doubleQuotation ) {
+	if( buff[ start_index ] == charValue::doubleQuotation )
 		return jumpDoubleQuotation( buff, buff_size, start_index, get_quoation_position_end, get_quotation_position_s );
-	} else if( buff[ start_index ] == charValue::singleQuotation ) {
+	else if( buff[ start_index ] == charValue::singleQuotation )
 		return jumpSingleQuotation( buff, buff_size, start_index, get_quoation_position_end, get_quotation_position_s );
-	} else
+	else
 		return false;
 }
 bool HtmlStringTools::isRouteChar( HtmlChar currentChar ) {
@@ -80,14 +80,14 @@ bool HtmlStringTools::jumpSace( const HtmlChar *foreachWCStr, size_t foreachMaxI
 			return true;
 	return false;
 }
-bool HtmlStringTools::findNextWCharPotion( const HtmlChar *w_c_ptr, size_t maxIndex, const HtmlChar find_w_c_char, size_t *startIndex ) {
-	for( ; *startIndex < maxIndex; ++( *startIndex ) )
-		if( w_c_ptr[ *startIndex ] == find_w_c_char )
+bool HtmlStringTools::findNextHtmlCharPotion( const HtmlChar *w_c_ptr, size_t maxIndex, const HtmlChar find_w_c_char, size_t &startIndex ) {
+	for( ; startIndex < maxIndex; ++startIndex )
+		if( w_c_ptr[ startIndex ] == find_w_c_char )
 			return true;
 	return false;
 }
 
-bool HtmlStringTools::findNextWStringPotion( const HtmlChar *w_c_ptr, size_t src_w_c_str_len, size_t startIndex, const HtmlChar *find_w_c_string, size_t find_w_c_str_len, size_t maxIndex, size_t *result ) {
+bool HtmlStringTools::findNextHtmlStringPotion( const HtmlChar *w_c_ptr, size_t src_w_c_str_len, size_t startIndex, const HtmlChar *find_w_c_string, size_t find_w_c_str_len, size_t maxIndex, size_t *result ) {
 
 	if( src_w_c_str_len < find_w_c_str_len )
 		return false;
@@ -188,4 +188,33 @@ bool HtmlStringTools::equRemoveSpaceOverHtmlString( HtmlString leftStr, HtmlStri
 			break;
 	}
 	return equHtmlString( leftStr, rightStr );
+}
+std::vector< HtmlString > HtmlStringTools::split( const HtmlString &src_html_string, const HtmlChar split_char ) {
+
+	size_t strLen = src_html_string.size( );
+	if( strLen == 0 )
+		return { src_html_string };
+	std::vector< HtmlString > result;
+
+	HtmlChar *buff = new HtmlChar[ strLen ];
+	size_t buffIndex = 0, spliteIndex = 0;
+	for( ; spliteIndex < strLen; ++spliteIndex ) {
+		HtmlChar value = src_html_string[ spliteIndex ];
+		if( value == split_char ) {
+			if( buffIndex == 0 )
+				continue;
+			HtmlString subStr( buff, buffIndex );
+			result.emplace_back( subStr );
+			buffIndex = 0;
+		} else {
+			buff[ buffIndex ] = value;
+			++buffIndex;
+		}
+	}
+	if( buffIndex != 0 ) {
+		HtmlString subStr( buff, buffIndex );
+		result.emplace_back( subStr );
+	}
+
+	return result;
 }

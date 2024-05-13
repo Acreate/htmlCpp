@@ -42,7 +42,8 @@ XPath::XPath( const HtmlString &wstr ) : XPath( ) {
 	delete[] buff;
 }
 XPath::XPath( const List_HtmlStringSptr &std_w_string_list_shared, const HtmlString &separator )
-	: separator( separator ), dirListSPtr( std::make_shared< Vector_XDirSPtr >( ) ) {
+: separator( separator )
+, dirListSPtr( std::make_shared< Vector_XDirSPtr >( ) ) {
 	for( auto &stdWString : std_w_string_list_shared )
 		dirListSPtr->emplace_back( std::make_shared< XDir >( *stdWString ) );
 }
@@ -52,28 +53,82 @@ XPath::XPath( ): dirListSPtr( std::make_shared< Vector_XDirSPtr >( ) ) {
 
 }
 
-Vector_HtmlNodeSPtr XPath::pathControlDirName( Vector_HtmlNodeSPtr &current_find_nodes, XDir *xdirInfo, XDir_Control_Type current_control_type, XDir_Control_Type old_control_type ) {
+Vector_HtmlNodeSPtr XPath::pathControlDirName(const Vector_HtmlNodeSPtr &current_find_nodes,const XDir *xdirInfo, XDir_Control_Type current_control_type, XDir_Control_Type old_control_type ) {
 	Vector_HtmlNodeSPtr result;
 	switch( current_control_type ) {
-	case Cd_Current :// 获取参数列表节点当中的友邻节点-如果存在
-		for( auto &node : current_find_nodes ) {
-			auto copyNode = node.get( );
-			//// 跳过尾节点
-			if( copyNode->isEndNode( ) )
-				continue;
+		case Cd_Current :// 获取参数列表节点当中的友邻节点-如果存在
+			for( auto &node : current_find_nodes ) {
+				auto copyNode = node.get( );
+				//// 跳过尾节点
+				if( copyNode->isEndNode( ) )
+					continue;
 
-			for( auto &resultNode : result )
-				if( *resultNode.get( ) == *copyNode ) {
-					copyNode = nullptr;
-					break;
+				for( auto &resultNode : result )
+					if( *resultNode.get( ) == *copyNode ) {
+						copyNode = nullptr;
+						break;
+					}
+				if( copyNode ) {
+					result.emplace_back( node );
+					auto brotherVSPtr = copyNode->getBrother( );
+					for( auto &brother : *brotherVSPtr ) {
+						copyNode = brother.get( );
+						// 跳过尾节点
+						if( copyNode->getNodeType( ) == Html_Node_Type::DoubleNode && copyNode == copyNode->getEndNode( ).get( ) )
+							continue;
+						for( auto &resultNode : result )
+							if( *resultNode.get( ) == *copyNode ) {
+								copyNode = nullptr;
+								break;
+							}
+						if( copyNode )
+							result.emplace_back( brother );
+					}
 				}
-			if( copyNode ) {
-				result.emplace_back( node );
-				auto brotherVSPtr = copyNode->getBrother( );
-				for( auto &brother : *brotherVSPtr ) {
-					copyNode = brother.get( );
+			}
+			break;
+		case Cd_Parent : // 获取参数列表节点当中的上级节点-如果存在，则遍历友邻节点
+			for( auto &node : current_find_nodes ) {
+				// 跳过尾节点
+				if( node->htmldocShared->isEndNode( node ) )
+					continue;
+				HtmlNode_Shared parent = node->getParent( );
+				auto htmlNode = parent.get( );
+				if( parent->isEndNode( ) )
+					continue;
+				if( htmlNode ) {
+					for( auto &resultNode : result )
+						if( *resultNode.get( ) == *htmlNode ) {
+							htmlNode = nullptr;
+							break;
+						}
+					if( htmlNode ) {
+						result.emplace_back( node );
+						const auto &brothers = htmlNode->getBrother( );
+						for( auto &brother : *brothers ) {
+							htmlNode = brother.get( );
+							// 跳过尾节点
+							if( htmlNode->isEndNode( ) )
+								continue;
+							for( auto &resultNode : result )
+								if( *resultNode.get( ) == *htmlNode ) {
+									htmlNode = nullptr;
+									break;
+								}
+							if( htmlNode )
+								result.emplace_back( brother );
+						}
+					}
+				}
+			}
+			break;
+		case Cd_Root : // 获取参数列表节点当中的根节点
+			for( auto &node : current_find_nodes ) {
+				auto htmlNodeRoots = node->getHtmlNodeRoots( );
+				for( auto &rootNode : *htmlNodeRoots ) {
+					auto copyNode = rootNode.get( );
 					// 跳过尾节点
-					if( copyNode->getNodeType( ) == Html_Node_Type::DoubleNode && copyNode == copyNode->getEndNode( ).get( ) )
+					if( copyNode->isEndNode( ) )
 						continue;
 					for( auto &resultNode : result )
 						if( *resultNode.get( ) == *copyNode ) {
@@ -81,108 +136,54 @@ Vector_HtmlNodeSPtr XPath::pathControlDirName( Vector_HtmlNodeSPtr &current_find
 							break;
 						}
 					if( copyNode )
-						result.emplace_back( brother );
+						result.emplace_back( rootNode );
 				}
 			}
-		}
-		break;
-	case Cd_Parent : // 获取参数列表节点当中的上级节点-如果存在，则遍历友邻节点
-		for( auto &node : current_find_nodes ) {
-			// 跳过尾节点
-			if( node->htmldocShared->isEndNode( node ) )
-				continue;
-			HtmlNode_Shared parent = node->getParent( );
-			auto htmlNode = parent.get( );
-			if( parent->isEndNode( ) )
-				continue;
-			if( htmlNode ) {
-				for( auto &resultNode : result )
-					if( *resultNode.get( ) == *htmlNode ) {
-						htmlNode = nullptr;
-						break;
-					}
-				if( htmlNode ) {
-					result.emplace_back( node );
-					const auto &brothers = htmlNode->getBrother( );
-					for( auto &brother : *brothers ) {
-						htmlNode = brother.get( );
-						// 跳过尾节点
-						if( htmlNode->isEndNode( ) )
-							continue;
-						for( auto &resultNode : result )
-							if( *resultNode.get( ) == *htmlNode ) {
-								htmlNode = nullptr;
+			break;
+		case Cd_None : {
+			if( old_control_type == Cd_None ) // 上次节点控制符使用的是名称代表，则当前需要使用子目录
+				for( auto &findNode : current_find_nodes ) { // 获取检查节点
+					auto copyNode = findNode.get( );
+					// 跳过尾节点
+					if( copyNode->isEndNode( ) )
+						continue;
+					for( auto &subNode : *findNode->getChildren( ) ) { // 获取子节点
+						auto iterator = result.begin( );
+						auto end = result.end( );
+						for( ; iterator != end; ++iterator )
+							if( *iterator->get( ) == *subNode.get( ) )
 								break;
-							}
-						if( htmlNode )
-							result.emplace_back( brother );
+						if( iterator == end ) {
+							HtmlNode *htmlNode = subNode.get( );
+							auto nodeName = *htmlNode->getNodeName( );
+							if( xdirInfo->hasName( nodeName ) )
+								if( xdirInfo->hasAttribute( htmlNode->analysisAttribute( ), nodeName ) )
+									result.emplace_back( subNode );
+						}
 					}
 				}
-			}
-		}
-		break;
-	case Cd_Root : // 获取参数列表节点当中的根节点
-		for( auto &node : current_find_nodes ) {
-			auto htmlNodeRoots = node->getHtmlNodeRoots( );
-			for( auto &rootNode : *htmlNodeRoots ) {
-				auto copyNode = rootNode.get( );
-				// 跳过尾节点
-				if( copyNode->isEndNode( ) )
-					continue;
-				for( auto &resultNode : result )
-					if( *resultNode.get( ) == *copyNode ) {
-						copyNode = nullptr;
-						break;
-					}
-				if( copyNode )
-					result.emplace_back( rootNode );
-			}
-		}
-		break;
-	case Cd_None : {
-		if( old_control_type == Cd_None ) // 上次节点控制符使用的是名称代表，则当前需要使用子目录
-			for( auto &findNode : current_find_nodes ) { // 获取检查节点
-				auto copyNode = findNode.get( );
-				// 跳过尾节点
-				if( copyNode->isEndNode( ) )
-					continue;
-				for( auto &subNode : *findNode->getChildren( ) ) { // 获取子节点
+			else { // 上次节点控制符使用的是路径控制符，则当前需要使用当前目录
+				for( auto &findNode : current_find_nodes ) { // 获取检查节点
+					auto copyNode = findNode.get( );
+					// 跳过尾节点
+					if( copyNode->isEndNode( ) )
+						continue;
 					auto iterator = result.begin( );
 					auto end = result.end( );
 					for( ; iterator != end; ++iterator )
-						if( *iterator->get( ) == *subNode.get( ) )
+						if( *iterator->get( ) == *findNode.get( ) )
 							break;
 					if( iterator == end ) {
-						HtmlNode *htmlNode = subNode.get( );
+						HtmlNode *htmlNode = findNode.get( );
 						auto nodeName = *htmlNode->getNodeName( );
 						if( xdirInfo->hasName( nodeName ) )
 							if( xdirInfo->hasAttribute( htmlNode->analysisAttribute( ), nodeName ) )
-								result.emplace_back( subNode );
+								result.emplace_back( findNode );
 					}
 				}
 			}
-		else { // 上次节点控制符使用的是路径控制符，则当前需要使用当前目录
-			for( auto &findNode : current_find_nodes ) { // 获取检查节点
-				auto copyNode = findNode.get( );
-				// 跳过尾节点
-				if( copyNode->isEndNode( ) )
-					continue;
-				auto iterator = result.begin( );
-				auto end = result.end( );
-				for( ; iterator != end; ++iterator )
-					if( *iterator->get( ) == *findNode.get( ) )
-						break;
-				if( iterator == end ) {
-					HtmlNode *htmlNode = findNode.get( );
-					auto nodeName = *htmlNode->getNodeName( );
-					if( xdirInfo->hasName( nodeName ) )
-						if( xdirInfo->hasAttribute( htmlNode->analysisAttribute( ), nodeName ) )
-							result.emplace_back( findNode );
-				}
-			}
 		}
-	}
-	break;
+		break;
 	}
 
 	Vector_HtmlNodeSPtr buff;
@@ -196,7 +197,7 @@ Vector_HtmlNodeSPtr XPath::pathControlDirName( Vector_HtmlNodeSPtr &current_find
 	return buff;
 }
 
-Vector_HtmlNodeSPtr XPath::matchesHtmlDocAllNodes( Vector_HtmlNodeSPtr &currentFindNodes, XDir *x_dir, HtmlString &path ) {
+Vector_HtmlNodeSPtr XPath::matchesHtmlDocAllNodes(const Vector_HtmlNodeSPtr &currentFindNodes,const XDir *x_dir,const HtmlString &path ) {
 	Vector_HtmlNodeSPtr buff;
 	auto currentFindNodesBegin = currentFindNodes.begin( );
 	auto currentFindNodesEnd = currentFindNodes.end( );
@@ -242,14 +243,11 @@ HtmlString XPath::getHtmlString( ) const {
 
 	return result;
 }
-Vector_HtmlNodeSPtr_Shared XPath::buider( Vector_HtmlNodeSPtr_Shared &html_node_shared_s ) {
+Vector_HtmlNodeSPtr_Shared XPath::buider( const Vector_HtmlNodeSPtr_Shared &html_node_shared_s ) {
 	auto iterator = dirListSPtr->begin( );
 	auto end = dirListSPtr->end( );
-
 	if( iterator == end ) // 根本没有节点
 		return nullptr;
-
-
 	Vector_HtmlNodeSPtr_Shared resultShared( new Vector_HtmlNodeSPtr );
 	auto currentFindNodes = *html_node_shared_s;
 	HtmlString rootPath( 1, forwardSlash );

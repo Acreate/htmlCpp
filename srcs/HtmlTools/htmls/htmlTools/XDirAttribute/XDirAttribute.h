@@ -1,6 +1,8 @@
 ﻿#ifndef XDIRATTRIBUTE_H_H_HEAD__FILE__
 #define XDIRATTRIBUTE_H_H_HEAD__FILE__
 #pragma once
+#include <iostream>
+
 #include "../../../htmlString/HtmlStringTools.h"
 #include "../../../nameSpace/cylHtmlTools.h"
 namespace cylHtmlTools {
@@ -12,6 +14,8 @@ namespace cylHtmlTools {
 		Vector_HtmlStringSPtr_Shared values;
 	public:
 		XDirAttribute( const HtmlString_Shared &in_name, const Vector_HtmlStringSPtr_Shared &in_values );
+		XDirAttribute( const HtmlString &in_name, const Vector_HtmlStringSPtr &in_values );
+		XDirAttribute( const HtmlString &in_name, const std::vector<HtmlString> &in_values );
 		XDirAttribute( const HtmlChar *name_buff, const size_t name_buff_size, const HtmlChar *values_buff, const size_t values_size );
 		virtual ~XDirAttribute( );
 	public: // - 属性
@@ -142,8 +146,10 @@ namespace cylHtmlTools {
 			for( auto &value : *values ) {
 				auto valuesIterator = others.begin( );
 				auto valuesIteratorEnd = others.end( );
+				auto leftStr = *value;
 				do {
-					if( HtmlStringTools::equRemoveSpaceOverHtmlString( *value, *valuesIterator->get( ) ) )
+					auto rightStr = *valuesIterator->get( );
+					if( HtmlStringTools::equRemoveSpaceOverHtmlString( leftStr, rightStr ) )
 						break;
 					++valuesIterator;
 					if( valuesIterator == valuesIteratorEnd )

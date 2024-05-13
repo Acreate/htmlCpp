@@ -465,7 +465,6 @@ Vector_HtmlNodeSPtr_Shared HtmlDoc::analysisAttributesNode( ) {
 		node.analysisAttribute( );
 		analysisOver->emplace_back( nodePtr );
 	}
-
 	return analysisOver;
 }
 bool HtmlDoc::isStartNode( const HtmlNode_Shared &node_shared ) const {
@@ -615,12 +614,11 @@ Vector_HtmlNodeSPtr_Shared HtmlDoc::matchChildrenNodes( const HtmlNode_Shared &n
 
 	return result;
 }
-Vector_HtmlNodeSPtr_Shared HtmlDoc::xpath( const HtmlString &xpath ) {
-	XPath xPath( xpath );
-	return xPath.buider( this->htmlNodeSPtrRoots );
+Vector_HtmlNodeSPtr_Shared HtmlDoc::xpathRootNodes( const HtmlString &xpath ) {
+	return XPath( xpath ).buider( getHtmlNodeRoots( ) );
 }
 Vector_HtmlNodeSPtr_Shared HtmlDoc::xpathAllNode( const HtmlString &xpath ) {
-		XPath xPath( xpath );
+	XPath xPath( xpath );
 	return xPath.buider( this->htmlDocNode );
 }
 Vector_HtmlNodeSPtr_Shared HtmlDoc::getHtmlNodeRoots( ) {
