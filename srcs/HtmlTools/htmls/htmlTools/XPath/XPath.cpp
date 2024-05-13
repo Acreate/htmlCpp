@@ -53,7 +53,7 @@ XPath::XPath( ): dirListSPtr( std::make_shared< Vector_XDirSPtr >( ) ) {
 
 }
 
-Vector_HtmlNodeSPtr XPath::pathControlDirName(const Vector_HtmlNodeSPtr &current_find_nodes,const XDir *xdirInfo, XDir_Control_Type current_control_type, XDir_Control_Type old_control_type ) {
+Vector_HtmlNodeSPtr XPath::pathControlDirName( const Vector_HtmlNodeSPtr &current_find_nodes, const XDir *xdirInfo, XDir_Control_Type current_control_type, XDir_Control_Type old_control_type ) {
 	Vector_HtmlNodeSPtr result;
 	switch( current_control_type ) {
 		case Cd_Current :// 获取参数列表节点当中的友邻节点-如果存在
@@ -197,7 +197,7 @@ Vector_HtmlNodeSPtr XPath::pathControlDirName(const Vector_HtmlNodeSPtr &current
 	return buff;
 }
 
-Vector_HtmlNodeSPtr XPath::matchesHtmlDocAllNodes(const Vector_HtmlNodeSPtr &currentFindNodes,const XDir *x_dir,const HtmlString &path ) {
+Vector_HtmlNodeSPtr XPath::matchesHtmlDocAllNodes( const Vector_HtmlNodeSPtr &currentFindNodes, const XDir *x_dir, const HtmlString &path ) {
 	Vector_HtmlNodeSPtr buff;
 	auto currentFindNodesBegin = currentFindNodes.begin( );
 	auto currentFindNodesEnd = currentFindNodes.end( );
@@ -206,9 +206,8 @@ Vector_HtmlNodeSPtr XPath::matchesHtmlDocAllNodes(const Vector_HtmlNodeSPtr &cur
 			if( node->isEndNode( ) ) // 跳过尾节点
 				return false;
 			auto nodeName = *node->getNodeName( );
-			if( x_dir->hasName( nodeName ) )
-				if( x_dir->hasAttribute( node->analysisAttribute( ), nodeName ) )
-					return true;
+			if( x_dir->hasAttribute( node->analysisAttribute( ), nodeName ) )
+				return true;
 			return false;
 		} );
 		if( findNodes )
@@ -230,7 +229,6 @@ HtmlString XPath::getHtmlString( ) const {
 	auto end = dirListSPtr->end( );
 	if( iterator == end )
 		return result;
-
 	do {
 		auto subStr = iterator->get( )->getXDirName( );
 		++iterator;

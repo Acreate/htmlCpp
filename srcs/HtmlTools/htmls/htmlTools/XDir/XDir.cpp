@@ -67,10 +67,13 @@ XDir::XDir( const HtmlString &param ) {
 	Vector_XDirAttributeSPtr_Shared attributesResult( std::make_shared< Vector_XDirAttributeSPtr >( ) ); // 存储解析后的属性
 	for( size_t index = 0; index < length; ++index ) {
 		value = data[ index ];
-		if( value == charValue::leftSquareBracket ) { // 找到 ]
-			HtmlString xdirName( buff, buffIndex );
-			namesList.emplace_back( xdirName );
-			buffIndex = 0;
+		if( value == charValue::leftSquareBracket ) { // 找到 [
+			HtmlString xdirName;
+			if( buffIndex != 0 ) { // 如果缓冲存在数据，则转换为名称
+				xdirName = HtmlString( buff, buffIndex );
+				namesList.emplace_back( xdirName );
+				buffIndex = 0;
+			}
 			++index;
 			for( ; index < length; ++index ) {
 				value = data[ index ];
@@ -85,7 +88,7 @@ XDir::XDir( const HtmlString &param ) {
 						buffIndex = 0;
 					}
 					break;
-				} else if( value == charValue::singleQuotation || value == charValue::doubleQuotation ) {
+				} else if( HtmlStringTools::isQuotation( value ) ) { // 引号，则扫描后续引号，并且填充缓存
 					size_t getQuotationEnd;
 					std::vector< std::pair< size_t, size_t > > getQuoattionPostions;
 					if( HtmlStringTools::jumpQuotation( data, length, index, getQuotationEnd, getQuoattionPostions ) ) {
@@ -95,11 +98,14 @@ XDir::XDir( const HtmlString &param ) {
 							buff[ buffIndex ] = data[ index ];
 						buff[ buffIndex ] = data[ index ];
 						++buffIndex;
+					} else {// 无法匹配引号，则直接配置结束索引
+						index = length;
+						buffIndex = 0;
 					}
-					continue;
+				} else {
+					buff[ buffIndex ] = value;
+					++buffIndex;
 				}
-				buff[ buffIndex ] = value;
-				++buffIndex;
 			}
 			continue;
 		}
@@ -282,6 +288,7 @@ HtmlString XDir::getXDirName( ) const {
 						++iterator;
 						if( iterator == end )
 							break;
+						result = result + charValue::space + charValue::at;
 					} while( true );
 				} else {
 					result.append( iterator->first );

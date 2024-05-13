@@ -32,7 +32,9 @@ namespace cylHtmlTools {
 		/// <returns>存在匹配返回 true</returns>
 		bool hasAttribute( const UMap_HtmlStringK_HtmlStringV_Shared &attribute, const HtmlString &nodeName ) const;
 	public: // 属性
-
+		UMap_HtmlStringK_VectorSPtr_XDirAttributeSPtrV getAttributeMaps( ) {
+			return *attributesMap;
+		}
 		/// <summary>
 		/// 获取名称
 		/// </summary>
@@ -61,7 +63,7 @@ namespace cylHtmlTools {
 		/// 插入一个属性<br/>
 		/// 操作状态: 
 		/// </summary>
-		/// <param name="dir_set_name">目录名称</param>
+		/// <param name="dir_set_name"></param>
 		/// <param name="xdir_info">属性</param>
 		/// <returns>返回操作状态</returns>
 		XDir_Attribute_Status insertXDirAttributeInfo( const HtmlString &dir_set_name, XDirAttribute_Shared &xdir_info );

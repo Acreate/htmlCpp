@@ -12,6 +12,7 @@
 #include "htmls/htmlTools/XPath/XPath.h"
 #include <htmls/htmlTools/HtmlWorkThread/HtmlWorkThread.h>
 #include <htmls/htmlTools/XDirAttribute/XDirAttribute.h>
+#include <htmls/htmlTools/XDir/XDir.h>
 #include "htmlString/HtmlStringTools.h"
 
 /// <summary>
@@ -487,6 +488,62 @@ void testXAttribute( const cylHtmlTools::HtmlString &test_paremt_name, const cyl
 void testXAttribute( const cylHtmlTools::HtmlString &test_paremt ) {
 	testXAttribute( test_paremt, test_paremt );
 }
+
+void testXDir( const cylHtmlTools::HtmlString &test_paremt ) {
+	cylHtmlTools::XDir xAttribute( test_paremt );
+	auto maps = xAttribute.getAttributeMaps( );
+	auto iterator = maps.begin( );
+	auto end = maps.end( );
+	std::wcout << L"===============" << std::endl;
+	for( ; iterator != end; ++iterator ) {
+		std::wcout << L"获得路径名称:\"" << iterator->first << '\"' << std::endl;
+		for( auto &str : *iterator->second ) {
+			auto &xdirAttribute = *str;
+			auto name = xdirAttribute.getName( );
+			if( name )
+				std::wcout << '\t' << L"获得属性名称:\"" << *name << '\"' << std::endl;
+			auto htmlStringSPtrShared = xdirAttribute.getValues( );
+			if( htmlStringSPtrShared )
+				for( auto &value : *htmlStringSPtrShared )
+					std::wcout << "\t\t" << L"获得属性值:\"" << *value << '\"' << std::endl;
+		}
+		std::wcout << std::endl;
+	}
+	std::wcout << L"===============" << std::endl;
+}
+void testXPath( const cylHtmlTools::HtmlString &test_paremt ) {
+	cylHtmlTools::XPath xpath( test_paremt );
+
+	std::wcout << L"===============" << std::endl;
+	std::wcout << L"获取路径 : \"" << xpath.getHtmlString( ) << '\"' << std::endl;
+	auto xDirS = xpath.getXDirs( );
+	for( auto &xdir : xDirS ) {
+		auto xdirName = xdir->getDirName( );
+		if( xdirName.empty( ) )
+			std::wcout << L"名称转化错误" << std::endl;
+		else
+			std::wcout << L"找到目录名称: \"" << xdirName << '\"' << std::endl;
+		auto maps = xdir->getAttributeMaps( );
+		auto iterator = maps.begin( );
+		auto end = maps.end( );
+		std::wcout << L"===============" << std::endl;
+		for( ; iterator != end; ++iterator ) {
+			std::wcout << L"获得路径名称:\"" << iterator->first << '\"' << std::endl;
+			for( auto &str : *iterator->second ) {
+				auto &xdirAttribute = *str;
+				auto name = xdirAttribute.getName( );
+				if( name )
+					std::wcout << '\t' << L"获得属性名称:\"" << *name << '\"' << std::endl;
+				auto htmlStringSPtrShared = xdirAttribute.getValues( );
+				if( htmlStringSPtrShared )
+					for( auto &value : *htmlStringSPtrShared )
+						std::wcout << "\t\t" << L"获得属性值:\"" << *value << '\"' << std::endl;
+			}
+			std::wcout << std::endl;
+		}
+	}
+	std::wcout << L"===============" << std::endl;
+}
 int main( int argc, char *argv[ ] ) {
 	std::locale locale( "zh_CN.UTF8" );
 	std::locale::global( locale );
@@ -502,7 +559,8 @@ int main( int argc, char *argv[ ] ) {
 
 	testXAttribute( LR"(@class="23 31" 123 " 3 11 ")" );
 	testXAttribute( LR"(@acd="23 31" 123 " 3 11 ")" );
-
+	testXDir( LR"(div[@"id"="sitebox sd" @class="cf ds"])" );
+	testXPath( LR"(div[@"id"="sitebox" @class="cf"])" );
 	std::string fString( u8"%s/%s/%s" );
 	char path[ 4096 ]{ 0 };
 	int len = snprintf( path, sizeof( path ), fString.c_str( ), std::string( Project_Run_bin ).c_str( ), u8"writeFile", u8"wuxia.html" );
@@ -519,8 +577,9 @@ int main( int argc, char *argv[ ] ) {
 	auto htmlDoc = cylHtmlTools::HtmlDoc::parse( string, endIndex, startIndex );
 	if( !htmlDoc )
 		return 3;
-	cylHtmlTools::HtmlString lrDivIdSitebox = LR"(div[@"id"="sitebox"]/dl)";
+	cylHtmlTools::HtmlString lrDivIdSitebox = LR"(div[@"id"="sitebox" @class="cf"])";
 
+	std::wcout << L"xpath 查找 : \"" << lrDivIdSitebox << '\"' << std::endl;
 	cylHtmlTools::XPath xpath( lrDivIdSitebox );
 	auto htmlNodeSPtrShared = htmlDoc->xpathRootNodes( xpath );
 	if( !htmlNodeSPtrShared )

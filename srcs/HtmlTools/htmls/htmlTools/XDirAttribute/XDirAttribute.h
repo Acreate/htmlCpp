@@ -247,6 +247,12 @@ namespace cylHtmlTools {
 		/// <returns>解析个数</returns>
 		static size_t parseXDirAttributes( const HtmlChar *buff, const size_t buff_size,
 			Vector_XDirAttributeSPtr_Shared &save_vector_xdirattribute_s );
+		/// <summary>
+		/// 判定名称是否需要切分值
+		/// </summary>
+		/// <param name="name">判定名称</param>
+		/// <returns>需要切分返回 true</returns>
+		static bool isSplitAttributeName(const HtmlString& name);
 	};
 }
 

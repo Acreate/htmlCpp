@@ -57,12 +57,11 @@ HtmlString_Shared XDirAttribute::converXDirAttributeName( const HtmlChar *buff, 
 }
 
 Vector_HtmlStringSPtr_Shared XDirAttribute::converXDirAttributeValues( const HtmlChar *buff, const size_t buff_size, HtmlString_Shared &name ) {
-
 	// 检测是否存在等号
 	size_t index = 0;
 	if( HtmlStringTools::findNextHtmlCharPotion( buff, buff_size, charValue::equ, index ) ) {
 		return converXDirAttributeValues( buff + index + 1, buff_size - index - 1, name );
-	} else if( HtmlStringTools::equRemoveSpaceOverHtmlString( *name, HtmlString( L"class" ) ) ) {
+	} else if( isSplitAttributeName( *name ) ) {
 		auto resultVectorSPtr = std::make_shared< Vector_HtmlStringSPtr >( );
 		auto htmlStringSPtrShared = htmlCharBuffConverToValues( buff, buff_size );
 		if( htmlStringSPtrShared )
@@ -97,37 +96,77 @@ int32_t XDirAttribute::appendAttribute( Vector_XDirAttributeSPtr_Shared &save_ve
 }
 int32_t XDirAttribute::appendAttribute( Vector_XDirAttributeSPtr_Shared &save_vector_xdirattribute_s, const HtmlString_Shared &name_shared, const Vector_HtmlStringSPtr_Shared &values_vector_shared ) {
 	if( values_vector_shared ) {
-		auto iterator = save_vector_xdirattribute_s->begin( );
-		auto end = save_vector_xdirattribute_s->end( );
 		auto &name = *name_shared;
-		for( ; iterator != end; ++iterator ) {
-			auto &xdirAttribute = **iterator;
-			// 存在属性名称相等则存储所有值
-			if( HtmlStringTools::equRemoveSpaceOverHtmlString( *xdirAttribute.getName( ), name ) ) {
-				// 遍历值列表
-				auto srcValuesVectorIterator = values_vector_shared->begin( );
-				auto srcValuesVectorEnd = values_vector_shared->end( );
-				// 获取已经存在的库遍历对象
-				auto saveValuesShared = xdirAttribute.getValues( );
-				do {
-					auto saveValueIterator = saveValuesShared->begin( );
-					auto saveValueEnd = saveValuesShared->end( );
-					// 查找是否存在相等的值
-					for( ; saveValueIterator != saveValueEnd; ++saveValueIterator )
-						if( HtmlStringTools::equRemoveSpaceOverHtmlString( *saveValueIterator, *srcValuesVectorIterator ) )
-							break;
-					if( saveValueIterator == saveValueEnd ) // 如果没有找到匹配项，则加入这个值
-						saveValuesShared->emplace_back( *srcValuesVectorIterator );
-					++srcValuesVectorIterator; // 遍历下一个
-					if( srcValuesVectorIterator == srcValuesVectorEnd ) // 全部值已经遍历完毕
-						break;
-				} while( true );
-				break; // 已经处理了该属性
+		if( isSplitAttributeName( name ) ) {
+			std::vector< HtmlString > splitOverLastStringList;
+			for( auto &strSPtr : *values_vector_shared ) {
+				auto split = HtmlStringTools::split( *strSPtr, charValue::space );
+				for( auto &subStr : split )
+					splitOverLastStringList.emplace_back( subStr );
 			}
+			auto iterator = save_vector_xdirattribute_s->begin( );
+			auto end = save_vector_xdirattribute_s->end( );
+			for( ; iterator != end; ++iterator ) {
+				auto &xdirAttribute = **iterator;
+				// 存在属性名称相等则存储所有值
+				if( HtmlStringTools::equRemoveSpaceOverHtmlString( *xdirAttribute.getName( ), name ) ) {
+					// 遍历值列表
+					auto srcValuesVectorIterator = splitOverLastStringList.begin( );
+					auto srcValuesVectorEnd = splitOverLastStringList.end( );
+					// 获取已经存在的库遍历对象
+					auto saveValuesShared = xdirAttribute.getValues( );
+					do {
+						auto saveValueIterator = saveValuesShared->begin( );
+						auto saveValueEnd = saveValuesShared->end( );
+						// 查找是否存在相等的值
+						for( ; saveValueIterator != saveValueEnd; ++saveValueIterator )
+							if( HtmlStringTools::equRemoveSpaceOverHtmlString( *saveValueIterator->get( ), *srcValuesVectorIterator ) )
+								break;
+						if( saveValueIterator == saveValueEnd )// 如果没有找到匹配项，则加入这个值
+							// class 属性名称的值，需要切分
+							saveValuesShared->emplace_back( std::make_shared< HtmlString >( *srcValuesVectorIterator ) );
+						++srcValuesVectorIterator; // 遍历下一个
+						if( srcValuesVectorIterator == srcValuesVectorEnd ) // 全部值已经遍历完毕
+							break;
+					} while( true );
+					break; // 已经处理了该属性
+				}
+			}
+			if( iterator == end ) // 没有匹配的属性，则把属性加入到当前属性列表当中
+				save_vector_xdirattribute_s->emplace_back( std::make_shared< XDirAttribute >( *name_shared, splitOverLastStringList ) );
+			return 0;
+		} else {
+			auto iterator = save_vector_xdirattribute_s->begin( );
+			auto end = save_vector_xdirattribute_s->end( );
+			for( ; iterator != end; ++iterator ) {
+				auto &xdirAttribute = **iterator;
+				// 存在属性名称相等则存储所有值
+				if( HtmlStringTools::equRemoveSpaceOverHtmlString( *xdirAttribute.getName( ), name ) ) {
+					// 遍历值列表
+					auto srcValuesVectorIterator = values_vector_shared->begin( );
+					auto srcValuesVectorEnd = values_vector_shared->end( );
+					// 获取已经存在的库遍历对象
+					auto saveValuesShared = xdirAttribute.getValues( );
+					do {
+						auto saveValueIterator = saveValuesShared->begin( );
+						auto saveValueEnd = saveValuesShared->end( );
+						// 查找是否存在相等的值
+						for( ; saveValueIterator != saveValueEnd; ++saveValueIterator )
+							if( HtmlStringTools::equRemoveSpaceOverHtmlString( *saveValueIterator, *srcValuesVectorIterator ) )
+								break;
+						if( saveValueIterator == saveValueEnd ) // 如果没有找到匹配项，则加入这个值
+							saveValuesShared->emplace_back( *srcValuesVectorIterator );
+						++srcValuesVectorIterator; // 遍历下一个
+						if( srcValuesVectorIterator == srcValuesVectorEnd ) // 全部值已经遍历完毕
+							break;
+					} while( true );
+					break; // 已经处理了该属性
+				}
+			}
+			if( iterator == end ) // 没有匹配的属性，则把属性加入到当前属性列表当中
+				save_vector_xdirattribute_s->emplace_back( std::make_shared< XDirAttribute >( name_shared, values_vector_shared ) );
+			return 0;
 		}
-		if( iterator == end ) // 没有匹配的属性，则把属性加入到当前属性列表当中
-			save_vector_xdirattribute_s->emplace_back( std::make_shared< XDirAttribute >( name_shared, values_vector_shared ) );
-		return 0;
 	}
 	return appendAttribute( save_vector_xdirattribute_s, name_shared );
 }
@@ -232,7 +271,6 @@ size_t XDirAttribute::parseXDirAttributes( const HtmlChar *buff, const size_t bu
 			// 查找下一个 @，判断属性数量
 			if( HtmlStringTools::findNextHtmlCharPotion( buff, buff_size, charValue::at, nextIndex ) ) {// 存在 @
 				// 开始处理已知 @ 属性( 首次的 @ 下标为 index，其次 @ 下标为 nextIndex)
-
 				// 查找 =，判断是否存在值
 				if( HtmlStringTools::findNextHtmlCharPotion( buff, buff_size, charValue::equ, equIndex ) ) {
 					nameHtmlShared = htmlCharBuffConverToName( buff + index, equIndex - index );
@@ -257,4 +295,8 @@ size_t XDirAttribute::parseXDirAttributes( const HtmlChar *buff, const size_t bu
 		}
 	}
 	return save_vector_xdirattribute_s->size( ) - parseCount;
+}
+bool XDirAttribute::isSplitAttributeName( const HtmlString &name ) {
+	return HtmlStringTools::equRemoveSpaceOverHtmlString( name, L"class" ) || HtmlStringTools::equRemoveSpaceOverHtmlString( name, L"id" );
+
 }
