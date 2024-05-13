@@ -519,14 +519,16 @@ int main( int argc, char *argv[ ] ) {
 	auto htmlDoc = cylHtmlTools::HtmlDoc::parse( string, endIndex, startIndex );
 	if( !htmlDoc )
 		return 3;
-	cylHtmlTools::HtmlString lrDivIdSitebox = LR"(div[@"id" bs		"a"="sitebox ds" ad "23" " 45"	" 78 " @class="2323"])";
+	cylHtmlTools::HtmlString lrDivIdSitebox = LR"(div[@"id"="sitebox"]/dl)";
 
 	cylHtmlTools::XPath xpath( lrDivIdSitebox );
 	auto htmlNodeSPtrShared = htmlDoc->xpathRootNodes( xpath );
 	if( !htmlNodeSPtrShared )
 		return 4;
 	for( auto &node : *htmlNodeSPtrShared ) {
-		std::wcout << *node->getIncludeNodeContent( );
+		std::wcout << L"↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓" << std::endl;
+		std::wcout << *node->getIncludeNodeContent( ) << std::endl;
+		std::wcout << L"↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑" << std::endl;
 	}
 	return 0;
 

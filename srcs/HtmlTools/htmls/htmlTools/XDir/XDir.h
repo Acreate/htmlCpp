@@ -4,6 +4,9 @@
 
 #include "../../../nameSpace/cylHtmlTools.h"
 namespace cylHtmlTools {
+	/// <summary>
+	/// XPtah 属性
+	/// </summary>
 	class HTMLTOOLS_EXPORT XDir {
 	public:
 		friend class XPath;

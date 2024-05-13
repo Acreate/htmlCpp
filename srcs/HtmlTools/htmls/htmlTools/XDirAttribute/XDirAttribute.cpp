@@ -49,7 +49,7 @@ HtmlString XDirAttribute::serializeToHtmlString( ) const {
 }
 
 Vector_HtmlStringSPtr_Shared XDirAttribute::normalXDirAttributeValues( const HtmlString &attribute_name, const Vector_HtmlStringSPtr &vector_html_stringptr ) {
-
+	// todo 未实现
 	return std::make_shared< Vector_HtmlStringSPtr >( vector_html_stringptr );
 }
 HtmlString_Shared XDirAttribute::converXDirAttributeName( const HtmlChar *buff, const size_t buff_size ) {
@@ -240,17 +240,6 @@ size_t XDirAttribute::parseXDirAttributes( const HtmlChar *buff, const size_t bu
 					values = htmlCharBuffConverToValues( buff + equIndex, nextIndex - equIndex );
 				} else  // 没有值，直接给与 name
 					nameHtmlShared = htmlCharBuffConverToName( buff + index, nextIndex - index );
-				std::wcout << L"=====================" << std::endl;
-				if( nameHtmlShared )
-					std::wcout << L"找到了名称 :\"" << *nameHtmlShared << '\"' << std::endl;
-				else
-					std::wcout << L"名称异常" << std::endl;
-				if( values )
-					for( auto &str_shared : *values )
-						std::wcout << L"找到了值 :\"" << *str_shared << '\"' << std::endl;
-				else
-					std::wcout << L"值异常" << std::endl;
-				std::wcout << L"=====================" << std::endl;
 				appendAttribute( save_vector_xdirattribute_s, nameHtmlShared, values );
 				// 准备下一次直接进入 @ 流程
 				index = nextIndex - 1;
@@ -262,18 +251,6 @@ size_t XDirAttribute::parseXDirAttributes( const HtmlChar *buff, const size_t bu
 					values = htmlCharBuffConverToValues( buff + equIndex, nextIndex - equIndex );
 				} else  // 没有值，直接给与 name
 					nameHtmlShared = htmlCharBuffConverToName( buff + index, nextIndex - index );
-				std::wcout << L"=====================" << std::endl;
-				if( nameHtmlShared )
-					std::wcout << L"找到了名称 :\"" << *nameHtmlShared << '\"' << std::endl;
-				else
-					std::wcout << L"名称异常" << std::endl;
-
-				if( values )
-					for( auto &str_shared : *values )
-						std::wcout << L"找到了值 :\"" << *str_shared << '\"' << std::endl;
-				else
-					std::wcout << L"值异常" << std::endl;
-				std::wcout << L"=====================" << std::endl;
 				appendAttribute( save_vector_xdirattribute_s, nameHtmlShared, values );
 				break;
 			}

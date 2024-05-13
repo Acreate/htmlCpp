@@ -12,6 +12,9 @@
 #include "../../../htmlString/HtmlStringTools.h"
 
 namespace cylHtmlTools {
+	/// <summary>
+	/// 描述一个路径
+	/// </summary>
 	class HTMLTOOLS_EXPORT XPath {
 		Vector_XDirSPtr_Shared dirListSPtr; // 名称
 		HtmlString separator; // 分隔符

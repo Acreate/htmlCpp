@@ -6,6 +6,9 @@
 #include "../../../htmlString/HtmlStringTools.h"
 #include "../../../nameSpace/cylHtmlTools.h"
 namespace cylHtmlTools {
+	/// <summary>
+	/// XDir 属性节点
+	/// </summary>
 	class HTMLTOOLS_EXPORT XDirAttribute {
 	public:
 		friend class XDir;
@@ -187,7 +190,7 @@ namespace cylHtmlTools {
 		/// <param name="attribute_name">属性名称</param>
 		/// <param name="vector_html_stringptr">修正的值列表</param>
 		/// <returns>修正过后的值列表</returns>
-		static Vector_HtmlStringSPtr_Shared normalXDirAttributeValues( const HtmlString &attribute_name, const Vector_HtmlStringSPtr &vector_html_stringptr );
+		static Vector_HtmlStringSPtr_Shared normalXDirAttributeValues( const HtmlString &attribute_name, const Vector_HtmlStringSPtr &vector_html_stringptr );// todo 未实现
 
 		/// <summary>
 		/// 从缓冲当中转换到名称
