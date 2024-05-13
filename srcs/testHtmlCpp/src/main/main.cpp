@@ -11,6 +11,7 @@
 
 #include "htmls/htmlTools/XPath/XPath.h"
 #include <htmls/htmlTools/HtmlWorkThread/HtmlWorkThread.h>
+#include <htmls/htmlTools/XDirAttribute/XDirAttribute.h>
 #include "htmlString/HtmlStringTools.h"
 
 /// <summary>
@@ -460,6 +461,32 @@ size_t setFileAllWString( const char *path, const cylHtmlTools::HtmlString &stri
 	auto &&write = ofstream.write( stringstream.c_str( ), stringstream.size( ) );
 	return write.tellp( );
 }
+
+void testXAttribute( const cylHtmlTools::HtmlString &test_paremt_name, const cylHtmlTools::HtmlString &test_paremt_value ) {
+	cylHtmlTools::HtmlString_Shared xattributeName(
+		std::make_shared< cylHtmlTools::HtmlString >( test_paremt_name )
+	);
+	cylHtmlTools::HtmlString_Shared xattributeValue(
+		std::make_shared< cylHtmlTools::HtmlString >( test_paremt_value )
+	);
+	cylHtmlTools::XDirAttribute xAttribute( xattributeName->c_str( ), xattributeName->length( ), xattributeValue->c_str( ), xattributeValue->length( ) );
+	auto name = xAttribute.getName( );
+	std::wcout << L"===============" << std::endl;
+	if( name )
+		std::wcout << L"找到名称: \"" << *name << '\"' << std::endl;
+	else
+		std::wcout << L"名称转化错误" << std::endl;
+	auto values = xAttribute.getValues( );
+	if( values )
+		for( auto &valuePtr : *values )
+			std::wcout << L"找到值: \"" << *valuePtr << '\"' << std::endl;
+	else
+		std::wcout << L"值转化错误" << std::endl;
+	std::wcout << L"===============" << std::endl;
+}
+void testXAttribute( const cylHtmlTools::HtmlString &test_paremt ) {
+	testXAttribute( test_paremt, test_paremt );
+}
 int main( int argc, char *argv[ ] ) {
 	std::locale locale( "zh_CN.UTF8" );
 	std::locale::global( locale );
@@ -473,6 +500,8 @@ int main( int argc, char *argv[ ] ) {
 	//int htmlDoc = testHtmlDoc( locale );
 	//return htmlDoc;
 
+	testXAttribute( LR"(@class="23 31" 123 " 3 11 ")" );
+	testXAttribute( LR"(@acd="23 31" 123 " 3 11 ")" );
 
 	std::string fString( u8"%s/%s/%s" );
 	char path[ 4096 ]{ 0 };
@@ -491,6 +520,7 @@ int main( int argc, char *argv[ ] ) {
 	if( !htmlDoc )
 		return 3;
 	cylHtmlTools::HtmlString lrDivIdSitebox = LR"(div[@"id" bs		"a"="sitebox ds" ad "23" " 45"	" 78 " @class="2323"])";
+
 	cylHtmlTools::XPath xpath( lrDivIdSitebox );
 	auto htmlNodeSPtrShared = htmlDoc->xpathRootNodes( xpath );
 	if( !htmlNodeSPtrShared )

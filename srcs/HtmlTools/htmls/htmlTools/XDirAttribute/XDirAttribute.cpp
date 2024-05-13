@@ -48,75 +48,236 @@ HtmlString XDirAttribute::serializeToHtmlString( ) const {
 	return result;
 }
 
+Vector_HtmlStringSPtr_Shared XDirAttribute::normalXDirAttributeValues( const HtmlString &attribute_name, const Vector_HtmlStringSPtr &vector_html_stringptr ) {
+
+	return std::make_shared< Vector_HtmlStringSPtr >( vector_html_stringptr );
+}
 HtmlString_Shared XDirAttribute::converXDirAttributeName( const HtmlChar *buff, const size_t buff_size ) {
-	return std::make_shared< HtmlString >( buff, buff_size );
+	return htmlCharBuffConverToName( buff, buff_size );
 }
 
 Vector_HtmlStringSPtr_Shared XDirAttribute::converXDirAttributeValues( const HtmlChar *buff, const size_t buff_size, HtmlString_Shared &name ) {
-	auto resultVectorSPtr = std::make_shared< Vector_HtmlStringSPtr >( );
-	if( HtmlStringTools::equRemoveSpaceOverHtmlString( *name, HtmlString( L"class" ) ) ) {
-		size_t get_quoation_position_end;
-		std::vector< std::pair< size_t, size_t > > get_quotation_position_s;
-		for( size_t index = 0; index < buff_size; ++index ) // 存在引号的情况
-			if( HtmlStringTools::isQuotation( buff[ index ] ) ) {
-				if( HtmlStringTools::jumpQuotation( buff, buff_size,
-						index,
-						get_quoation_position_end, get_quotation_position_s )
-				) {
-					size_t htmlStrBuffMaxnLen = get_quoation_position_end - index; // 不保存第一个引号
-					HtmlChar *htmlStrBuff = new HtmlChar[ htmlStrBuffMaxnLen ];
-					size_t htmlStrBuffIndex = 0;
-					for( ++index; index < get_quoation_position_end & index < buff_size; ++index ) {
-						if( HtmlStringTools::isSpace( buff[ index ] ) && htmlStrBuffIndex > 0 ) {
-							auto htmlStringPtr = std::make_shared< HtmlString >( htmlStrBuff, htmlStrBuffIndex );
-							auto iterator = resultVectorSPtr->begin( );
-							auto end = resultVectorSPtr->end( );
-							for( ; iterator != end; ++iterator )
-								if( *iterator->get( ) == *htmlStringPtr )
-									break;
-							if( iterator == end )
-								resultVectorSPtr->emplace_back( htmlStringPtr );
-							htmlStrBuffIndex = 0;
-							continue;
-						}
-						htmlStrBuff[ htmlStrBuffIndex ] = buff[ index ];
-						++htmlStrBuffIndex;
-					}
-					index = get_quoation_position_end + 1; // 跳过引号
-					if( htmlStrBuffIndex > 0 ) {
-						auto htmlStringPtr = std::make_shared< HtmlString >( htmlStrBuff, htmlStrBuffIndex );
-						auto iterator = resultVectorSPtr->begin( );
-						auto end = resultVectorSPtr->end( );
-						for( ; iterator != end; ++iterator )
-							if( *iterator->get( ) == *htmlStringPtr )
-								break;
-						if( iterator == end )
-							resultVectorSPtr->emplace_back( htmlStringPtr );
-						continue;
-					}
-					delete[] htmlStrBuff;
+
+	// 检测是否存在等号
+	size_t index = 0;
+	if( HtmlStringTools::findNextHtmlCharPotion( buff, buff_size, charValue::equ, index ) ) {
+		return converXDirAttributeValues( buff + index + 1, buff_size - index - 1, name );
+	} else if( HtmlStringTools::equRemoveSpaceOverHtmlString( *name, HtmlString( L"class" ) ) ) {
+		auto resultVectorSPtr = std::make_shared< Vector_HtmlStringSPtr >( );
+		auto htmlStringSPtrShared = htmlCharBuffConverToValues( buff, buff_size );
+		if( htmlStringSPtrShared )
+			for( auto &value : *htmlStringSPtrShared ) {
+				HtmlStringTools::removeBothSpace( *value ); // 移除两侧空格
+				if( value->empty( ) ) // 跳过空字符串
 					continue;
-				}
-				return nullptr; // 没有匹配的引号
+				std::vector< HtmlString > split = HtmlStringTools::split( *value, charValue::space ); // 空格切分
+				for( auto &subStr : split )
+					if( !subStr.empty( ) ) // 非空字符串加入到返回列表当中
+						resultVectorSPtr->emplace_back( std::make_shared< HtmlString >( subStr ) ); // 添加切分后的字符串
 			}
-		if( resultVectorSPtr->size( ) == 0 ) {// 不存在引号的情况
-			auto htmlStringPtr = std::make_shared< HtmlString >( buff, buff_size );
-			resultVectorSPtr->emplace_back( htmlStringPtr );
+		return resultVectorSPtr;
+	} else
+		return htmlCharBuffConverToValues( buff, buff_size );
+	return nullptr;
+}
+int32_t XDirAttribute::appendAttribute( Vector_XDirAttributeSPtr_Shared &save_vector_xdirattribute_s, const HtmlString_Shared &name_shared ) {
+	if( name_shared ) {
+		auto iterator = save_vector_xdirattribute_s->begin( );
+		auto end = save_vector_xdirattribute_s->end( );
+		auto &name = *name_shared;
+		for( ; iterator != end; ++iterator )
+			// 存在属性名称相等则存储所有值
+			if( HtmlStringTools::equRemoveSpaceOverHtmlString( *iterator->get( )->getName( ), name ) )
+				break; // 已经处理了该属性
+		if( iterator == end ) // 没有匹配的属性，则把属性加入到当前属性列表当中
+			save_vector_xdirattribute_s->emplace_back( std::make_shared< XDirAttribute >( name_shared, nullptr ) );
+		return 0;
+	}
+	return 1;
+}
+int32_t XDirAttribute::appendAttribute( Vector_XDirAttributeSPtr_Shared &save_vector_xdirattribute_s, const HtmlString_Shared &name_shared, const Vector_HtmlStringSPtr_Shared &values_vector_shared ) {
+	if( values_vector_shared ) {
+		auto iterator = save_vector_xdirattribute_s->begin( );
+		auto end = save_vector_xdirattribute_s->end( );
+		auto &name = *name_shared;
+		for( ; iterator != end; ++iterator ) {
+			auto &xdirAttribute = **iterator;
+			// 存在属性名称相等则存储所有值
+			if( HtmlStringTools::equRemoveSpaceOverHtmlString( *xdirAttribute.getName( ), name ) ) {
+				// 遍历值列表
+				auto srcValuesVectorIterator = values_vector_shared->begin( );
+				auto srcValuesVectorEnd = values_vector_shared->end( );
+				// 获取已经存在的库遍历对象
+				auto saveValuesShared = xdirAttribute.getValues( );
+				do {
+					auto saveValueIterator = saveValuesShared->begin( );
+					auto saveValueEnd = saveValuesShared->end( );
+					// 查找是否存在相等的值
+					for( ; saveValueIterator != saveValueEnd; ++saveValueIterator )
+						if( HtmlStringTools::equRemoveSpaceOverHtmlString( *saveValueIterator, *srcValuesVectorIterator ) )
+							break;
+					if( saveValueIterator == saveValueEnd ) // 如果没有找到匹配项，则加入这个值
+						saveValuesShared->emplace_back( *srcValuesVectorIterator );
+					++srcValuesVectorIterator; // 遍历下一个
+					if( srcValuesVectorIterator == srcValuesVectorEnd ) // 全部值已经遍历完毕
+						break;
+				} while( true );
+				break; // 已经处理了该属性
+			}
 		}
-	} else {
-		size_t start_index = 0, get_quoation_position_end;
-		std::vector< std::pair< size_t, size_t > > get_quotation_position_s;
-		if( HtmlStringTools::jumpQuotation( buff, buff_size, start_index, get_quoation_position_end, get_quotation_position_s ) ) {
-			++start_index;
-			HtmlString value = HtmlString( buff + start_index, get_quoation_position_end - start_index );
-			cylHtmlTools::HtmlStringTools::removeBothSpace( value );
-			auto strings = cylHtmlTools::HtmlStringTools::split( value, ' ' );
-			for( auto &str : strings )
-				resultVectorSPtr->emplace_back( std::make_shared< HtmlString >( str ) );
-		} else {
-			auto htmlStringPtr = std::make_shared< HtmlString >( buff, buff_size );
-			resultVectorSPtr->emplace_back( htmlStringPtr );
+		if( iterator == end ) // 没有匹配的属性，则把属性加入到当前属性列表当中
+			save_vector_xdirattribute_s->emplace_back( std::make_shared< XDirAttribute >( name_shared, values_vector_shared ) );
+		return 0;
+	}
+	return appendAttribute( save_vector_xdirattribute_s, name_shared );
+}
+Vector_HtmlStringSPtr_Shared XDirAttribute::htmlCharBuffConverToValues( const HtmlChar *conver_buff, const size_t conver_buff_size ) {
+
+	size_t index = 0;
+	// 跳过开始的 @
+	for( ; index < conver_buff_size; ++index )
+		if( conver_buff[ index ] != charValue::at )
+			break;
+	Vector_HtmlStringSPtr_Shared result( std::make_shared< Vector_HtmlStringSPtr >( ) );
+	HtmlChar *buff = new HtmlChar[ conver_buff_size ];
+	size_t buffIndex = 0;
+	for( ; index < conver_buff_size; ++index ) {
+		HtmlChar currentCharValue = conver_buff[ index ];
+		if( HtmlStringTools::isQuotation( currentCharValue ) ) {
+			if( buffIndex > 0 ) { // 优先处理缓冲
+				result->emplace_back( std::make_shared< HtmlString >( buff, buffIndex ) );
+				buffIndex = 0;
+			}
+			// 处理引号
+			size_t endIndex;
+			std::vector< std::pair< size_t, size_t > > getQuotationPositionS;
+			if( HtmlStringTools::jumpQuotation( conver_buff, conver_buff_size, index, endIndex, getQuotationPositionS ) )
+				result->emplace_back( std::make_shared< HtmlString >( conver_buff + index + 1, endIndex - index - 1 ) );
+			else
+				break;
+			index = endIndex + 1;
+		} else if( HtmlStringTools::isSpace( currentCharValue ) ) { // 如果是空字符，则参考 buff 是否有缓存
+			if( buffIndex == 0 )
+				continue;
+			result->emplace_back( std::make_shared< HtmlString >( buff, buffIndex ) );
+			buffIndex = 0;
+		} else { // 当前字符存储到缓存
+			buff[ buffIndex ] = currentCharValue;
+			++buffIndex;
 		}
 	}
-	return resultVectorSPtr;
+	if( buffIndex > 0 ) { // 处理缓冲
+		result->emplace_back( std::make_shared< HtmlString >( buff, buffIndex ) );
+		return result;
+	}
+	if( result->size( ) > 0 )
+		return result;
+	return nullptr;
+}
+HtmlString_Shared XDirAttribute::htmlCharBuffConverToName( const HtmlChar *conver_buff, const size_t conver_buff_size ) {
+	size_t index = 0;
+	// 跳过开始的 @
+	for( ; index < conver_buff_size; ++index )
+		if( conver_buff[ index ] != charValue::at )
+			break;
+	HtmlString_Shared result( std::make_shared< HtmlString >( ) );
+	HtmlChar *buff = new HtmlChar[ conver_buff_size ];
+	size_t buffIndex = 0;
+	for( ; index < conver_buff_size; ++index ) {
+		HtmlChar currentCharValue = conver_buff[ index ];
+		if( HtmlStringTools::isQuotation( currentCharValue ) ) {
+			if( buffIndex > 0 ) { // 优先处理缓冲
+				result->append( HtmlString( buff, buffIndex ) );
+				buffIndex = 0;
+			}
+			// 处理引号
+			size_t endIndex;
+			std::vector< std::pair< size_t, size_t > > getQuotationPositionS;
+			if( HtmlStringTools::jumpQuotation( conver_buff, conver_buff_size, index, endIndex, getQuotationPositionS ) )
+				result->append( HtmlString( conver_buff + index + 1, endIndex - index - 1 ) );
+			else
+				break;
+			index = endIndex + 1;
+		} else if( HtmlStringTools::isSpace( currentCharValue ) ) { // 如果是空字符，则参考 buff 是否有缓存
+			if( buffIndex == 0 )
+				continue;
+			result->append( HtmlString( buff, buffIndex ) );
+			buffIndex = 0;
+		} else if( currentCharValue == charValue::equ ) { // 如果是等号
+			break;
+		} else { // 当前字符存储到缓存
+			buff[ buffIndex ] = currentCharValue;
+			++buffIndex;
+		}
+	}
+	if( buffIndex > 0 ) { // 处理缓冲
+		result->append( HtmlString( buff, buffIndex ) );
+		return result;
+	}
+	if( result->size( ) > 0 )
+		return result;
+	return nullptr;
+}
+size_t XDirAttribute::parseXDirAttributes( const HtmlChar *buff, const size_t buff_size, Vector_XDirAttributeSPtr_Shared &save_vector_xdirattribute_s ) {
+	size_t parseCount = save_vector_xdirattribute_s->size( );
+	HtmlChar charValue;
+	size_t index = 0;
+	for( ; index < buff_size; ++index ) {
+		charValue = buff[ index ];
+		if( charValue == charValue::at ) { // 找到了 @ 符号
+			++index;
+			size_t nextIndex = index, equIndex = nextIndex;
+			HtmlString_Shared nameHtmlShared;
+			Vector_HtmlStringSPtr_Shared values;
+			// 查找下一个 @，判断属性数量
+			if( HtmlStringTools::findNextHtmlCharPotion( buff, buff_size, charValue::at, nextIndex ) ) {// 存在 @
+				// 开始处理已知 @ 属性( 首次的 @ 下标为 index，其次 @ 下标为 nextIndex)
+
+				// 查找 =，判断是否存在值
+				if( HtmlStringTools::findNextHtmlCharPotion( buff, buff_size, charValue::equ, equIndex ) ) {
+					nameHtmlShared = htmlCharBuffConverToName( buff + index, equIndex - index );
+					equIndex += 1;
+					values = htmlCharBuffConverToValues( buff + equIndex, nextIndex - equIndex );
+				} else  // 没有值，直接给与 name
+					nameHtmlShared = htmlCharBuffConverToName( buff + index, nextIndex - index );
+				std::wcout << L"=====================" << std::endl;
+				if( nameHtmlShared )
+					std::wcout << L"找到了名称 :\"" << *nameHtmlShared << '\"' << std::endl;
+				else
+					std::wcout << L"名称异常" << std::endl;
+				if( values )
+					for( auto &str_shared : *values )
+						std::wcout << L"找到了值 :\"" << *str_shared << '\"' << std::endl;
+				else
+					std::wcout << L"值异常" << std::endl;
+				std::wcout << L"=====================" << std::endl;
+				appendAttribute( save_vector_xdirattribute_s, nameHtmlShared, values );
+				// 准备下一次直接进入 @ 流程
+				index = nextIndex - 1;
+			} else { // 没有下一个 @ 的时候，处理完成后直接退出(单个属性)
+				// 查找 =，判断是否存在值
+				if( HtmlStringTools::findNextHtmlCharPotion( buff, buff_size, charValue::equ, equIndex ) ) {
+					nameHtmlShared = htmlCharBuffConverToName( buff + index, equIndex - index );
+					equIndex += 1;
+					values = htmlCharBuffConverToValues( buff + equIndex, nextIndex - equIndex );
+				} else  // 没有值，直接给与 name
+					nameHtmlShared = htmlCharBuffConverToName( buff + index, nextIndex - index );
+				std::wcout << L"=====================" << std::endl;
+				if( nameHtmlShared )
+					std::wcout << L"找到了名称 :\"" << *nameHtmlShared << '\"' << std::endl;
+				else
+					std::wcout << L"名称异常" << std::endl;
+
+				if( values )
+					for( auto &str_shared : *values )
+						std::wcout << L"找到了值 :\"" << *str_shared << '\"' << std::endl;
+				else
+					std::wcout << L"值异常" << std::endl;
+				std::wcout << L"=====================" << std::endl;
+				appendAttribute( save_vector_xdirattribute_s, nameHtmlShared, values );
+				break;
+			}
+		}
+	}
+	return save_vector_xdirattribute_s->size( ) - parseCount;
 }

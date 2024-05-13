@@ -15,7 +15,7 @@ namespace cylHtmlTools {
 	public:
 		XDirAttribute( const HtmlString_Shared &in_name, const Vector_HtmlStringSPtr_Shared &in_values );
 		XDirAttribute( const HtmlString &in_name, const Vector_HtmlStringSPtr &in_values );
-		XDirAttribute( const HtmlString &in_name, const std::vector<HtmlString> &in_values );
+		XDirAttribute( const HtmlString &in_name, const std::vector< HtmlString > &in_values );
 		XDirAttribute( const HtmlChar *name_buff, const size_t name_buff_size, const HtmlChar *values_buff, const size_t values_size );
 		virtual ~XDirAttribute( );
 	public: // - 属性
@@ -172,6 +172,24 @@ namespace cylHtmlTools {
 		}
 	public: // - 解析函数
 		/// <summary>
+		/// 修正一个值列表
+		/// </summary>
+		/// <param name="attribute_name_shared">属性名称</param>
+		/// <param name="vector_html_string_ptr_shared">修正的值列表</param>
+		/// <returns>修正过后的值列表</returns>
+		static Vector_HtmlStringSPtr_Shared normalXDirAttributeValues( const HtmlString_Shared &attribute_name_shared, const Vector_HtmlStringSPtr_Shared &vector_html_string_ptr_shared ) {
+			return normalXDirAttributeValues( *attribute_name_shared, *vector_html_string_ptr_shared );
+		}
+
+		/// <summary>
+		/// 修正一个值列表
+		/// </summary>
+		/// <param name="attribute_name">属性名称</param>
+		/// <param name="vector_html_stringptr">修正的值列表</param>
+		/// <returns>修正过后的值列表</returns>
+		static Vector_HtmlStringSPtr_Shared normalXDirAttributeValues( const HtmlString &attribute_name, const Vector_HtmlStringSPtr &vector_html_stringptr );
+
+		/// <summary>
 		/// 从缓冲当中转换到名称
 		/// </summary>
 		/// <param name="buff">缓冲</param>
@@ -186,6 +204,46 @@ namespace cylHtmlTools {
 		/// <param name="name">属性名称</param>
 		/// <returns>值列表对象指针，失败返回 nullptr</returns>
 		static Vector_HtmlStringSPtr_Shared converXDirAttributeValues( const HtmlChar *buff, const size_t buff_size, HtmlString_Shared &name );
+
+
+		/// <summary>
+		/// 追加一个属性
+		/// </summary>
+		/// <param name="save_vector_xdirattribute_s">属性列表</param>
+		/// <param name="name_shared">属性名称</param>
+		/// <returns>失败返回非 0</returns>
+		static int32_t appendAttribute( Vector_XDirAttributeSPtr_Shared &save_vector_xdirattribute_s, const HtmlString_Shared &name_shared );
+		/// <summary>
+		/// 追加一个属性
+		/// </summary>
+		/// <param name="save_vector_xdirattribute_s">属性列表</param>
+		/// <param name="name_shared">属性名称</param>
+		/// <param name="values_vector_shared">属性值列表</param>
+		/// <returns>失败返回非 0</returns>
+		static int32_t appendAttribute( Vector_XDirAttributeSPtr_Shared &save_vector_xdirattribute_s, const HtmlString_Shared &name_shared, const Vector_HtmlStringSPtr_Shared &values_vector_shared );
+		/// <summary>
+		/// 使一个缓冲转换为属性属性列表
+		/// </summary>
+		/// <param name="conver_buff">缓冲指针</param>
+		/// <param name="conver_buff_size">缓冲大小</param>
+		/// <returns>转换后的属性列表，失败返回 nullptr</returns>
+		static Vector_HtmlStringSPtr_Shared htmlCharBuffConverToValues( const HtmlChar *conver_buff, const size_t conver_buff_size );
+		/// <summary>
+		/// 使一个缓冲转换为属性名称
+		/// </summary>
+		/// <param name="conver_buff">缓冲指针</param>
+		/// <param name="conver_buff_size">缓冲大小</param>
+		/// <returns>转换后的名称，失败返回 nullptr</returns>
+		static HtmlString_Shared htmlCharBuffConverToName( const HtmlChar *conver_buff, const size_t conver_buff_size );
+		/// <summary>
+		/// 解析字符串当中的属性
+		/// </summary>
+		/// <param name="buff">缓冲</param>
+		/// <param name="buff_size">缓冲长度</param>
+		/// <param name="save_vector_xdirattribute_s">解析对象存储位置</param>
+		/// <returns>解析个数</returns>
+		static size_t parseXDirAttributes( const HtmlChar *buff, const size_t buff_size,
+			Vector_XDirAttributeSPtr_Shared &save_vector_xdirattribute_s );
 	};
 }
 
