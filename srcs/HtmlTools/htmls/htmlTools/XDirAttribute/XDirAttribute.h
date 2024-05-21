@@ -145,23 +145,6 @@ namespace cylHtmlTools {
 			return isOtherXDirAttributeValuesIncludeThisXDirAttributeValues( *others.values );
 		}
 	public: // - 解析函数
-		/// <summary>
-		/// 修正一个值列表
-		/// </summary>
-		/// <param name="attribute_name_shared">属性名称</param>
-		/// <param name="vector_html_string_ptr_shared">修正的值列表</param>
-		/// <returns>修正过后的值列表</returns>
-		static Vector_HtmlStringSPtr_Shared normalXDirAttributeValues( const HtmlString_Shared &attribute_name_shared, const Vector_HtmlStringSPtr_Shared &vector_html_string_ptr_shared ) {
-			return normalXDirAttributeValues( *attribute_name_shared, *vector_html_string_ptr_shared );
-		}
-
-		/// <summary>
-		/// 修正一个值列表
-		/// </summary>
-		/// <param name="attribute_name">属性名称</param>
-		/// <param name="vector_html_stringptr">修正的值列表</param>
-		/// <returns>修正过后的值列表</returns>
-		static Vector_HtmlStringSPtr_Shared normalXDirAttributeValues( const HtmlString &attribute_name, const Vector_HtmlStringSPtr &vector_html_stringptr );// todo 未实现
 
 		/// <summary>
 		/// 从缓冲当中转换到名称

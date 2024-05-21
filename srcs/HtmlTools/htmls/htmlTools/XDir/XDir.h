@@ -77,12 +77,28 @@ namespace cylHtmlTools {
 		/// <returns>具备 [] 属性的名称</returns>
 		HtmlString getXDirName( ) const;
 		/// <summary>
+		/// 比较两个列表，检测左侧列表是否包含右侧列表，包含返回 true，否则返回 false
+		/// </summary>
+		/// <param name="left_xdirattributeSPtr_vector">左操作符列表</param>
+		/// <param name="right_xdirattributeSPtr_vector">右操作符列表</param>
+		/// <returns>包含返回 true，否则返回 false</returns>
+		static bool isLeftXDirIncludeRightXDir( const Vector_XDirAttributeSPtr &left_xdirattributeSPtr_vector, Vector_XDirAttributeSPtr &right_xdirattributeSPtr_vector );
+		/// <summary>
 		/// 比较左侧是否包含右侧
 		/// </summary>
 		/// <param name="left_xdir">超集</param>
 		/// <param name="right_xdir">子集</param>
 		/// <returns>true 表示 right_xdir 是 left_xdir 子集</returns>
 		static bool isLeftXDirIncludeRightXDir( const XDir *left_xdir, const XDir *right_xdir );
+		/// <summary>
+		/// 比较左侧是否包含右侧
+		/// </summary>
+		/// <param name="left_xdir">超集</param>
+		/// <param name="right_xdir">子集</param>
+		/// <returns>true 表示 right_xdir 是 left_xdir 子集</returns>
+		static bool isLeftXDirIncludeRightXDir( const XDir &left_xdir, const XDir &right_xdir ) {
+			return isLeftXDirIncludeRightXDir( &left_xdir, &right_xdir );
+		}
 		/// <summary>
 		/// oter_xdir_sptr 是否包含 本对象 this ⊆ oter_xdir_sptr<br/>
 		/// this 是否是 oter_xdir_sptr 子集

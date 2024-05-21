@@ -321,8 +321,70 @@ HtmlString XDir::getXDirName( ) const {
 
 	return result;
 }
+
+bool XDir::isLeftXDirIncludeRightXDir( const Vector_XDirAttributeSPtr &left_xdirattributeSPtr_vector, Vector_XDirAttributeSPtr &right_xdirattributeSPtr_vector ) {
+	if( left_xdirattributeSPtr_vector.size( ) == 0 )
+		return true;
+	if( right_xdirattributeSPtr_vector.size( ) == 0 )
+		return false;
+	auto rightIterator = right_xdirattributeSPtr_vector.begin( );
+	auto rightEnd = right_xdirattributeSPtr_vector.end( );
+	do {
+		auto leftIterator = left_xdirattributeSPtr_vector.begin( );
+		auto leftEnd = left_xdirattributeSPtr_vector.end( );
+		for( ; leftIterator != leftEnd; ++leftIterator ) // 查找所有左操作元素，检测是否存在匹配的属性
+			if( HtmlStringTools::equRemoveSpaceOverHtmlString( leftIterator->get( )->getName( ).get( ), rightIterator->get( )->getName( ).get( ) ) && XDirAttribute::isLeftXDirAttributeValuesIncludeRightXDirAttributeValues( *leftIterator->get( )->getValues( ), *rightIterator->get( )->getValues( ) ) )
+				break;
+		if( leftIterator == leftEnd )
+			break;
+		++rightIterator;
+		if( rightIterator == rightEnd )
+			break;
+	} while( true );
+	if( rightIterator == rightEnd )
+		return true;
+	return false;
+}
+
 bool XDir::isLeftXDirIncludeRightXDir( const XDir *left_xdir, const XDir *right_xdir ) { // todo 实现包含
-	
+
+	size_t rightNameSize = right_xdir->namesList.size( );
+	if( rightNameSize == 0 )
+		return true; // 空集允许被任意集合包含
+	size_t leftNameSize = left_xdir->namesList.size( );
+	if( leftNameSize == 0 )
+		return false; // 空集不包含任何非空子集
+
+	/// 遍历右操作对象所有的元素
+	auto rightIterator = right_xdir->namesList.begin( ); // 右操作对象元素遍历下标
+	auto rightEnd = right_xdir->namesList.end( );  // 右操作对象元素结束下标
+	do {
+		/// 遍历左操作对象所有的元素
+		auto leftIterator = left_xdir->namesList.begin( ); // 左操作对象元素遍历下标
+		auto leftEnd = left_xdir->namesList.end( );  // 左操作对象元素结束下标
+		do {
+			if( HtmlStringTools::equRemoveSpaceOverHtmlString( *leftIterator, *rightIterator ) )
+				break;
+			++leftIterator;
+			if( leftEnd == leftIterator )
+				break;
+		} while( true );
+		if( leftEnd == leftIterator )
+			return false; // 找不到匹配的名称
+		Vector_XDirAttributeSPtr rightValues;
+		if( right_xdir->tryAttributeGet( *rightIterator, rightValues ) == None )
+			continue; // 空属性
+		Vector_XDirAttributeSPtr leftValues;
+		if( left_xdir->tryAttributeGet( *leftIterator, leftValues ) == None ) // 没有元素
+			return false; // 没有属性
+		if( !isLeftXDirIncludeRightXDir( leftValues, rightValues ) ) // 不包含则退出
+			break;
+		++rightIterator;
+		if( rightEnd == rightIterator )
+			break;
+	} while( true );
+	if( rightEnd == rightIterator )
+		return true;
 	return false;
 }
 

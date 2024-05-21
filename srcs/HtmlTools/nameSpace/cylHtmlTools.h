@@ -90,8 +90,9 @@ namespace cylHtmlTools {
 	/// std::shared_ptr< XDirAttribute >
 	/// </summary>
 	using XDirAttribute_Shared = std::shared_ptr< XDirAttribute >;
+
 	/// <summary>
-	/// std::vector< std::shared_ptr< XDirAttribute > >
+	/// XDirAttribute_Shared 迭代器 @see XDirAttribute_Shared
 	/// </summary>
 	using Vector_XDirAttributeSPtr = std::vector< XDirAttribute_Shared >;
 	/// <summary>

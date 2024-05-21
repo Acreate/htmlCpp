@@ -502,7 +502,7 @@ void testXDir( const cylHtmlTools::HtmlString &test_paremt ) {
 	auto maps = xdir.getAttributeMaps( );
 	auto iterator = maps.begin( );
 	auto end = maps.end( );
-	std::wcout << L"===============" << std::endl;
+	std::wcout << L"=============== 测试 XDir 生成对象" << std::endl;
 	for( ; iterator != end; ++iterator ) {
 		std::wcout << L"获得路径名称:\"" << iterator->first << '\"' << std::endl;
 		for( auto &str : *iterator->second ) {
@@ -517,6 +517,57 @@ void testXDir( const cylHtmlTools::HtmlString &test_paremt ) {
 		}
 		std::wcout << std::endl;
 	}
+	std::wcout << L"===============" << std::endl;
+}
+/// <summary>
+/// 测试 XDir 对象的包含功能
+/// </summary>
+/// <param name="left_param">左生成对象字符串</param>
+/// <param name="right_param">右生成对象字符串</param>
+void testIncludeXDir( const cylHtmlTools::HtmlString &left_param, const cylHtmlTools::HtmlString &right_param ) {
+	cylHtmlTools::XDir leftXdir( left_param );
+	cylHtmlTools::XDir rightXdir( right_param );
+	std::wcout << L"=============== 测试 xdir 包含功能" << std::endl;
+	do {
+		auto maps = leftXdir.getAttributeMaps( );
+		auto iterator = maps.begin( );
+		auto end = maps.end( );
+		for( ; iterator != end; ++iterator ) {
+			std::wcout << L"leftXdir 获得路径名称:\"" << iterator->first << '\"' << std::endl;
+			for( auto &str : *iterator->second ) {
+				auto &xdirAttribute = *str;
+				auto name = xdirAttribute.getName( );
+				if( name )
+					std::wcout << '\t' << L"获得属性名称:\"" << *name << '\"' << std::endl;
+				auto htmlStringSPtrShared = xdirAttribute.getValues( );
+				if( htmlStringSPtrShared )
+					for( auto &value : *htmlStringSPtrShared )
+						std::wcout << "\t\t" << L"获得属性值:\"" << *value << '\"' << std::endl;
+			}
+			std::wcout << std::endl;
+		}
+	} while( false );
+	do {
+		auto maps = rightXdir.getAttributeMaps( );
+		auto iterator = maps.begin( );
+		auto end = maps.end( );
+		for( ; iterator != end; ++iterator ) {
+			std::wcout << L"rightXdir 获得路径名称:\"" << iterator->first << '\"' << std::endl;
+			for( auto &str : *iterator->second ) {
+				auto &xdirAttribute = *str;
+				auto name = xdirAttribute.getName( );
+				if( name )
+					std::wcout << '\t' << L"获得属性名称:\"" << *name << '\"' << std::endl;
+				auto htmlStringSPtrShared = xdirAttribute.getValues( );
+				if( htmlStringSPtrShared )
+					for( auto &value : *htmlStringSPtrShared )
+						std::wcout << "\t\t" << L"获得属性值:\"" << *value << '\"' << std::endl;
+			}
+			std::wcout << std::endl;
+		}
+	} while( false );
+	bool isInclude = cylHtmlTools::XDir::isLeftXDirIncludeRightXDir( leftXdir, rightXdir );
+	std::wcout << L"isLeftXDirIncludeRightXDir : " << ( isInclude ? L"包含" : L"不包含" ) << std::endl;
 	std::wcout << L"===============" << std::endl;
 }
 /// <summary>
@@ -562,7 +613,7 @@ void testXPath( const cylHtmlTools::HtmlString &test_paremt ) {
 /// <param name="test_paremt_name">用于构建 xdir 对象的名称参数</param>
 /// <param name="test_paremt_value">用于构建 xdir 对象的值参数</param>
 /// <param name="value">用于匹配被包含的值列表</param>
-void testXAttributeIsIncludeOther( const cylHtmlTools::HtmlString &test_paremt_name, const cylHtmlTools::HtmlString &test_paremt_value, const std::vector< cylHtmlTools::HtmlString > &value ) { 
+void testXAttributeIsIncludeOther( const cylHtmlTools::HtmlString &test_paremt_name, const cylHtmlTools::HtmlString &test_paremt_value, const std::vector< cylHtmlTools::HtmlString > &value ) {
 	cylHtmlTools::HtmlString_Shared xattributeName(
 		std::make_shared< cylHtmlTools::HtmlString >( test_paremt_name )
 	);
@@ -614,7 +665,7 @@ void testXAttributeIsIncludeOther( const cylHtmlTools::HtmlString &test_paremt, 
 /// <param name="test_paremt_name">用于构建 xdir 对象的名称参数</param>
 /// <param name="test_paremt_value">用于构建 xdir 对象的值参数</param>
 /// <param name="value">用于匹配包含 xdir 对象的值列表</param>
-void testXAttributeIsOtherInclude( const cylHtmlTools::HtmlString &test_paremt_name, const cylHtmlTools::HtmlString &test_paremt_value, const std::vector< cylHtmlTools::HtmlString > &value ) { 
+void testXAttributeIsOtherInclude( const cylHtmlTools::HtmlString &test_paremt_name, const cylHtmlTools::HtmlString &test_paremt_value, const std::vector< cylHtmlTools::HtmlString > &value ) {
 	cylHtmlTools::HtmlString_Shared xattributeName(
 		std::make_shared< cylHtmlTools::HtmlString >( test_paremt_name )
 	);
@@ -775,7 +826,9 @@ int main( int argc, char *argv[ ] ) {
 	testHtmlNodeAttributeConverToXDirAttribute( LR"(id="sitebox bs" class="cf de")" );
 	testHtmlNodeAttributeConverToXDirAttribute( LR"(id="sitebox bs" sitebox1 bs2 class="cf de")" );
 	testHtmlNodeAttributeConverToXDirAttribute( LR"(id="sitebox bs" sitebox1 bs2 class="cf de" cf3 de4)" );
-	return 0;
+	testIncludeXDir( LR"(div[@"id"="sitebox sd" @class="cf ds"])", LR"(div[@"id"="sitebox sd" @class="cf ds"])" );
+	testIncludeXDir( LR"(div[@"id"="sitebox sd" @class="cf ds es"])", LR"(div[@"id"="sitebox sd" @class="cf ds"])" );
+	testIncludeXDir( LR"(div[@"id"="sitebox sd" @class="cf ds"])", LR"(div[@"id"="sitebox sd" @class="cf ds  es"])" );
 	std::string fString( u8"%s/%s/%s" );
 	char path[ 4096 ]{ 0 };
 	int len = snprintf( path, sizeof( path ), fString.c_str( ), std::string( Project_Run_bin ).c_str( ), u8"writeFile", u8"wuxia.html" );

@@ -54,10 +54,6 @@ HtmlString XDirAttribute::serializeToHtmlString( ) const {
 	return result;
 }
 
-Vector_HtmlStringSPtr_Shared XDirAttribute::normalXDirAttributeValues( const HtmlString &attribute_name, const Vector_HtmlStringSPtr &vector_html_stringptr ) {
-	// todo 未实现
-	return std::make_shared< Vector_HtmlStringSPtr >( vector_html_stringptr );
-}
 HtmlString_Shared XDirAttribute::converXDirAttributeName( const HtmlChar *buff, const size_t buff_size ) {
 	return htmlCharBuffConverToName( buff, buff_size );
 }
@@ -67,7 +63,7 @@ Vector_HtmlStringSPtr_Shared XDirAttribute::converXDirAttributeValues( const Htm
 	size_t index = 0;
 	if( HtmlStringTools::findNextHtmlCharPotion( buff, buff_size, charValue::equ, index ) ) {
 		return converXDirAttributeValues( buff + index + 1, buff_size - index - 1, name );
-	} else if( isSplitAttributeName( *name ) ) {
+	} else if( name && !name->empty( ) && isSplitAttributeName( *name ) ) {
 		auto resultVectorSPtr = std::make_shared< Vector_HtmlStringSPtr >( );
 		auto htmlStringSPtrShared = htmlCharBuffConverToValues( buff, buff_size );
 		if( htmlStringSPtrShared )
