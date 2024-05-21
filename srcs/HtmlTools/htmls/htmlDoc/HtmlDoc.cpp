@@ -607,7 +607,7 @@ HtmlString_Shared HtmlDoc::getNodeContentText( const HtmlNode_Shared &node_share
 	HtmlString_Shared result( new HtmlString( mystr ) );
 	return result;
 }
-XDir_Shared HtmlDoc::converXDirSptr( const HtmlNode_Shared &node_shared ) { // todo 实现转换
+XDir_Shared HtmlDoc::converXDirSptr( const HtmlNode_Shared &node_shared ) {
 	if( node_shared->nodeType == Html_Node_Type::AnnotationNode )
 		return nullptr; // todo  注释未实现
 	if( isEndNode( node_shared ) )
@@ -635,7 +635,7 @@ XDir_Shared HtmlDoc::converXDirSptr( const HtmlNode_Shared &node_shared ) { // t
 	return std::make_shared< XDir >( xdirName, xDirAttributes );
 }
 Vector_XDirAttributeSPtr_Shared HtmlDoc::converNodeAttributeToXDirAttributes(
-	const HtmlChar *conver_buff, const size_t conver_buff_len ) { // todo 未完成
+	const HtmlChar *conver_buff, const size_t conver_buff_len ) {
 	Vector_XDirAttributeSPtr_Shared result( std::make_shared< Vector_XDirAttributeSPtr >( ) );
 	size_t index = 0;
 	size_t buffIndex = 0;

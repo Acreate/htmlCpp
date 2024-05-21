@@ -346,7 +346,7 @@ bool XDir::isLeftXDirIncludeRightXDir( const Vector_XDirAttributeSPtr &left_xdir
 	return false;
 }
 
-bool XDir::isLeftXDirIncludeRightXDir( const XDir *left_xdir, const XDir *right_xdir ) { // todo 实现包含
+bool XDir::isLeftXDirIncludeRightXDir( const XDir *left_xdir, const XDir *right_xdir ) {
 
 	size_t rightNameSize = right_xdir->namesList.size( );
 	if( rightNameSize == 0 )
