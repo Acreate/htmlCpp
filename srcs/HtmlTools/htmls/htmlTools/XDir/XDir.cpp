@@ -372,13 +372,13 @@ bool XDir::isLeftXDirIncludeRightXDir( const XDir *left_xdir, const XDir *right_
 		if( leftEnd == leftIterator )
 			return false; // 找不到匹配的名称
 		Vector_XDirAttributeSPtr rightValues;
-		if( right_xdir->tryAttributeGet( *rightIterator, rightValues ) == None )
-			continue; // 空属性
-		Vector_XDirAttributeSPtr leftValues;
-		if( left_xdir->tryAttributeGet( *leftIterator, leftValues ) == None ) // 没有元素
-			return false; // 没有属性
-		if( !isLeftXDirIncludeRightXDir( leftValues, rightValues ) ) // 不包含则退出
-			break;
+		if( right_xdir->tryAttributeGet( *rightIterator, rightValues ) != None ) {
+			Vector_XDirAttributeSPtr leftValues;
+			if( left_xdir->tryAttributeGet( *leftIterator, leftValues ) == None ) // 没有元素
+				return false; // 没有属性
+			if( !isLeftXDirIncludeRightXDir( leftValues, rightValues ) ) // 不包含则退出
+				break;
+		}
 		++rightIterator;
 		if( rightEnd == rightIterator )
 			break;

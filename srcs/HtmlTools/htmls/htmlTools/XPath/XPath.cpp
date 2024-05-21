@@ -154,11 +154,9 @@ Vector_HtmlNodeSPtr XPath::pathControlDirName( const Vector_HtmlNodeSPtr &curren
 							if( *iterator->get( ) == *subNode.get( ) )
 								break;
 						if( iterator == end ) {
-							HtmlNode *htmlNode = subNode.get( );
-							auto nodeName = *htmlNode->getNodeName( );
-							if( xdirInfo->hasName( nodeName ) )
-								if( xdirInfo->hasAttribute( htmlNode->analysisAttribute( ), nodeName ) )
-									result.emplace_back( subNode );
+							auto converXDirSptr = subNode->converXDirSptr( );
+							if( converXDirSptr->isLeftXDirIncludeRightXDir( converXDirSptr.get( ), xdirInfo ) )
+								result.emplace_back( subNode );
 						}
 					}
 				}
@@ -174,11 +172,9 @@ Vector_HtmlNodeSPtr XPath::pathControlDirName( const Vector_HtmlNodeSPtr &curren
 						if( *iterator->get( ) == *findNode.get( ) )
 							break;
 					if( iterator == end ) {
-						HtmlNode *htmlNode = findNode.get( );
-						auto nodeName = *htmlNode->getNodeName( );
-						if( xdirInfo->hasName( nodeName ) )
-							if( xdirInfo->hasAttribute( htmlNode->analysisAttribute( ), nodeName ) )
-								result.emplace_back( findNode );
+						auto converXDirSptr = findNode->converXDirSptr( );
+						if( converXDirSptr->isLeftXDirIncludeRightXDir( converXDirSptr.get( ), xdirInfo ) )
+							result.emplace_back( findNode );
 					}
 				}
 			}
