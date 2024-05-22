@@ -127,7 +127,7 @@ namespace cylHtmlTools {
 		/// </summary>
 		/// <param name="callFunction">校验函数</param>
 		/// <returns>命中列表</returns>
-		UMap_HtmlStringK_HtmlStringV_Shared findAttribute( const std::function< bool( const HtmlString &, const HtmlString & ) > &callFunction ) const;
+		UMap_HtmlStringK_HtmlStringV_Shared findAttribute( const std::function< bool( const HtmlString &attributeName, const HtmlString &attributeValue ) > &callFunction ) const;
 		/// <summary>
 		/// 使用 xpath 查找元素
 		/// </summary>

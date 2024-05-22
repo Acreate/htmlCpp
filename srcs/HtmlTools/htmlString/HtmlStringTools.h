@@ -142,6 +142,10 @@ namespace cylHtmlTools {
 		/// <param name="removeSpaceStatus">删除空白字符的状态标识</param>
 		/// <returns>相等返回 true</returns>
 		inline static bool equRemoveSpaceOverHtmlString( HtmlString *leftStr, HtmlString *rightStr, RemoveSpaceStatus removeSpaceStatus = both ) {
+			if( leftStr == nullptr && rightStr != nullptr )
+				return false;
+			if( leftStr != nullptr && rightStr == nullptr )
+				return false;
 			return equRemoveSpaceOverHtmlString( *leftStr, *rightStr, removeSpaceStatus );
 		}
 		/// <summary>
