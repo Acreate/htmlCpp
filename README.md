@@ -1,6 +1,8 @@
 # htmlCpp
 
-基于 C++ 实现的 html 解析库
+基于 C++ / cpp  实现的 html 解析库
+
+加入 xpath查找（类 xpath）
 
 ## 环境
 
