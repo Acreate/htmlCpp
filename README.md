@@ -58,11 +58,11 @@ Vector_HtmlNodeSPtr_Shared HtmlTools::HtmlDoc::getNodes( const std::function< bo
 
 ../
 
-​	上级目录，获取父级节点的所有友邻节点
+​	上级目录
 
 ./ 
 
-​	当前目录，获取当前节点的所有友邻节点
+​	当前目录
 
 any
 

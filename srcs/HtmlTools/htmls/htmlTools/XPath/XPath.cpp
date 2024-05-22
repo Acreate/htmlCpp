@@ -53,73 +53,42 @@ XPath::XPath( ): dirListSPtr( std::make_shared< Vector_XDirSPtr >( ) ) {
 
 }
 
+inline bool hasNode( const Vector_HtmlNodeSPtr &checkList, const HtmlNode_Shared &node ) {
+	auto iterator = checkList.begin( );
+	auto end = checkList.end( );
+	for( ; iterator != end; ++iterator )
+		if( *iterator->get( ) == *node )
+			return true;
+	return false;
+}
+
 Vector_HtmlNodeSPtr XPath::pathControlDirName( const Vector_HtmlNodeSPtr &current_find_nodes, const XDir *xdirInfo, XDir_Control_Type current_control_type, XDir_Control_Type old_control_type ) {
 	Vector_HtmlNodeSPtr result;
 	switch( current_control_type ) {
-		case Cd_Current :// 获取参数列表节点当中的友邻节点-如果存在
+		case Cd_Current :// 获取参数列表节点当中的所有子节点-如果存在
 			for( auto &node : current_find_nodes ) {
-				auto copyNode = node.get( );
 				//// 跳过尾节点
-				if( copyNode->isEndNode( ) )
+				if( node->isEndNode( ) )
 					continue;
-
-				for( auto &resultNode : result )
-					if( *resultNode.get( ) == *copyNode ) {
-						copyNode = nullptr;
-						break;
-					}
-				if( copyNode ) {
-					result.emplace_back( node );
-					auto brotherVSPtr = copyNode->getBrother( );
-					for( auto &brother : *brotherVSPtr ) {
-						copyNode = brother.get( );
-						// 跳过尾节点
-						if( copyNode->getNodeType( ) == Html_Node_Type::DoubleNode && copyNode == copyNode->getEndNode( ).get( ) )
-							continue;
-						for( auto &resultNode : result )
-							if( *resultNode.get( ) == *copyNode ) {
-								copyNode = nullptr;
-								break;
-							}
-						if( copyNode )
-							result.emplace_back( brother );
-					}
+				Vector_HtmlNodeSPtr_Shared children = node->getChildren( );
+				for( auto &childerNode : *children ) {
+					if( childerNode->isEndNode( ) )
+						continue;
+					if( !hasNode( result, childerNode ) )
+						result.emplace_back( childerNode );
 				}
 			}
 			break;
-		case Cd_Parent : // 获取参数列表节点当中的上级节点-如果存在，则遍历友邻节点
+		case Cd_Parent : // 获取参数列表节点当中的上级节点
 			for( auto &node : current_find_nodes ) {
 				// 跳过尾节点
-				if( node->htmldocShared->isEndNode( node ) )
+				if( node->isEndNode( ) )
 					continue;
 				HtmlNode_Shared parent = node->getParent( );
-				auto htmlNode = parent.get( );
 				if( parent->isEndNode( ) )
 					continue;
-				if( htmlNode ) {
-					for( auto &resultNode : result )
-						if( *resultNode.get( ) == *htmlNode ) {
-							htmlNode = nullptr;
-							break;
-						}
-					if( htmlNode ) {
-						result.emplace_back( node );
-						const auto &brothers = htmlNode->getBrother( );
-						for( auto &brother : *brothers ) {
-							htmlNode = brother.get( );
-							// 跳过尾节点
-							if( htmlNode->isEndNode( ) )
-								continue;
-							for( auto &resultNode : result )
-								if( *resultNode.get( ) == *htmlNode ) {
-									htmlNode = nullptr;
-									break;
-								}
-							if( htmlNode )
-								result.emplace_back( brother );
-						}
-					}
-				}
+				if( parent && parent->isStartNode( ) )
+					result.emplace_back( parent );
 			}
 			break;
 		case Cd_Root : // 获取参数列表节点当中的根节点
