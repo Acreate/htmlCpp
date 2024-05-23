@@ -87,10 +87,13 @@ bool HtmlStringTools::findNextHtmlCharPotion( const HtmlChar *w_c_ptr, size_t ma
 	return false;
 }
 
+
 bool HtmlStringTools::findNextHtmlStringPotion( const HtmlChar *w_c_ptr, size_t src_w_c_str_len, size_t startIndex, const HtmlChar *find_w_c_string, size_t find_w_c_str_len, size_t maxIndex, size_t *result ) {
 
 	if( src_w_c_str_len < find_w_c_str_len )
 		return false;
+	if( maxIndex == 0 )
+		maxIndex = src_w_c_str_len;
 	find_w_c_str_len -= 1;
 	size_t leftIndex = startIndex;
 	size_t rightIndex = 0;
@@ -109,7 +112,8 @@ bool HtmlStringTools::findNextHtmlStringPotion( const HtmlChar *w_c_ptr, size_t 
 			rightChar = find_w_c_string[ rightIndex ];
 		} while( true );
 		if( rightIndex ) {
-			*result = leftIndex - startIndex;
+			if( result )
+				*result = leftIndex - startIndex;
 			return true;
 		}
 	}

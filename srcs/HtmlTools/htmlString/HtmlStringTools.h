@@ -84,6 +84,35 @@ namespace cylHtmlTools {
 		static bool findNextHtmlCharPotion( const HtmlChar *w_c_ptr, size_t maxIndex, const HtmlChar find_w_c_char, size_t &startIndex );
 		/// <summary>
 		/// 查找匹配的字符串
+		/// 如果 maxIndex 等于 0， 则使用 find_org_html_string 的长度 的值
+		/// </summary>
+		/// <param name="find_org_html_string">源字符串</param>
+		/// <param name="startIndex">开始下标</param>
+		/// <param name="find_target_html_string">查找的目标字符串</param>
+		/// <param name="maxIndex">查找最大的长度(startIndex >= maxIndex 返回)</param>
+		/// <param name="result">相对位置，如果为 nullptr，则不会辅助</param>
+		/// <returns>成功返回 true</returns>
+		static bool findNextHtmlStringPotion( const HtmlString *find_org_html_string, size_t startIndex, const HtmlString *find_target_html_string, size_t maxIndex = 0, size_t *result = nullptr ) {
+			return findNextHtmlStringPotion( find_org_html_string->c_str( ), find_org_html_string->length( ), startIndex, find_target_html_string->c_str( ), find_target_html_string->length( ), maxIndex, result );
+		}
+
+		/// <summary>
+		/// 查找匹配的字符串
+		/// 如果 maxIndex 等于 0， 则使用 find_org_html_string 的长度 的值
+		/// </summary>
+		/// <param name="find_org_html_string">源字符串</param>
+		/// <param name="startIndex">开始下标</param>
+		/// <param name="find_w_c_string">查找的目标字符串</param>
+		/// <param name="find_w_c_str_len">查找的目标字符串的长度</param>
+		/// <param name="maxIndex">查找最大的长度(startIndex >= maxIndex 返回)</param>
+		/// <param name="result">相对位置，如果为 nullptr，则不会辅助</param>
+		/// <returns>成功返回 true</returns>
+		static bool findNextHtmlStringPotion( const HtmlString *find_org_html_string, size_t startIndex, const HtmlChar *find_w_c_string, size_t find_w_c_str_len, size_t maxIndex = 0, size_t *result = nullptr ) {
+			return findNextHtmlStringPotion( find_org_html_string->c_str( ), find_org_html_string->length( ), startIndex, find_w_c_string, find_w_c_str_len, maxIndex, result );
+		}
+		/// <summary>
+		/// 查找匹配的字符串
+		/// 如果 maxIndex 等于 0， 则使用 src_w_c_str_len 的值
 		/// </summary>
 		/// <param name="w_c_ptr">源字符串</param>
 		/// <param name="src_w_c_str_len">源字符串的长度</param>
@@ -91,9 +120,9 @@ namespace cylHtmlTools {
 		/// <param name="find_w_c_string">查找的目标字符串</param>
 		/// <param name="find_w_c_str_len">查找的目标字符串的长度</param>
 		/// <param name="maxIndex">查找最大的长度(startIndex >= maxIndex 返回)</param>
-		/// <param name="result">相对位置</param>
+		/// <param name="result">相对位置，如果为 nullptr，则不会辅助</param>
 		/// <returns>成功返回 true</returns>
-		static bool findNextHtmlStringPotion( const HtmlChar *w_c_ptr, size_t src_w_c_str_len, size_t startIndex, const HtmlChar *find_w_c_string, size_t find_w_c_str_len, size_t maxIndex, size_t *result );
+		static bool findNextHtmlStringPotion( const HtmlChar *w_c_ptr, size_t src_w_c_str_len, size_t startIndex, const HtmlChar *find_w_c_string, size_t find_w_c_str_len, size_t maxIndex = 0, size_t *result = nullptr );
 
 		/// <summary>
 		/// 比较两个字符串是否相等
