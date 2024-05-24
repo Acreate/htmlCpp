@@ -12,9 +12,22 @@ cylHtmlTools::HtmlWorkThread< TDataType * >::HtmlWorkThread( const Start_Thread_
 	mutexStdThread = new std::mutex( );
 	this->endTime = nullptr;
 	this->startTime = nullptr;
-	this->startThreadRun = start_thread_run;
-	this->currentThreadRun = current_thread_run;
-	this->finishThreadRun = finish_thread_run;
+	if( start_thread_run )
+		this->startThreadRun = start_thread_run;
+	else
+		this->startThreadRun = [=]( const cylHtmlTools::HtmlWorkThread< TDataType * > *html_work_thread, const std::thread *run_std_cpp_thread, std::mutex *html_work_thread_mutex, std::mutex *std_cpp_thread_mutex, TDataType *data ) {
+		};
+	if( current_thread_run )
+		this->currentThreadRun = current_thread_run;
+	else
+		this->currentThreadRun = [=]( const cylHtmlTools::HtmlWorkThread< TDataType * > *html_work_thread, const std::thread *run_std_cpp_thread, std::mutex *html_work_thread_mutex, std::mutex *std_cpp_thread_mutex, TDataType *data, const time_t *startTime ) {
+		};
+	if( finish_thread_run )
+		this->finishThreadRun = finish_thread_run;
+	else
+		this->finishThreadRun = [=]( const cylHtmlTools::HtmlWorkThread< TDataType * > *html_work_thread, const std::thread *run_std_cpp_thread, std::mutex *html_work_thread_mutex, std::mutex *std_cpp_thread_mutex, TDataType *data ) {
+		};
+
 	this->data = data;
 }
 template< class TDataType >
@@ -48,9 +61,22 @@ bool cylHtmlTools::HtmlWorkThread< TDataType * >::reInit( const Start_Thread_Run
 	if( isRun( ) || this->workStatus == None )
 		return false;
 	this->mutexHtmlWorkThread->lock( );
-	this->startThreadRun = start_thread_run;
-	this->currentThreadRun = current_thread_run;
-	this->finishThreadRun = finish_thread_run;
+	if( start_thread_run )
+		this->startThreadRun = start_thread_run;
+	else
+		this->startThreadRun = [=]( const cylHtmlTools::HtmlWorkThread< TDataType * > *html_work_thread, const std::thread *run_std_cpp_thread, std::mutex *html_work_thread_mutex, std::mutex *std_cpp_thread_mutex, TDataType *data ) {
+		};
+	if( current_thread_run )
+		this->currentThreadRun = current_thread_run;
+	else
+		this->currentThreadRun = [=]( const cylHtmlTools::HtmlWorkThread< TDataType * > *html_work_thread, const std::thread *run_std_cpp_thread, std::mutex *html_work_thread_mutex, std::mutex *std_cpp_thread_mutex, TDataType *data, const time_t *startTime ) {
+		};
+	if( finish_thread_run )
+		this->finishThreadRun = finish_thread_run;
+	else
+		this->finishThreadRun = [=]( const cylHtmlTools::HtmlWorkThread< TDataType * > *html_work_thread, const std::thread *run_std_cpp_thread, std::mutex *html_work_thread_mutex, std::mutex *std_cpp_thread_mutex, TDataType *data ) {
+		};
+
 	this->data = data;
 	this->mutexHtmlWorkThread->unlock( );
 	return true;
@@ -106,9 +132,23 @@ cylHtmlTools::HtmlWorkThread< std::shared_ptr< TDataType > >::HtmlWorkThread( co
 	mutexStdThread = new std::mutex( );
 	this->endTime = nullptr;
 	this->startTime = nullptr;
-	this->startThreadRun = start_thread_run;
-	this->currentThreadRun = current_thread_run;
-	this->finishThreadRun = finish_thread_run;
+
+	if( start_thread_run )
+		this->startThreadRun = start_thread_run;
+	else
+		this->startThreadRun = [=]( const cylHtmlTools::HtmlWorkThread< std::shared_ptr< TDataType > > *html_work_thread, const std::thread *run_std_cpp_thread, std::mutex *html_work_thread_mutex, std::mutex *std_cpp_thread_mutex, std::shared_ptr< TDataType > &data ) {
+		};
+	if( current_thread_run )
+		this->currentThreadRun = current_thread_run;
+	else
+		this->currentThreadRun = [=]( const cylHtmlTools::HtmlWorkThread< std::shared_ptr< TDataType > > *html_work_thread, const std::thread *run_std_cpp_thread, std::mutex *html_work_thread_mutex, std::mutex *std_cpp_thread_mutex, std::shared_ptr< TDataType > &data, const time_t *startTime ) {
+		};
+	if( finish_thread_run )
+		this->finishThreadRun = finish_thread_run;
+	else
+		this->finishThreadRun = [=]( const cylHtmlTools::HtmlWorkThread< std::shared_ptr< TDataType > > *html_work_thread, const std::thread *run_std_cpp_thread, std::mutex *html_work_thread_mutex, std::mutex *std_cpp_thread_mutex, std::shared_ptr< TDataType > &data ) {
+		};
+
 	this->data = data;
 }
 template< class TDataType >
@@ -142,9 +182,23 @@ bool cylHtmlTools::HtmlWorkThread< std::shared_ptr< TDataType > >::reInit( const
 	if( isRun( ) || this->workStatus == None )
 		return false;
 	this->mutexHtmlWorkThread->lock( );
-	this->startThreadRun = start_thread_run;
-	this->currentThreadRun = current_thread_run;
-	this->finishThreadRun = finish_thread_run;
+
+	if( start_thread_run )
+		this->startThreadRun = start_thread_run;
+	else
+		this->startThreadRun = [=]( const cylHtmlTools::HtmlWorkThread< std::shared_ptr< TDataType > > *html_work_thread, const std::thread *run_std_cpp_thread, std::mutex *html_work_thread_mutex, std::mutex *std_cpp_thread_mutex, std::shared_ptr< TDataType > &data ) {
+		};
+	if( current_thread_run )
+		this->currentThreadRun = current_thread_run;
+	else
+		this->currentThreadRun = [=]( const cylHtmlTools::HtmlWorkThread< std::shared_ptr< TDataType > > *html_work_thread, const std::thread *run_std_cpp_thread, std::mutex *html_work_thread_mutex, std::mutex *std_cpp_thread_mutex, std::shared_ptr< TDataType > &data, const time_t *startTime ) {
+		};
+	if( finish_thread_run )
+		this->finishThreadRun = finish_thread_run;
+	else
+		this->finishThreadRun = [=]( const cylHtmlTools::HtmlWorkThread< std::shared_ptr< TDataType > > *html_work_thread, const std::thread *run_std_cpp_thread, std::mutex *html_work_thread_mutex, std::mutex *std_cpp_thread_mutex, std::shared_ptr< TDataType > &data ) {
+		};
+
 	this->data = data;
 	this->mutexHtmlWorkThread->unlock( );
 	return true;
@@ -194,6 +248,8 @@ time_t cylHtmlTools::HtmlWorkThread< std::shared_ptr< TDataType > >::wait( ) {
 
 template class cylHtmlTools::HtmlWorkThread< void * >;
 
+template class cylHtmlTools::HtmlWorkThread< bool * >;
+
 template class cylHtmlTools::HtmlWorkThread< char * >;
 template class cylHtmlTools::HtmlWorkThread< short * >;
 template class cylHtmlTools::HtmlWorkThread< int * >;
@@ -217,6 +273,8 @@ template class cylHtmlTools::HtmlWorkThread< cylHtmlTools::XDir * >;
 template class cylHtmlTools::HtmlWorkThread< cylHtmlTools::XDirAttribute * >;
 template class cylHtmlTools::HtmlWorkThread< cylHtmlTools::XPath * >;
 
+
+template class cylHtmlTools::HtmlWorkThread< std::shared_ptr< bool > >;
 
 template class cylHtmlTools::HtmlWorkThread< std::shared_ptr< char > >;
 template class cylHtmlTools::HtmlWorkThread< std::shared_ptr< short > >;

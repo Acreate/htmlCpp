@@ -21,14 +21,14 @@ namespace cylHtmlTools {
 	class HTMLTOOLS_EXPORT HtmlWorkThread< TDataType * > {
 	public:
 		template< class TThreadDataType >
-		using T_Start_Thread_Run = std::function< void( const HtmlWorkThread *html_work_thread, const std::thread *run_std_cpp_thread, std::mutex *html_work_thread_mutex, std::mutex *std_cpp_thread_mutex, TThreadDataType data ) >;
+		using T_Start_Thread_Run = std::function< void( const HtmlWorkThread *html_work_thread, const std::thread *run_std_cpp_thread, std::mutex *html_work_thread_mutex, std::mutex *std_cpp_thread_mutex, TThreadDataType *data ) >;
 		template< class TThreadDataType >
-		using T_Current_Thread_Run = std::function< void( const HtmlWorkThread *html_work_thread, const std::thread *run_std_cpp_thread, std::mutex *html_work_thread_mutex, std::mutex *std_cpp_thread_mutex, TThreadDataType data, const time_t *startTime ) >;
+		using T_Current_Thread_Run = std::function< void( const HtmlWorkThread *html_work_thread, const std::thread *run_std_cpp_thread, std::mutex *html_work_thread_mutex, std::mutex *std_cpp_thread_mutex, TThreadDataType *data, const time_t *startTime ) >;
 		template< class TThreadDataType >
-		using T_Finish_Thread_Run = std::function< void( const HtmlWorkThread *html_work_thread, const std::thread *run_std_cpp_thread, std::mutex *html_work_thread_mutex, std::mutex *std_cpp_thread_mutex, TThreadDataType data ) >;
-		using Start_Thread_Run = T_Start_Thread_Run< TDataType * >;
-		using Current_Thread_Run = T_Current_Thread_Run< TDataType * >;
-		using Finish_Thread_Run = T_Finish_Thread_Run< TDataType * >;
+		using T_Finish_Thread_Run = std::function< void( const HtmlWorkThread *html_work_thread, const std::thread *run_std_cpp_thread, std::mutex *html_work_thread_mutex, std::mutex *std_cpp_thread_mutex, TThreadDataType *data ) >;
+		using Start_Thread_Run = T_Start_Thread_Run< TDataType >;
+		using Current_Thread_Run = T_Current_Thread_Run< TDataType >;
+		using Finish_Thread_Run = T_Finish_Thread_Run< TDataType >;
 		enum Html_Work_Status {
 			None // 没有任何状态-无法使用
 			, Init // 正在初始化
