@@ -102,7 +102,7 @@ void testNodeIncludeText( cylHtmlTools::HtmlDoc_Shared htmlDoc, const cylHtmlToo
 	size_t count = 0;
 	for( auto &node : *nodes ) {
 		std::wcout << L"==========================	" << count << std::endl;
-		auto contentText = node->getNodeINcludeContentText( );
+		auto contentText = node->getNodeIncludeContentText( );
 		if( contentText )
 			std::wcout << *contentText << std::endl;
 		std::wcout << L"==========================	" << std::endl;
@@ -124,7 +124,7 @@ bool getValue( std::wstringstream &stringstream, cylHtmlTools::HtmlDoc_Shared ht
 	stringstream << L"\t" << L"======== htmlDoc ===============" << std::endl;
 	for( auto &node : *vectorHtmlNodeSPtrShared ) {
 		auto name = *node->getNodeName( );
-		auto contentText = *node->getNodeINcludeContentText( );
+		auto contentText = *node->getNodeIncludeContentText( );
 		auto content = *node->getNodeContent( );
 		auto path = *node->getPath( );
 		stringstream << L"\t" << L"=======================" << std::endl;
@@ -155,7 +155,7 @@ bool getValue( std::wstringstream &stringstream, cylHtmlTools::Vector_HtmlNodeSP
 	}
 	for( auto &node : *vectorHtmlNodeSPtrShared ) {
 		auto name = *node->getNodeName( );
-		auto contentText = *node->getNodeINcludeContentText( );
+		auto contentText = *node->getNodeIncludeContentText( );
 		auto content = *node->getNodeContent( );
 		auto path = *node->getPath( );
 		stringstream << L"\t" L"\t" << L"=======================" << std::endl;
