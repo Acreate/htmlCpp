@@ -43,20 +43,9 @@ bool HtmlDocTools::findNodeName( const HtmlChar *std_c_w_string, size_t start_in
 bool HtmlDocTools::findNextNodeEndChar( const HtmlChar *std_c_w_string, const size_t max_index, size_t &start_index ) {
 	for( ; start_index < max_index; ++start_index ) {
 		auto currenChar = std_c_w_string[ start_index ];
-		if( currenChar == charValue::singleQuotation ) {
-			++start_index;
-			for( ; start_index < max_index; ++start_index ) {
-				currenChar = std_c_w_string[ start_index ];
-				if( currenChar == charValue::singleQuotation )
-					break;
-			}
-		} else if( currenChar == charValue::doubleQuotation ) {
-			++start_index;
-			for( ; start_index < max_index; ++start_index ) {
-				currenChar = std_c_w_string[ start_index ];
-				if( currenChar == charValue::doubleQuotation )
-					break;
-			}
+		if( HtmlStringTools::isQuotation( currenChar ) ) {
+			if( !HtmlStringTools::jumpQuotation( std_c_w_string, max_index, start_index, start_index ) )
+				return false; // 不匹配
 		} else if( currenChar == charValue::nodeEndChar )
 			return true;
 	}
@@ -85,20 +74,9 @@ bool HtmlDocTools::findNextNodeStartChar( const HtmlChar *std_c_w_string, size_t
 bool HtmlDocTools::findNextNodeForwardSlash( const HtmlChar *std_c_w_string, const size_t max_index, size_t &start_index ) {
 	for( ; start_index < max_index; ++start_index ) {
 		auto currenChar = std_c_w_string[ start_index ];
-		if( currenChar == charValue::singleQuotation ) {
-			++start_index;
-			for( ; start_index < max_index; ++start_index ) {
-				currenChar = std_c_w_string[ start_index ];
-				if( currenChar == charValue::singleQuotation )
-					break;
-			}
-		} else if( currenChar == charValue::doubleQuotation ) {
-			++start_index;
-			for( ; start_index < max_index; ++start_index ) {
-				currenChar = std_c_w_string[ start_index ];
-				if( currenChar == charValue::doubleQuotation )
-					break;
-			}
+		if( HtmlStringTools::isQuotation( currenChar ) ) {
+			if( !HtmlStringTools::jumpQuotation( std_c_w_string, max_index, start_index, start_index ) )
+				return false; // 不匹配
 		} else if( currenChar == charValue::exclamation ) {
 			++start_index;
 			for( ; start_index < max_index; ++start_index ) {
@@ -148,20 +126,9 @@ bool HtmlDocTools::isStartNode( const HtmlString_Shared &std_c_w_string, size_t 
 		currentChar = c_str[ index ];
 		if( HtmlStringTools::isSpace( currentChar ) )
 			continue;
-		if( currentChar == charValue::doubleQuotation ) {
-			++index;
-			for( ; index <= end_index; ++index ) {
-				currentChar = c_str[ index ];
-				if( currentChar == charValue::doubleQuotation )
-					break;
-			}
-		} else if( currentChar == charValue::singleQuotation ) {
-			++index;
-			for( ; index <= end_index; ++index ) {
-				currentChar = c_str[ index ];
-				if( currentChar == charValue::singleQuotation )
-					break;
-			}
+		if( HtmlStringTools::isQuotation( currentChar ) ) {
+			if( !HtmlStringTools::jumpQuotation( c_str, end_index + 1, start_index, start_index ) )
+				return false; // 不匹配
 		} else if( currentChar == charValue::forwardSlash )
 			return false;
 		else {
