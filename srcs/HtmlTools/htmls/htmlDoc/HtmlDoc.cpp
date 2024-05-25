@@ -284,12 +284,11 @@ HtmlString_Shared HtmlDoc::getNodeContentText( const HtmlNode_Shared &node_share
 	}
 	size_t startIndex, endIndex;
 	auto startNode = node_shared->startNode;
-	startIndex = node_shared->ptrOffset + node_shared->ptrCWtrLen;
+	startIndex = startNode->ptrOffset + startNode->ptrCWtrLen;
 	endIndex = node_shared->getEndNode( )->ptrOffset - startIndex;
-	auto substr = htmlWCStr->substr( startIndex, endIndex );
-	if( substr.length( ) == 0 )
+	if( endIndex == 0 )
 		return nullptr;
-	return HtmlDocTools::htmlStringContentTextConverToHtmlString( substr.c_str( ), substr.length( ) );
+	return HtmlDocTools::htmlStringContentTextConverToHtmlString( htmlWCStr->c_str( ) + startIndex, endIndex );
 
 }
 XDir_Shared HtmlDoc::converXDirSptr( const HtmlNode_Shared &node_shared ) {

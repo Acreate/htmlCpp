@@ -64,11 +64,10 @@ bool HtmlDocTools::findNextNodeEndChar( const HtmlChar *std_c_w_string, const si
 }
 bool HtmlDocTools::findNextNodeStartChar( const HtmlChar *std_c_w_string, size_t max_index, size_t &start_index ) {
 	size_t get_quoation_position_end;
-	std::vector< std::pair< size_t, size_t > > get_quotation_position_s;
 	for( ; start_index < max_index; ++start_index ) {
 		auto currenChar = std_c_w_string[ start_index ];
 		if( HtmlStringTools::isQuotation( currenChar ) ) {
-			if( !HtmlStringTools::jumpQuotation( std_c_w_string, max_index, start_index, get_quoation_position_end, get_quotation_position_s ) )
+			if( !HtmlStringTools::jumpQuotation( std_c_w_string, max_index, start_index, get_quoation_position_end ) )
 				break;
 			start_index = get_quoation_position_end + 1;
 		} else if( currenChar == charValue::exclamation ) {
@@ -309,9 +308,7 @@ HtmlString_Shared HtmlDocTools::htmlStringContentTextConverToHtmlString( const H
 	size_t buffIndex = 0;
 	size_t index = 0; // 末尾下标
 	size_t startPtr = 0; // 当前处理下标
-	HtmlString str; // 最后结果
 	HtmlString nodeName; // 节点名称
-	bool flag;
 	HtmlChar currentChar;
 	do {
 		currentChar = conver_contents[ index ];

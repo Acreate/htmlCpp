@@ -90,8 +90,7 @@ XDir::XDir( const HtmlString &param ) {
 					break;
 				} else if( HtmlStringTools::isQuotation( value ) ) { // 引号，则扫描后续引号，并且填充缓存
 					size_t getQuotationEnd;
-					std::vector< std::pair< size_t, size_t > > getQuoattionPostions;
-					if( HtmlStringTools::jumpQuotation( data, length, index, getQuotationEnd, getQuoattionPostions ) ) {
+					if( HtmlStringTools::jumpQuotation( data, length, index, getQuotationEnd) ) {
 						buff[ buffIndex ] = value;
 						++buffIndex;
 						for( ++index; index < getQuotationEnd; ++index, ++buffIndex )

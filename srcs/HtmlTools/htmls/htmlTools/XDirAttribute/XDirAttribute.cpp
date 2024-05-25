@@ -191,8 +191,7 @@ Vector_HtmlStringSPtr_Shared XDirAttribute::htmlCharBuffConverToValues( const Ht
 			}
 			// 处理引号
 			size_t endIndex;
-			std::vector< std::pair< size_t, size_t > > getQuotationPositionS;
-			if( HtmlStringTools::jumpQuotation( conver_buff, conver_buff_size, index, endIndex, getQuotationPositionS ) )
+			if( HtmlStringTools::jumpQuotation( conver_buff, conver_buff_size, index, endIndex) )
 				result->emplace_back( std::make_shared< HtmlString >( conver_buff + index + 1, endIndex - index - 1 ) );
 			else
 				break;
@@ -233,8 +232,7 @@ HtmlString_Shared XDirAttribute::htmlCharBuffConverToName( const HtmlChar *conve
 			}
 			// 处理引号
 			size_t endIndex;
-			std::vector< std::pair< size_t, size_t > > getQuotationPositionS;
-			if( HtmlStringTools::jumpQuotation( conver_buff, conver_buff_size, index, endIndex, getQuotationPositionS ) )
+			if( HtmlStringTools::jumpQuotation( conver_buff, conver_buff_size, index, endIndex ) )
 				result->append( HtmlString( conver_buff + index + 1, endIndex - index - 1 ) );
 			else
 				break;
