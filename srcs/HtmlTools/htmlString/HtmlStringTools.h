@@ -56,6 +56,38 @@ namespace cylHtmlTools {
 		/// <returns>不存在返回 faluse</returns>
 		static bool jumpQuotation( const HtmlChar *buff, const size_t buff_size, size_t start_index, size_t &get_quoation_position_end, std::vector< std::pair< size_t, size_t > > &get_quotation_position_s );
 
+		
+		/// <summary>
+		/// 获取匹配单引号的结束位置<br/>
+		/// buff[start_index] 必须等于 charValue::singleQuotation
+		/// </summary>
+		/// <param name="buff">缓冲</param>
+		/// <param name="buff_size">缓冲大小</param>
+		/// <param name="start_index">开始位置</param>
+		/// <param name="get_quoation_position_end">返回的单引号结束位置</param>
+		/// <returns>成功返回 true</returns>
+		static bool jumpSingleQuotation( const HtmlChar *buff, size_t buff_size, size_t start_index, size_t &get_quoation_position_end);
+		/// <summary>
+		/// 获取匹配双引号的结束位置<br/>
+		/// buff[start_index] 必须等于 charValue::doubleQuotation
+		/// </summary>
+		/// <param name="buff">缓冲</param>
+		/// <param name="buff_size">缓冲大小</param>
+		/// <param name="start_index">开始位置</param>
+		/// <param name="get_quoation_position_end">返回的双引号结束位置</param>
+		/// <returns>成功返回 true</returns>
+		static bool jumpDoubleQuotation( const HtmlChar *buff, size_t buff_size, size_t start_index, size_t &get_quoation_position_end);
+		/// <summary>
+		/// 获取缓冲的的匹配引号位置<br/>
+		/// buff[start_index] 必须等于 charValue::doubleQuotation 或者 charValue::singleQuotation，否则返回 false
+		/// </summary>
+		/// <param name="buff">缓冲</param>
+		/// <param name="buff_size">缓冲大小</param>
+		/// <param name="start_index">开始位置</param>
+		/// <param name="get_quoation_position_end">最后的引号匹配位置</param>
+		/// <returns>不存在返回 faluse</returns>
+		static bool jumpQuotation( const HtmlChar *buff, const size_t buff_size, size_t start_index, size_t &get_quoation_position_end );
+
 		/// <summary>
 		/// 是否路径符(包含 '/' 与 '\')
 		/// </summary>

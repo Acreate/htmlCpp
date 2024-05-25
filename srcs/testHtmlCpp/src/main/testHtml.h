@@ -7,7 +7,23 @@
 #include "nameSpace/cylHtmlTools.h"
 
 int testHtml( std::locale locale = std::locale( ) );
-
+/// <summary>
+/// 输出一个 html doc 对象
+/// </summary>
+/// <param name="shared">输出对象</param>
+void outHtmlDoc( const cylHtmlTools::HtmlDoc_Shared & shared );
+/// <summary>
+/// 测试 IncludeText 输出
+/// </summary>
+/// <param name="htmlDoc">html 文本</param>
+void testNodeIncludeText( const cylHtmlTools::HtmlString &htmlDoc );
+/// <summary>
+/// 测试 IncludeText 输出
+///	基于节点查找
+/// </summary>
+/// <param name="htmlDoc">html 文档节点对象</param>
+/// <param name="lrDivIdSitebox">xptah 路径</param>
+void testNodeIncludeText( cylHtmlTools::HtmlDoc_Shared htmlDoc, const cylHtmlTools::HtmlString &lrDivIdSitebox );
 /// <summary>
 /// 根查找
 /// </summary>
@@ -32,8 +48,6 @@ bool getValue( std::wstringstream &stringstream, cylHtmlTools::Vector_HtmlNodeSP
 /// <returns>非 0 表示异常</returns>
 int testHtmlDoc( std::locale locale = std::locale( ) );
 
-std::wstringstream getFileAllWString( const char *path );
-size_t setFileAllWString( const char *path, const cylHtmlTools::HtmlString &stringstream );
 /// <summary>
 /// 测试 XDirAttribute
 /// </summary>

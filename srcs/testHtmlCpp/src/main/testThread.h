@@ -1,26 +1,26 @@
-#ifndef TESTTHREAD_H_H_HEAD__FILE__
+ï»¿#ifndef TESTTHREAD_H_H_HEAD__FILE__
 #define TESTTHREAD_H_H_HEAD__FILE__
 #pragma once
 #include <iostream>
 
 /// <summary>
-/// µ÷ÓÃ²âÊÔ°¸Àý
+/// è°ƒç”¨æµ‹è¯•æ¡ˆä¾‹
 /// </summary>
 int testThread( std::locale locale = std::locale());
 /// <summary>
-/// Ïß³Ì°¸Àý
+/// çº¿ç¨‹æ¡ˆä¾‹
 /// </summary>
 void testHtmlThreadNull( );
 /// <summary>
-/// Ïß³Ì°¸Àý
+/// çº¿ç¨‹æ¡ˆä¾‹
 /// </summary>
 void testHtmlThread( );
 /// <summary>
-/// Ïß³Ì°¸Àý
+/// çº¿ç¨‹æ¡ˆä¾‹
 /// </summary>
 void testHtmlThreadSharedNull( );
 /// <summary>
-/// Ïß³Ì°¸Àý
+/// çº¿ç¨‹æ¡ˆä¾‹
 /// </summary>
 void testHtmlThreadShared( );
 

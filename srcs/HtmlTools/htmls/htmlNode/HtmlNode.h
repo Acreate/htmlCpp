@@ -16,6 +16,7 @@ namespace cylHtmlTools {
 	public:
 		friend class HtmlDoc;
 		friend class XPath;
+		friend class HtmlDocTools;
 	private: // 私有成员变量
 		/// <summary>
 		/// 字符串指针
@@ -118,7 +119,7 @@ namespace cylHtmlTools {
 		/// 获取节点当中文本内容<br/>
 		/// 节点之间的内容会相对应的转换
 		/// </summary>
-		HtmlString_Shared getNodeContentText( ) const;
+		HtmlString_Shared getNodeINcludeContentText( ) const;
 
 		/// <summary>
 		/// 查找节点属性<br/>

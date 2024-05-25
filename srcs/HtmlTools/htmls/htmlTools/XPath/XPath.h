@@ -30,7 +30,7 @@ namespace cylHtmlTools {
 		/// </summary>
 		/// <param name="html_node_shared_s">查找的列表</param>
 		/// <returns>节点列表</returns>
-		Vector_HtmlNodeSPtr_Shared buider( const Vector_HtmlNodeSPtr_Shared &html_node_shared_s );
+		Vector_HtmlNodeSPtr_Shared buider( const Vector_HtmlNodeSPtr_Shared &html_node_shared_s ) const;
 		/// <summary>
 		/// 使用的 路径控制器属性
 		/// </summary>
@@ -48,7 +48,7 @@ namespace cylHtmlTools {
 		/// <param name="current_control_type">控制符类型</param>
 		/// <param name="old_control_type">上次控制符类型</param>
 		/// <returns>经过控制符转换的节点</returns>
-		Vector_HtmlNodeSPtr pathControlDirName( const Vector_HtmlNodeSPtr &current_find_nodes, const XDir *xdirInfo, XDir_Control_Type current_control_type, XDir_Control_Type old_control_type );
+		Vector_HtmlNodeSPtr pathControlDirName( const Vector_HtmlNodeSPtr &current_find_nodes, const XDir *xdirInfo, XDir_Control_Type current_control_type, XDir_Control_Type old_control_type ) const;
 
 		/// <summary>
 		/// 匹配全部节点<br/>
@@ -58,7 +58,7 @@ namespace cylHtmlTools {
 		/// <param name="x_dir">目录属性</param>
 		/// <param name="path">历史目录(不包含属性)</param>
 		/// <returns>查找到的列表</returns>
-		Vector_HtmlNodeSPtr matchesHtmlDocAllNodes( const Vector_HtmlNodeSPtr &currentFindNodes, const XDir *x_dir, const HtmlString &path );
+		Vector_HtmlNodeSPtr matchesHtmlDocAllNodes( const Vector_HtmlNodeSPtr &currentFindNodes, const XDir *x_dir, const HtmlString &path ) const;
 	public:// - 属性
 		Vector_XDirSPtr getXDirs( ) const {
 			return *dirListSPtr;

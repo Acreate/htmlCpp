@@ -71,6 +71,56 @@ bool HtmlStringTools::jumpQuotation( const HtmlChar *buff, const size_t buff_siz
 	else
 		return false;
 }
+bool HtmlStringTools::jumpSingleQuotation( const HtmlChar *buff, size_t buff_size, size_t start_index, size_t &get_quoation_position_end ) {
+	if( buff[ start_index ] != charValue::singleQuotation )
+		return false;
+	for( ++start_index; start_index < buff_size; ++start_index )
+		if( buff[ start_index ] == charValue::singleQuotation )
+			break;
+		else if( buff[ start_index ] == charValue::doubleQuotation ) {
+			if( !jumpDoubleQuotation( buff, buff_size, start_index, get_quoation_position_end ) )
+				break;
+			start_index = get_quoation_position_end;
+		} else if( buff[ start_index ] == charValue::backSlash ) { // 是否出现转义字符
+			auto newIndex = start_index + 1;
+			if( buff[ newIndex ] == charValue::doubleQuotation
+				|| buff[ newIndex ] == charValue::singleQuotation ) //转义字符则跳过一次
+				start_index += 2;
+		}
+	if( start_index == buff_size ) // 超出下标
+		return false;
+	get_quoation_position_end = start_index;
+	return true;
+}
+bool HtmlStringTools::jumpDoubleQuotation( const HtmlChar *buff, size_t buff_size, size_t start_index, size_t &get_quoation_position_end ) {
+	if( buff[ start_index ] != charValue::doubleQuotation )
+		return false;
+	for( ++start_index; start_index < buff_size; ++start_index )
+		if( buff[ start_index ] == charValue::doubleQuotation )
+			break;
+		else if( buff[ start_index ] == charValue::singleQuotation ) {
+			if( !jumpSingleQuotation( buff, buff_size, start_index, get_quoation_position_end ) )
+				break;
+			start_index = get_quoation_position_end;
+		} else if( buff[ start_index ] == charValue::backSlash ) { // 是否出现转义字符
+			auto newIndex = start_index + 1;
+			if( buff[ newIndex ] == charValue::doubleQuotation
+				|| buff[ newIndex ] == charValue::singleQuotation ) //转义字符则跳过一次
+				start_index += 2;
+		}
+	if( start_index == buff_size )// 超出下标
+		return false;
+	get_quoation_position_end = start_index;
+	return true;
+}
+bool HtmlStringTools::jumpQuotation( const HtmlChar *buff, const size_t buff_size, size_t start_index, size_t &get_quoation_position_end ) {
+	if( buff[ start_index ] == charValue::doubleQuotation )
+		return jumpDoubleQuotation( buff, buff_size, start_index, get_quoation_position_end );
+	else if( buff[ start_index ] == charValue::singleQuotation )
+		return jumpSingleQuotation( buff, buff_size, start_index, get_quoation_position_end );
+	else
+		return false;
+}
 bool HtmlStringTools::isRouteChar( HtmlChar currentChar ) {
 	return currentChar == charValue::forwardSlash || currentChar == charValue::backSlash;
 }

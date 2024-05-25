@@ -62,7 +62,7 @@ inline bool hasNode( const Vector_HtmlNodeSPtr &checkList, const HtmlNode_Shared
 	return false;
 }
 
-Vector_HtmlNodeSPtr XPath::pathControlDirName( const Vector_HtmlNodeSPtr &current_find_nodes, const XDir *xdirInfo, XDir_Control_Type current_control_type, XDir_Control_Type old_control_type ) {
+Vector_HtmlNodeSPtr XPath::pathControlDirName( const Vector_HtmlNodeSPtr &current_find_nodes, const XDir *xdirInfo, XDir_Control_Type current_control_type, XDir_Control_Type old_control_type ) const {
 	Vector_HtmlNodeSPtr result;
 	switch( current_control_type ) {
 		case Cd_Current :// 获取参数列表节点当中的所有子节点-如果存在
@@ -162,7 +162,7 @@ Vector_HtmlNodeSPtr XPath::pathControlDirName( const Vector_HtmlNodeSPtr &curren
 	return buff;
 }
 
-Vector_HtmlNodeSPtr XPath::matchesHtmlDocAllNodes( const Vector_HtmlNodeSPtr &currentFindNodes, const XDir *x_dir, const HtmlString &path ) {
+Vector_HtmlNodeSPtr XPath::matchesHtmlDocAllNodes( const Vector_HtmlNodeSPtr &currentFindNodes, const XDir *x_dir, const HtmlString &path ) const {
 	Vector_HtmlNodeSPtr buff;
 	auto currentFindNodesBegin = currentFindNodes.begin( );
 	auto currentFindNodesEnd = currentFindNodes.end( );
@@ -207,7 +207,7 @@ HtmlString XPath::getHtmlString( ) const {
 
 	return result;
 }
-Vector_HtmlNodeSPtr_Shared XPath::buider( const Vector_HtmlNodeSPtr_Shared &html_node_shared_s ) {
+Vector_HtmlNodeSPtr_Shared XPath::buider( const Vector_HtmlNodeSPtr_Shared &html_node_shared_s ) const {
 	auto iterator = dirListSPtr->begin( );
 	auto end = dirListSPtr->end( );
 	if( iterator == end ) // 根本没有节点

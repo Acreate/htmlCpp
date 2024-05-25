@@ -18,7 +18,10 @@ namespace cylHtmlTools {
 	/// </summary>
 	using HtmlChar = HtmlString::value_type;
 
-	class HTMLTOOLS_EXPORT RefWStr;
+	/// <summary>
+	/// html 工具类
+	/// </summary>
+	class HTMLTOOLS_EXPORT HtmlDocTools;
 	// html 文档
 	class HTMLTOOLS_EXPORT HtmlDoc;
 	// 宽字符工具

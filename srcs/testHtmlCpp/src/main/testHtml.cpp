@@ -13,15 +13,26 @@
 #include <windows.h>
 
 #include "htmls/htmlTools/XPath/XPath.h"
+#include <htmls/htmlDoc/Tools/HtmlDocTools.h>
 #include <htmls/htmlTools/HtmlWorkThread/HtmlWorkThread.h>
 #include <htmls/htmlTools/XDirAttribute/XDirAttribute.h>
 #include <htmls/htmlTools/XDir/XDir.h>
+#include <htmls/htmlDoc/Tools/HtmlDocTools.h>
 #include "htmlString/HtmlStringTools.h"
 
 #include "htmls/htmlDoc/HtmlDoc.h"
 #include "macro/cmake_to_c_cpp_header_env.h"
+void outHtmlDoc( const cylHtmlTools::HtmlDoc_Shared &shared ) {
+	std::string path;
+	path.append( Cache_Path_Dir ).append( "outHtmlDoc.txt" );
+	shared->findNodes( [&]( cylHtmlTools::HtmlNode_Shared &node )->bool {
+		auto includeNodeContent = *node->getIncludeNodeContent( );
+		cylHtmlTools::HtmlDocTools::setFileAllWString( path, includeNodeContent );
+		std::wcout << includeNodeContent << std::endl;
+		return false;
+	} );
+}
 int testHtml( std::locale locale ) {
-	
 	testXAttribute( LR"(@class="23 31" 123 " 3 11 ")" );
 	testXAttribute( LR"(@acd="23 31" 123 " 3 11 ")" );
 	testXAttributeIsIncludeOther( LR"(@acd="23 31" 123 " 3 11 ")", { LR"(23)" } );
@@ -51,26 +62,58 @@ int testHtml( std::locale locale ) {
 	testIncludeXDir( LR"(div[@"id"="sitebox sd" @class="cf ds"])", LR"(div[@"id"="sitebox sd" @class="cf ds  es"])" );
 	std::string fString( u8"%s/%s/%s" );
 	char path[ 4096 ]{ 0 };
-	int len = snprintf( path, sizeof( path ), fString.c_str( ), std::string( Project_Run_bin ).c_str( ), u8"writeFile", u8"wuxia.html" );
+	int len = snprintf( path, sizeof( path ), fString.c_str( ), std::string( Project_Run_bin ).c_str( ), u8"writeFile", u8"www.121ds.cc.html" );
 	if( len == 0 )
 		return 1;
-	auto wstringstream = getFileAllWString( path );
+	auto wstringstream = cylHtmlTools::HtmlDocTools::getFileAllWString( path );
 	len = snprintf( path, sizeof( path ), fString.c_str( ), std::string( Cache_Path_Dir ).c_str( ), u8"", u8"wuxia.html" );
 	if( len == 0 )
 		return 2;
-	size_t fileAllWString = setFileAllWString( path, wstringstream.str( ) );
-
-	auto string = std::make_shared< cylHtmlTools::HtmlString >( wstringstream.str( ) );
-	size_t endIndex = string->size( ), startIndex = 0;
-	auto htmlDoc = cylHtmlTools::HtmlDoc::parse( string, endIndex, startIndex );
+	size_t fileAllWString = cylHtmlTools::HtmlDocTools::setFileAllWString( path, *wstringstream );
+	auto htmlDoc = cylHtmlTools::HtmlDoc::parse( wstringstream );
 	if( !htmlDoc )
 		return 3;
 	htmlDocNodeConverToXDir( htmlDoc );
+	findElements( htmlDoc, LR"(div[@"id"="subnav"])" );
 	findElements( htmlDoc, LR"(div[@"id"="sitebox"])" );
 	findElements( htmlDoc, LR"(div[@"id"="sitebox"]/dl/dd/h3/a)" );
 	findElements( htmlDoc, LR"(div[@"id"="sitebox" @class="cfe"]/dl/dd/h3/a)" );
 	findElements( htmlDoc, LR"(div[@"id"="sitebox" @class="cf"]/dl/dd/h3/a)" );
+	testNodeIncludeText( LR"(你是最棒的<div class="book-intro">
+<span>最新章节：</span>
+<a href="/227940/727627.html" target="_blank">第540章 谈婚论嫁</a><br />
+白渊巧合之下穿越秦时世界，成为道家天宗弟子，觉醒了一个奇奇怪怪的词条系统，从此开始搞事的生活。<br>用【量子速读】偷学百家功法，对罗网刺客使出【煽情剑法】，让他们改过自新，凭一己之力逐渐带歪七国的画风。<br>为何燕丹痛失爱妃？为何紫女夜不归宿？为何韩非掩面痛哭？<br>白渊：来，都看向我，没错，这些都是我干的！
+</div>)" );
+	testNodeIncludeText( htmlDoc, LR"(div[@class="book-intro"])" );
 	return 0;
+}
+
+void testNodeIncludeText( const cylHtmlTools::HtmlString &htmlDoc ) {
+	std::wcout << L"↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ \t测试 testNodeIncludeText" << std::endl;
+	std::wcout << *cylHtmlTools::HtmlDocTools::htmlStringContentTextConverToHtmlString( htmlDoc ) << std::endl;
+	std::wcout << L"↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑" << std::endl;
+
+}
+void testNodeIncludeText( cylHtmlTools::HtmlDoc_Shared htmlDoc, const cylHtmlTools::HtmlString &lrDivIdSitebox ) {
+	std::wcout << L"↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ \t测试 htmlDoc testNodeIncludeText" << std::endl;
+	std::wcout << L"---------->[" << lrDivIdSitebox << ']' << std::endl;
+	cylHtmlTools::XPath xPath( lrDivIdSitebox );
+	auto nodes = htmlDoc->xpathRootNodes( xPath );
+	size_t count = 0;
+	for( auto &node : *nodes ) {
+		std::wcout << L"==========================	" << count << std::endl;
+		auto contentText = node->getNodeINcludeContentText( );
+		if( contentText )
+			std::wcout << *contentText << std::endl;
+		std::wcout << L"==========================	" << std::endl;
+		contentText = node->getIncludeNodeContent( );
+		if( contentText )
+			std::wcout << *contentText << std::endl;
+		std::wcout << L"--------------------------	" << std::endl;
+		++count;
+	}
+	std::wcout << L"↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑" << std::endl;
+
 }
 bool getValue( std::wstringstream &stringstream, cylHtmlTools::HtmlDoc_Shared htmlDoc, cylHtmlTools::XPath &xpath ) {
 	auto htmlNodeRoots = htmlDoc->getHtmlNodeRoots( );
@@ -81,7 +124,7 @@ bool getValue( std::wstringstream &stringstream, cylHtmlTools::HtmlDoc_Shared ht
 	stringstream << L"\t" << L"======== htmlDoc ===============" << std::endl;
 	for( auto &node : *vectorHtmlNodeSPtrShared ) {
 		auto name = *node->getNodeName( );
-		auto contentText = *node->getNodeContentText( );
+		auto contentText = *node->getNodeINcludeContentText( );
 		auto content = *node->getNodeContent( );
 		auto path = *node->getPath( );
 		stringstream << L"\t" << L"=======================" << std::endl;
@@ -112,7 +155,7 @@ bool getValue( std::wstringstream &stringstream, cylHtmlTools::Vector_HtmlNodeSP
 	}
 	for( auto &node : *vectorHtmlNodeSPtrShared ) {
 		auto name = *node->getNodeName( );
-		auto contentText = *node->getNodeContentText( );
+		auto contentText = *node->getNodeINcludeContentText( );
 		auto content = *node->getNodeContent( );
 		auto path = *node->getPath( );
 		stringstream << L"\t" L"\t" << L"=======================" << std::endl;
@@ -159,8 +202,7 @@ int testHtmlDoc( std::locale locale ) {
 	ofstream.close( );
 
 	// 测试调用
-	size_t endIndex = htmlContent->size( ), startIndex = 0;
-	auto htmlDoc = cylHtmlTools::HtmlDoc::parse( htmlContent, endIndex, startIndex );
+	auto htmlDoc = cylHtmlTools::HtmlDoc::parse( htmlContent );
 
 
 	stringstream = std::wstringstream( );
@@ -357,33 +399,6 @@ int testHtmlDoc( std::locale locale ) {
 	ofstream.close( );
 	return 0;
 }
-std::wstringstream getFileAllWString( const char *path ) {
-	std::wstringstream stringstream;
-	std::wifstream ifstream( path, std::ios::binary | std::ios::in );
-	if( !ifstream.is_open( ) )
-		return stringstream;
-	do {
-		std::wstring getStr;
-		auto &getline = std::getline( ifstream, getStr );
-		if( getline.eof( ) )
-			break;
-		if( !getStr.empty( ) )
-			stringstream << getStr;
-		stringstream << L'\n';
-	} while( true );
-	std::shared_ptr< std::wstring > htmlContent( new std::wstring( stringstream.str( ) ) );
-	ifstream.close( );
-	return stringstream;
-
-}
-size_t setFileAllWString( const char *path, const cylHtmlTools::HtmlString &stringstream ) {
-	std::wofstream ofstream;
-	ofstream.open( path, std::ios::binary | std::ios::out | std::ios::trunc );
-	if( !ofstream.is_open( ) )
-		return 0;
-	auto &&write = ofstream.write( stringstream.c_str( ), stringstream.size( ) );
-	return write.tellp( );
-}
 void testXAttribute( const cylHtmlTools::HtmlString &test_paremt_name, const cylHtmlTools::HtmlString &test_paremt_value ) {
 	cylHtmlTools::HtmlString_Shared xattributeName(
 		std::make_shared< cylHtmlTools::HtmlString >( test_paremt_name )
@@ -510,7 +525,7 @@ void testXPath( const cylHtmlTools::HtmlString &test_paremt ) {
 	}
 	std::wcout << L"===============" << std::endl;
 }
-void testXAttributeIsIncludeOther( const cylHtmlTools::HtmlString &test_paremt_name, const cylHtmlTools::HtmlString &test_paremt_value, const std::vector<cylHtmlTools::HtmlString> &value ) {
+void testXAttributeIsIncludeOther( const cylHtmlTools::HtmlString &test_paremt_name, const cylHtmlTools::HtmlString &test_paremt_value, const std::vector< cylHtmlTools::HtmlString > &value ) {
 	cylHtmlTools::HtmlString_Shared xattributeName(
 		std::make_shared< cylHtmlTools::HtmlString >( test_paremt_name )
 	);
@@ -548,10 +563,10 @@ void testXAttributeIsIncludeOther( const cylHtmlTools::HtmlString &test_paremt_n
 
 	std::wcout << L"===============" << std::endl;
 }
-void testXAttributeIsIncludeOther( const cylHtmlTools::HtmlString &test_paremt, const std::vector<cylHtmlTools::HtmlString> &value ) {
+void testXAttributeIsIncludeOther( const cylHtmlTools::HtmlString &test_paremt, const std::vector< cylHtmlTools::HtmlString > &value ) {
 	testXAttributeIsIncludeOther( test_paremt, test_paremt, value );
 }
-void testXAttributeIsOtherInclude( const cylHtmlTools::HtmlString &test_paremt_name, const cylHtmlTools::HtmlString &test_paremt_value, const std::vector<cylHtmlTools::HtmlString> &value ) {
+void testXAttributeIsOtherInclude( const cylHtmlTools::HtmlString &test_paremt_name, const cylHtmlTools::HtmlString &test_paremt_value, const std::vector< cylHtmlTools::HtmlString > &value ) {
 	cylHtmlTools::HtmlString_Shared xattributeName(
 		std::make_shared< cylHtmlTools::HtmlString >( test_paremt_name )
 	);
@@ -588,7 +603,7 @@ void testXAttributeIsOtherInclude( const cylHtmlTools::HtmlString &test_paremt_n
 
 	std::wcout << L"===============" << std::endl;
 }
-void testXAttributeIsOtherInclude( const cylHtmlTools::HtmlString &test_paremt, const std::vector<cylHtmlTools::HtmlString> &value ) {
+void testXAttributeIsOtherInclude( const cylHtmlTools::HtmlString &test_paremt, const std::vector< cylHtmlTools::HtmlString > &value ) {
 	testXAttributeIsOtherInclude( test_paremt, test_paremt, value );
 
 }

@@ -1,4 +1,4 @@
-#include "testThread.h"
+ï»¿#include "testThread.h"
 #include <codecvt>
 
 #include "../macro/cmake_to_c_cpp_header_env.h"
@@ -24,104 +24,104 @@ int testThread( std::locale locale ) {
 	return 4;
 }
 void testHtmlThreadNull( ) {
-	std::cout << u8"testHtmlThreadNull ¿ªÊ¼²âÊÔÏß³Ì¿ÕÏß³Ì: " << std::endl;
+	std::cout << u8"testHtmlThreadNull å¼€å§‹æµ‹è¯•çº¿ç¨‹ç©ºçº¿ç¨‹: " << std::endl;
 
 	cylHtmlTools::HtmlWorkThread< int * > thread;
 	thread.start( );
 	while( thread.isRun( ) ) {
-		std::cout << u8"µÈ´ýÏß³Ì½áÊø" << std::endl;
+		std::cout << u8"ç­‰å¾…çº¿ç¨‹ç»“æŸ" << std::endl;
 		std::this_thread::sleep_for( std::chrono::seconds( 1 ) );
 	}
 
-	std::cout << u8"¿ÕÏß³ÌÒÑ¾­ÊµÏÖÍê³É£¬ÕýÔÚ½øÐÐÊýÖµÐ£ÑéÊä³ö" << std::endl;
+	std::cout << u8"ç©ºçº¿ç¨‹å·²ç»å®žçŽ°å®Œæˆï¼Œæ­£åœ¨è¿›è¡Œæ•°å€¼æ ¡éªŒè¾“å‡º" << std::endl;
 }
 void testHtmlThread( ) {
 	int coun = 22;
-	std::cout << u8"testHtmlThread ¿ªÊ¼²âÊÔÏß³Ì¹¦ÄÜ :(×¼±¸Êý¾Ý) : " << coun << std::endl;
+	std::cout << u8"testHtmlThread å¼€å§‹æµ‹è¯•çº¿ç¨‹åŠŸèƒ½ :(å‡†å¤‡æ•°æ®) : " << coun << std::endl;
 	cylHtmlTools::HtmlWorkThread< int * >::Start_Thread_Run startThreadRun = [=]( const cylHtmlTools::HtmlWorkThread< int * > *html_work_thread, const std::thread *run_std_cpp_thread, std::mutex *html_work_thread_mutex, std::mutex *std_cpp_thread_mutex, int *data ) {
 		std::this_thread::sleep_for( std::chrono::seconds( 3 ) );
-		std::cout << u8"¿ªÊ¼Ò»¸öÏß³Ì :(·¢ÏÖÊý¾Ý) : " << *data << std::endl;
+		std::cout << u8"å¼€å§‹ä¸€ä¸ªçº¿ç¨‹ :(å‘çŽ°æ•°æ®) : " << *data << std::endl;
 	};
 
-	// ²âÊÔ»Øµ÷
+	// æµ‹è¯•å›žè°ƒ
 	startThreadRun( nullptr, nullptr, nullptr, nullptr, &coun );
 
 	cylHtmlTools::HtmlWorkThread< int * >::Current_Thread_Run currentThreadRun = [=]( const cylHtmlTools::HtmlWorkThread< int * > *html_work_thread, const std::thread *run_std_cpp_thread, std::mutex *html_work_thread_mutex, std::mutex *std_cpp_thread_mutex, int *data, const time_t *startTime ) {
 		std::this_thread::sleep_for( std::chrono::seconds( 3 ) );
-		std::cout << u8"Ïß³ÌÕýÔÚ¹¤×÷ :(·¢ÏÖÊý¾Ý) : " << *data << std::endl;
+		std::cout << u8"çº¿ç¨‹æ­£åœ¨å·¥ä½œ :(å‘çŽ°æ•°æ®) : " << *data << std::endl;
 		*data = 777;
-		std::cout << u8"Ïß³ÌÕýÔÚ¹¤×÷ :(¸Ä±äÊý¾Ý) : " << *data << std::endl;
+		std::cout << u8"çº¿ç¨‹æ­£åœ¨å·¥ä½œ :(æ”¹å˜æ•°æ®) : " << *data << std::endl;
 	};
-	// ²âÊÔ»Øµ÷
+	// æµ‹è¯•å›žè°ƒ
 	currentThreadRun( nullptr, nullptr, nullptr, nullptr, &coun, nullptr );
 
 	cylHtmlTools::HtmlWorkThread< int * >::Finish_Thread_Run finishThreadRun = [=]( const cylHtmlTools::HtmlWorkThread< int * > *html_work_thread, const std::thread *run_std_cpp_thread, std::mutex *html_work_thread_mutex, std::mutex *std_cpp_thread_mutex, int *data ) {
 		std::this_thread::sleep_for( std::chrono::seconds( 3 ) );
-		std::cout << u8"½áÊøÒ»¸öÏß³Ì :(·¢ÏÖÊý¾Ý) : " << *data << std::endl;
+		std::cout << u8"ç»“æŸä¸€ä¸ªçº¿ç¨‹ :(å‘çŽ°æ•°æ®) : " << *data << std::endl;
 	};
 
-	// ²âÊÔ»Øµ÷
+	// æµ‹è¯•å›žè°ƒ
 	finishThreadRun( nullptr, nullptr, nullptr, nullptr, &coun );
 
 	coun = 22;
-	std::cout << u8"ÖØÖÃ²âÊÔÊý¾Ý(" << coun << ")" << std::endl;
+	std::cout << u8"é‡ç½®æµ‹è¯•æ•°æ®(" << coun << ")" << std::endl;
 	cylHtmlTools::HtmlWorkThread< int * > thread( startThreadRun, currentThreadRun, finishThreadRun, &coun );
 	thread.start( );
 	while( thread.isRun( ) ) {
-		std::cout << u8"µÈ´ýÏß³Ì½áÊø" << std::endl;
+		std::cout << u8"ç­‰å¾…çº¿ç¨‹ç»“æŸ" << std::endl;
 		std::this_thread::sleep_for( std::chrono::seconds( 1 ) );
 	}
 
-	std::cout << u8"¹¤×÷ÒÑ¾­ÊµÏÖÍê³É£¬ÕýÔÚ½øÐÐÊýÖµÐ£ÑéÊä³ö : " << coun << std::endl;
+	std::cout << u8"å·¥ä½œå·²ç»å®žçŽ°å®Œæˆï¼Œæ­£åœ¨è¿›è¡Œæ•°å€¼æ ¡éªŒè¾“å‡º : " << coun << std::endl;
 }
 void testHtmlThreadSharedNull( ) {
-	std::cout << u8"testHtmlThreadSharedNull ¿ªÊ¼²âÊÔ¿ÕÏß³Ì¹¦ÄÜ" << std::endl;
+	std::cout << u8"testHtmlThreadSharedNull å¼€å§‹æµ‹è¯•ç©ºçº¿ç¨‹åŠŸèƒ½" << std::endl;
 
 	cylHtmlTools::HtmlWorkThread< std::shared_ptr< int > > thread;
 	thread.start( );
 	while( thread.isRun( ) ) {
-		std::cout << u8"µÈ´ýÏß³Ì½áÊø" << std::endl;
+		std::cout << u8"ç­‰å¾…çº¿ç¨‹ç»“æŸ" << std::endl;
 		std::this_thread::sleep_for( std::chrono::seconds( 1 ) );
 	}
 
-	std::cout << u8"¿ÕÏß³Ì¹¦ÄÜÒÑ¾­ÊµÏÖÍê³É£¬ÕýÔÚ½øÐÐÊýÖµÐ£ÑéÊä³ö " << std::endl;
+	std::cout << u8"ç©ºçº¿ç¨‹åŠŸèƒ½å·²ç»å®žçŽ°å®Œæˆï¼Œæ­£åœ¨è¿›è¡Œæ•°å€¼æ ¡éªŒè¾“å‡º " << std::endl;
 }
 void testHtmlThreadShared( ) {
 	std::shared_ptr< int > coun( std::make_shared< int >( 22 ) );
-	std::cout << u8"testHtmlThreadShared ¿ªÊ¼²âÊÔÏß³Ì¹¦ÄÜ :(×¼±¸Êý¾Ý) : " << *coun << std::endl;
+	std::cout << u8"testHtmlThreadShared å¼€å§‹æµ‹è¯•çº¿ç¨‹åŠŸèƒ½ :(å‡†å¤‡æ•°æ®) : " << *coun << std::endl;
 	cylHtmlTools::HtmlWorkThread< std::shared_ptr< int > >::Start_Thread_Run startThreadRun = [=]( const cylHtmlTools::HtmlWorkThread< std::shared_ptr< int > > *html_work_thread, const std::thread *run_std_cpp_thread, std::mutex *html_work_thread_mutex, std::mutex *std_cpp_thread_mutex, std::shared_ptr< int > &data ) {
 		std::this_thread::sleep_for( std::chrono::seconds( 3 ) );
-		std::cout << u8"¿ªÊ¼Ò»¸öÏß³Ì :(·¢ÏÖÊý¾Ý) : " << *data << std::endl;
+		std::cout << u8"å¼€å§‹ä¸€ä¸ªçº¿ç¨‹ :(å‘çŽ°æ•°æ®) : " << *data << std::endl;
 	};
 
-	// ²âÊÔ»Øµ÷
+	// æµ‹è¯•å›žè°ƒ
 	startThreadRun( nullptr, nullptr, nullptr, nullptr, coun );
 
 	cylHtmlTools::HtmlWorkThread< std::shared_ptr< int > >::Current_Thread_Run currentThreadRun = [=]( const cylHtmlTools::HtmlWorkThread< std::shared_ptr< int > > *html_work_thread, const std::thread *run_std_cpp_thread, std::mutex *html_work_thread_mutex, std::mutex *std_cpp_thread_mutex, std::shared_ptr< int > &data, const time_t *startTime ) {
 		std::this_thread::sleep_for( std::chrono::seconds( 3 ) );
-		std::cout << u8"Ïß³ÌÕýÔÚ¹¤×÷ :(·¢ÏÖÊý¾Ý) : " << *data << std::endl;
+		std::cout << u8"çº¿ç¨‹æ­£åœ¨å·¥ä½œ :(å‘çŽ°æ•°æ®) : " << *data << std::endl;
 		*data = 777;
-		std::cout << u8"Ïß³ÌÕýÔÚ¹¤×÷ :(¸Ä±äÊý¾Ý) : " << *data << std::endl;
+		std::cout << u8"çº¿ç¨‹æ­£åœ¨å·¥ä½œ :(æ”¹å˜æ•°æ®) : " << *data << std::endl;
 	};
-	// ²âÊÔ»Øµ÷
+	// æµ‹è¯•å›žè°ƒ
 	currentThreadRun( nullptr, nullptr, nullptr, nullptr, coun, nullptr );
 
 	cylHtmlTools::HtmlWorkThread< std::shared_ptr< int > >::Finish_Thread_Run finishThreadRun = [=]( const cylHtmlTools::HtmlWorkThread< std::shared_ptr< int > > *html_work_thread, const std::thread *run_std_cpp_thread, std::mutex *html_work_thread_mutex, std::mutex *std_cpp_thread_mutex, std::shared_ptr< int > &data ) {
 		std::this_thread::sleep_for( std::chrono::seconds( 3 ) );
-		std::cout << u8"½áÊøÒ»¸öÏß³Ì :(·¢ÏÖÊý¾Ý) : " << *data << std::endl;
+		std::cout << u8"ç»“æŸä¸€ä¸ªçº¿ç¨‹ :(å‘çŽ°æ•°æ®) : " << *data << std::endl;
 	};
 
-	// ²âÊÔ»Øµ÷
+	// æµ‹è¯•å›žè°ƒ
 	finishThreadRun( nullptr, nullptr, nullptr, nullptr, coun );
 
 	*coun = 22;
-	std::cout << u8"ÖØÖÃ²âÊÔÊý¾Ý(" << *coun << ")" << std::endl;
+	std::cout << u8"é‡ç½®æµ‹è¯•æ•°æ®(" << *coun << ")" << std::endl;
 	cylHtmlTools::HtmlWorkThread< std::shared_ptr< int > > thread( startThreadRun, currentThreadRun, finishThreadRun, coun );
 	thread.start( );
 	while( thread.isRun( ) ) {
-		std::cout << u8"µÈ´ýÏß³Ì½áÊø" << std::endl;
+		std::cout << u8"ç­‰å¾…çº¿ç¨‹ç»“æŸ" << std::endl;
 		std::this_thread::sleep_for( std::chrono::seconds( 1 ) );
 	}
 
-	std::cout << u8"¹¤×÷ÒÑ¾­ÊµÏÖÍê³É£¬ÕýÔÚ½øÐÐÊýÖµÐ£ÑéÊä³ö : " << *coun << std::endl;
+	std::cout << u8"å·¥ä½œå·²ç»å®žçŽ°å®Œæˆï¼Œæ­£åœ¨è¿›è¡Œæ•°å€¼æ ¡éªŒè¾“å‡º : " << *coun << std::endl;
 }

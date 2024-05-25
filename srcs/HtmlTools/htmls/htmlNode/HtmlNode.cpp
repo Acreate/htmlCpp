@@ -4,6 +4,7 @@
 #include "../htmlDoc/HtmlDoc.h"
 #include "../htmlTools/XPath/XPath.h"
 #include "../../htmlString/HtmlStringTools.h"
+#include "../htmlDoc/Tools/HtmlDocTools.h"
 #include <sstream>
 
 using namespace cylHtmlTools;
@@ -186,7 +187,7 @@ HtmlString_Shared HtmlNode::getIncludeNodeContent( ) const {
 HtmlString_Shared HtmlNode::getPath( ) const {
 	return htmldocShared->getPath( thisSharedPtr );
 }
-HtmlString_Shared HtmlNode::getNodeContentText( ) const {
+HtmlString_Shared HtmlNode::getNodeINcludeContentText( ) const {
 	return htmldocShared->getNodeContentText( thisSharedPtr );
 }
 UMap_HtmlStringK_HtmlStringV_Shared HtmlNode::findAttribute( const std::function< bool( const HtmlString & attributeName, const HtmlString & attributeValue) > &callFunction ) const {
@@ -218,13 +219,13 @@ Vector_HtmlNodeSPtr_Shared HtmlNode::parseHtmlNodeCharPair( const HtmlDoc_Shared
 	auto stdCWString = html_doc_shared->htmlWCStr;
 	for( ; start_index < max_index; ++start_index ) {
 		auto maxIndex = max_index;
-		findCharResut = HtmlDoc::findNextNodeStartChar( stdCWString, maxIndex, start_index );
+		findCharResut = HtmlDocTools::findNextNodeStartChar( stdCWString, maxIndex, start_index );
 		if( !findCharResut )
 			break;
 		auto ptr = new HtmlNode;
 		HtmlNode_Shared currentHtmlNodeCharPairSharedPtr( ptr );
 		ptr->ptrOffset = start_index;
-		findCharResut = HtmlDoc::findNextNodeEndChar( stdCWString, maxIndex, start_index );
+		findCharResut = HtmlDocTools::findNextNodeEndChar( stdCWString, maxIndex, start_index );
 		if( !findCharResut )
 			break;
 		ptr->ptrCWtrLen = start_index + 1 - ptr->ptrOffset;

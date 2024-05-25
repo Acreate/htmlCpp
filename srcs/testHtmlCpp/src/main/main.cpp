@@ -1,4 +1,5 @@
-﻿#include <iostream>
+﻿#include <algorithm>
+#include <iostream>
 #include <locale>
 #include "testThread.h"
 #include "testHtml.h"
@@ -7,8 +8,9 @@ int main( int argc, char *argv[ ] ) {
 	std::locale::global( locale );
 	std::wcout.imbue( locale );
 	std::cout.imbue( locale );
-	testThread( locale );
-	//testHtml( locale );
+
+	//testThread( locale );
+	testHtml( locale );
 
 	return 0;
 
