@@ -1,4 +1,4 @@
-CMAKE_MINIMUM_REQUIRED( VERSION 3.19 )
+﻿CMAKE_MINIMUM_REQUIRED( VERSION 3.19 )
 
 macro( m_set_env bin_ptah install_path )
 	SET( PROJECT_BINARY_DIR "${bin_ptah}" CACHE STRING "" FORCE )
@@ -13,6 +13,7 @@ macro( m_set_env bin_ptah install_path )
 	SET( CMAKE_INSTALL_LIBDIR "${install_path}" CACHE PATH "" FORCE )
 	SET( CMAKE_INSTALL_PREFIX "${install_path}" CACHE PATH "" FORCE )
 
+	SET( QT_DEPLOY_BIN_DIR "${install_path}" CACHE STRING "" FORCE )
 endmacro()
 
 macro( m_all_set_env all_path )

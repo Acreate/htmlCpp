@@ -21,8 +21,6 @@ INCLUDE( GNUInstallDirs )
 
 SET( Project_Run_bin "${CMAKE_HOME_DIRECTORY}/builder/${CMAKE_BUILD_TYPE}_${CMAKE_CXX_COMPILER_ARCHITECTURE_ID}_${CMAKE_CXX_COMPILER_ID}/" )
 SET( Project_Install_bin "${Project_Run_bin}" )
-SET( Project_Plug_bin "${CMAKE_HOME_DIRECTORY}/builder/${CMAKE_BUILD_TYPE}_${CMAKE_CXX_COMPILER_ARCHITECTURE_ID}_${CMAKE_CXX_COMPILER_ID}/plugs" )
-
 get_current_dir_name( current_dir_name ${CMAKE_CURRENT_SOURCE_DIR} )
 
 # # 根部定义的模板位置

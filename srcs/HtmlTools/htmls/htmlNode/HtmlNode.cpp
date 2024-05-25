@@ -187,7 +187,7 @@ HtmlString_Shared HtmlNode::getIncludeNodeContent( ) const {
 HtmlString_Shared HtmlNode::getPath( ) const {
 	return htmldocShared->getPath( thisSharedPtr );
 }
-HtmlString_Shared HtmlNode::getNodeINcludeContentText( ) const {
+HtmlString_Shared HtmlNode::getNodeIncludeContentText( ) const {
 	return htmldocShared->getNodeContentText( thisSharedPtr );
 }
 UMap_HtmlStringK_HtmlStringV_Shared HtmlNode::findAttribute( const std::function< bool( const HtmlString & attributeName, const HtmlString & attributeValue) > &callFunction ) const {

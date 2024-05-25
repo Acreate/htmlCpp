@@ -275,6 +275,8 @@ Vector_HtmlNodeSPtr_Shared XPath::buider( const Vector_HtmlNodeSPtr_Shared &html
 			break;
 
 	} while( true );
+	if( currentFindNodes.size( ) == 0 )
+		return nullptr;
 	resultShared->clear( );
 	for( auto &node : currentFindNodes ) {
 		auto resultIterator = resultShared->begin( );
