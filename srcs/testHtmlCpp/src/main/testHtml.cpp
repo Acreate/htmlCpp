@@ -3,7 +3,7 @@
 #include <iostream>
 #include <codecvt>
 
-#include "../macro/cmake_to_c_cpp_header_env.h"
+#include "../auto_generate_files/macro/cmake_to_c_cpp_header_env.h"
 #include <fstream>
 #include <htmls/HtmlNode/HtmlNode.h>
 #include <htmls/htmlDoc/HtmlDoc.h>
@@ -21,7 +21,6 @@
 #include "htmlString/HtmlStringTools.h"
 
 #include "htmls/htmlDoc/HtmlDoc.h"
-#include "macro/cmake_to_c_cpp_header_env.h"
 void outHtmlDoc( const cylHtmlTools::HtmlDoc_Shared &shared ) {
 	std::string path;
 	path.append( Cache_Path_Dir ).append( "outHtmlDoc.txt" );

@@ -7,7 +7,7 @@
 #include <vector>
 #include <string>
 
-#include "../export/HtmlTools_export.h" // 导出导入声明
+#include "../auto_generate_files/export/HtmlTools_export.h" // 导出导入声明
 namespace cylHtmlTools {
 	/// <summary>
 	/// 限定文本类型
