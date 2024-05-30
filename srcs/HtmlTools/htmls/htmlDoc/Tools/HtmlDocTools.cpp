@@ -94,6 +94,11 @@ bool HtmlDocTools::isSingelNode( const HtmlChar *std_c_w_string, size_t &start_i
 	if( currentChar != charValue::nodeStartChar )
 		for( ++start_index; start_index < end_index; ++start_index ) {
 			currentChar = std_c_w_string[ start_index ];
+			if( HtmlStringTools::isQuotation( currentChar ) )
+				if( HtmlStringTools::jumpQuotation( std_c_w_string, end_index, start_index, start_index ) )
+					continue;
+				else
+					return false; // 找不到
 			if( currentChar == charValue::nodeStartChar )
 				break;
 		}
@@ -103,6 +108,11 @@ bool HtmlDocTools::isSingelNode( const HtmlChar *std_c_w_string, size_t &start_i
 			currentChar = std_c_w_string[ forwardSlashIndex ];
 			if( HtmlStringTools::isSpace( currentChar ) )
 				continue;
+			if( HtmlStringTools::isQuotation( currentChar ) )
+				if( HtmlStringTools::jumpQuotation( std_c_w_string, end_index, start_index, start_index ) )
+					continue;
+				else
+					return false; // 找不到
 			if( currentChar != charValue::nodeEndChar )
 				break;
 			end_index = forwardSlashIndex;
@@ -117,6 +127,11 @@ bool HtmlDocTools::isStartNode( const HtmlString_Shared &std_c_w_string, size_t 
 	if( currentChar != charValue::nodeStartChar )
 		for( ++start_index; start_index < end_index; ++start_index ) {
 			currentChar = c_str[ start_index ];
+			if( HtmlStringTools::isQuotation( currentChar ) )
+				if( HtmlStringTools::jumpQuotation( c_str, end_index, start_index, start_index ) )
+					continue;
+				else
+					return false; // 找不到
 			if( currentChar == charValue::nodeStartChar )
 				break;
 		}
@@ -143,11 +158,21 @@ bool HtmlDocTools::isEndNode( const HtmlString_Shared &std_c_w_string, size_t &s
 	// 碰到的第一个必须是 / 而不是通用字符或者 >
 	for( ; start_index <= end_index; ++start_index ) {
 		currentChar = c_str[ start_index ];
+		if( HtmlStringTools::isQuotation( currentChar ) )
+			if( HtmlStringTools::jumpQuotation( c_str, end_index, start_index, start_index ) )
+				continue;
+			else
+				return false; // 找不到
 		if( currentChar == charValue::nodeStartChar )
 			break;
 	}
 	for( auto index = start_index + 1; index <= end_index; ++index ) {
 		currentChar = c_str[ index ];
+		if( HtmlStringTools::isQuotation( currentChar ) )
+			if( HtmlStringTools::jumpQuotation( c_str, end_index, start_index, start_index ) )
+				continue;
+			else
+				return false; // 找不到
 		if( HtmlStringTools::isSpace( currentChar ) )
 			continue;
 		if( currentChar != charValue::forwardSlash )
@@ -161,6 +186,11 @@ bool HtmlDocTools::isAnnotation( const HtmlString_Shared &std_c_w_string, size_t
 	if( currentChar != charValue::nodeStartChar )
 		for( ++start_index; start_index < end_index; ++start_index ) {
 			currentChar = c_str[ start_index ];
+			if( HtmlStringTools::isQuotation( currentChar ) )
+				if( HtmlStringTools::jumpQuotation( c_str, end_index, start_index, start_index ) )
+					continue;
+				else
+					return false; // 找不到
 			if( currentChar == charValue::nodeStartChar )
 				break;
 		}
@@ -168,6 +198,11 @@ bool HtmlDocTools::isAnnotation( const HtmlString_Shared &std_c_w_string, size_t
 
 	for( ; endIndex < end_index; ++endIndex ) {
 		currentChar = c_str[ endIndex ];
+		if( HtmlStringTools::isQuotation( currentChar ) )
+			if( HtmlStringTools::jumpQuotation( c_str, end_index, start_index, start_index ) )
+				continue;
+			else
+				return false; // 找不到
 		if( currentChar == charValue::exclamation ) {
 			if( findNextNodeEndChar( std_c_w_string, end_index, endIndex ) ) {
 				end_index = endIndex;
@@ -343,23 +378,24 @@ size_t HtmlDocTools::setFileAllWString( const std::string &path, const HtmlStrin
 		return 0;
 	auto &&write = ofstream.write( stringstream.c_str( ), stringstream.size( ) );
 	auto tellp = write.tellp( );
+	ofstream.flush( );
 	ofstream.close( );
 	return tellp;
 }
 HtmlString_Shared HtmlDocTools::getFileAllWString( const std::string &path, std::ios_base::openmode open_mode, int open_prot ) {
-	std::wstringstream stringstream;
 	std::wifstream ifstream( path, open_mode, open_prot );
 	if( !ifstream.is_open( ) )
 		return nullptr;
+	std::wstringstream stringstream;
 	auto result = std::make_shared< HtmlString >( );
 	do {
 		auto &getline = std::getline( ifstream, *result );
-		if( getline.eof( ) )
-			break;
 		if( !result->empty( ) )
 			stringstream << *result;
 		stringstream << L'\n';
 		result->clear( );
+		if( getline.eof( ) )
+			break;
 	} while( true );
 	ifstream.close( );
 	*result = stringstream.str( );

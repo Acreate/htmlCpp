@@ -22,14 +22,12 @@ using namespace cylHtmlTools;
 using namespace cylHtmlTools::charValue;
 
 
-HtmlDoc_Shared HtmlDoc::parse( const HtmlString_Shared &std_c_w_string ) {
+HtmlDoc_Shared HtmlDoc::parse( const HtmlChar *std_c_w_string, const size_t str_len ) {
 	HtmlDoc_Shared result( new HtmlDoc );
 	result->thisStdShared = result;
-	result->htmlWCStr = std_c_w_string;
-	auto stdCWString = result->htmlWCStr;
+	result->htmlWCStr = std::make_shared< HtmlString >( std_c_w_string, str_len );
 	size_t count;
-	auto resultHtml = HtmlNode::parseHtmlNodeCharPair( result, 0, std_c_w_string->length( ), count );
-
+	auto resultHtml = HtmlNode::parseHtmlNodeCharPair( result, 0, result->htmlWCStr->length( ), count );
 	auto htmlNodeCharPairs = resultHtml.get( );
 	size_t maxSize = htmlNodeCharPairs->size( );
 	size_t index = 0;
@@ -53,14 +51,14 @@ HtmlDoc_Shared HtmlDoc::parse( const HtmlString_Shared &std_c_w_string ) {
 			continue;
 		auto left = htmlNode->ptrOffset;
 		auto right = htmlNode->ptrCWtrLen + left;
-		bool nodeType = HtmlDocTools::isAnnotation( stdCWString, left, right );
+		bool nodeType = HtmlDocTools::isAnnotation( result->htmlWCStr, left, right );
 		if( nodeType && left < right ) {
 			htmlDocCharPair->nodeType = Html_Node_Type::AnnotationNode;
 			result->htmlDocNode->emplace_back( htmlDocCharPair );
 		} else {
 			left = htmlNode->ptrOffset;
 			right = htmlNode->ptrCWtrLen + left;
-			nodeType = HtmlDocTools::isSingelNode( stdCWString, left, right );
+			nodeType = HtmlDocTools::isSingelNode( result->htmlWCStr, left, right );
 			if( nodeType ) {
 				htmlDocCharPair->nodeType = Html_Node_Type::SingleNode;
 				result->htmlDocNode->emplace_back( htmlDocCharPair );
@@ -68,7 +66,7 @@ HtmlDoc_Shared HtmlDoc::parse( const HtmlString_Shared &std_c_w_string ) {
 				left = htmlNode->ptrOffset;
 				size_t endLeft = left;
 				right = htmlNode->ptrCWtrLen + endLeft;
-				if( HtmlDocTools::isStartNode( stdCWString, endLeft, right ) ) {
+				if( HtmlDocTools::isStartNode( result->htmlWCStr, endLeft, right ) ) {
 					size_t lastNodeIndex = index + 1;
 					size_t endNodeIndex = maxSize;
 					auto vectorHtmlXPathSPtrShared = HtmlDocTools::analysisDoubleNode( result, htmlDocCharPair, resultHtml, lastNodeIndex, endNodeIndex );
@@ -76,7 +74,6 @@ HtmlDoc_Shared HtmlDoc::parse( const HtmlString_Shared &std_c_w_string ) {
 					auto endNode = vectorHtmlXPathSPtrShared->end( );
 					for( ; htmlNodeIterator != endNode; ++htmlNodeIterator )
 						result->htmlDocNode->emplace_back( *htmlNodeIterator );
-
 				}
 			}
 		}
@@ -319,7 +316,8 @@ XDir_Shared HtmlDoc::converXDirSptr( const HtmlNode_Shared &node_shared ) {
 	return std::make_shared< XDir >( xdirName, xDirAttributes );
 }
 Vector_XDirAttributeSPtr_Shared HtmlDoc::converNodeAttributeToXDirAttributes(
-	const HtmlChar *conver_buff, const size_t conver_buff_len ) {
+	const HtmlChar *conver_buff
+	, const size_t conver_buff_len ) {
 	Vector_XDirAttributeSPtr_Shared result( std::make_shared< Vector_XDirAttributeSPtr >( ) );
 	size_t index = 0;
 	size_t buffIndex = 0;

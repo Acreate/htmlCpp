@@ -28,15 +28,24 @@ namespace cylHtmlTools {
 		/// 根据字符串内容生成节点列表
 		/// </summary>
 		/// <param name="std_c_w_string">指向字符串的指针</param>
+		/// <param name="str_len">指针长度</param>
 		/// <returns>解析后的列表</returns>
-		static HtmlDoc_Shared parse( const HtmlString_Shared &std_c_w_string);
+		static HtmlDoc_Shared parse( const HtmlChar *std_c_w_string, const size_t str_len );
 		/// <summary>
 		/// 根据字符串内容生成节点列表
 		/// </summary>
 		/// <param name="std_c_w_string">指向字符串的指针</param>
 		/// <returns>解析后的列表</returns>
-		static HtmlDoc_Shared parse( const HtmlString &std_c_w_string) {
-			return parse( std::make_shared< HtmlString >( std_c_w_string ) );
+		static HtmlDoc_Shared parse( const HtmlString_Shared &std_c_w_string ) {
+			return parse( std_c_w_string->c_str( ), std_c_w_string->length( ) );
+		}
+		/// <summary>
+		/// 根据字符串内容生成节点列表
+		/// </summary>
+		/// <param name="std_c_w_string">指向字符串的指针</param>
+		/// <returns>解析后的列表</returns>
+		static HtmlDoc_Shared parse( const HtmlString &std_c_w_string ) {
+			return parse( std_c_w_string.c_str( ), std_c_w_string.length( ) );
 		}
 		/// <summary>
 		/// 根据字符串内容生成节点列表
@@ -44,16 +53,7 @@ namespace cylHtmlTools {
 		/// <param name="std_c_w_string">指向字符串的指针</param>
 		/// <returns>解析后的列表</returns>
 		static HtmlDoc_Shared parse( const HtmlString *std_c_w_string ) {
-			return parse( std::make_shared< HtmlString >( *std_c_w_string ) );
-		}
-		/// <summary>
-		/// 根据字符串内容生成节点列表
-		/// </summary>
-		/// <param name="std_c_w_string">指向字符串的指针</param>
-		/// <param name="str_len">指针长度</param>
-		/// <returns>解析后的列表</returns>
-		static HtmlDoc_Shared parse( const HtmlChar *std_c_w_string, const size_t str_len) {
-			return parse( std::make_shared< HtmlString >( std_c_w_string, str_len ));
+			return parse( std_c_w_string->c_str( ), std_c_w_string->length( ) );
 		}
 	private: // 核心成员
 
