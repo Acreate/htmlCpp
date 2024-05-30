@@ -76,7 +76,7 @@ namespace cylHtmlTools {
 			} while( true );
 			return true;
 		}
-
+	public:
 		/// <summary>
 		/// 该对象是否完全包含列表参数中的所有值
 		/// </summary>
@@ -161,8 +161,6 @@ namespace cylHtmlTools {
 		/// <param name="name">属性名称</param>
 		/// <returns>值列表对象指针，失败返回 nullptr</returns>
 		static Vector_HtmlStringSPtr_Shared converXDirAttributeValues( const HtmlChar *buff, const size_t buff_size, HtmlString_Shared &name );
-
-
 		/// <summary>
 		/// 追加一个属性
 		/// </summary>
@@ -199,8 +197,7 @@ namespace cylHtmlTools {
 		/// <param name="buff_size">缓冲长度</param>
 		/// <param name="save_vector_xdirattribute_s">解析对象存储位置</param>
 		/// <returns>解析个数</returns>
-		static size_t parseXDirAttributes( const HtmlChar *buff, const size_t buff_size,
-			Vector_XDirAttributeSPtr_Shared &save_vector_xdirattribute_s );
+		static size_t parseXDirAttributes( const HtmlChar *buff, const size_t buff_size, Vector_XDirAttributeSPtr_Shared &save_vector_xdirattribute_s );
 		/// <summary>
 		/// 判定名称是否需要切分值
 		/// </summary>

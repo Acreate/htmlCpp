@@ -90,7 +90,7 @@ XDir::XDir( const HtmlString &param ) {
 					break;
 				} else if( HtmlStringTools::isQuotation( value ) ) { // 引号，则扫描后续引号，并且填充缓存
 					size_t getQuotationEnd;
-					if( HtmlStringTools::jumpQuotation( data, length, index, getQuotationEnd) ) {
+					if( HtmlStringTools::jumpQuotation( data, length, index, getQuotationEnd ) ) {
 						buff[ buffIndex ] = value;
 						++buffIndex;
 						for( ++index; index < getQuotationEnd; ++index, ++buffIndex )
@@ -120,18 +120,22 @@ XDir::XDir( const HtmlString &param ) {
 XDir::XDir( const cylHtmlTools::HtmlString &name, const XDirAttribute_Shared &xdiattrbute_sptr ) {
 	namesList.emplace_back( name );
 	attributesMap = std::make_shared< UMap_HtmlStringK_VectorSPtr_XDirAttributeSPtrV >( );
-	auto dirAttributes = std::make_shared< Vector_XDirAttributeSPtr >( );
-	dirAttributes->emplace_back( xdiattrbute_sptr );
-	attributesMap->emplace( name, dirAttributes );
+	if( xdiattrbute_sptr ) {
+		auto dirAttributes = std::make_shared< Vector_XDirAttributeSPtr >( );
+		dirAttributes->emplace_back( xdiattrbute_sptr );
+		attributesMap->emplace( name, dirAttributes );
+	}
 }
 XDir::XDir( const cylHtmlTools::HtmlString &name, const XDirAttribute &xdiattrbute ) : XDir( name, std::make_shared< XDirAttribute >( xdiattrbute ) ) {
 }
 XDir::XDir( const cylHtmlTools::HtmlString &name, const Vector_XDirAttributeSPtr_Shared &vector_xdiattrbutesptr_sptr ) {
 	namesList.emplace_back( name );
 	attributesMap = std::make_shared< UMap_HtmlStringK_VectorSPtr_XDirAttributeSPtrV >( );
-	attributesMap->emplace( name, vector_xdiattrbutesptr_sptr );
+	if( vector_xdiattrbutesptr_sptr->size( ) > 0 )
+		attributesMap->emplace( name, vector_xdiattrbutesptr_sptr );
 }
 XDir::XDir( const cylHtmlTools::HtmlString &name, const Vector_XDirAttributeSPtr &vector_xdiattrbutesptr ): XDir( name, std::make_shared< Vector_XDirAttributeSPtr >( vector_xdiattrbutesptr ) ) {
+
 }
 XDir::~XDir( ) {
 }
@@ -238,9 +242,7 @@ inline bool jion( const Vector_HtmlStringSPtr_Shared &html_string_s_ptr, HtmlStr
 /// <param name="result">返回属性名称与值的键值对列表</param>
 /// <param name="joint">拼接对象</param>
 /// <returns>序列化个数</returns>
-inline size_t Vector_XDirAttributeSPtrToHtmlString( Vector_XDirAttributeSPtr &x_dir_attribute_s,
-	std::unordered_map< HtmlString, HtmlString > &result,
-	const HtmlString &joint ) {
+inline size_t Vector_XDirAttributeSPtrToHtmlString( Vector_XDirAttributeSPtr &x_dir_attribute_s, std::unordered_map< HtmlString, HtmlString > &result, const HtmlString &joint ) {
 	auto iterator = x_dir_attribute_s.begin( );
 	auto end = x_dir_attribute_s.end( );
 	if( iterator == end )

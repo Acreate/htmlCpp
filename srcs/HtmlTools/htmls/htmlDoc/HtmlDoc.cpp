@@ -289,8 +289,9 @@ HtmlString_Shared HtmlDoc::getNodeContentText( const HtmlNode_Shared &node_share
 
 }
 XDir_Shared HtmlDoc::converXDirSptr( const HtmlNode_Shared &node_shared ) {
+	// 注释节点
 	if( node_shared->nodeType == Html_Node_Type::AnnotationNode )
-		return nullptr; // todo  注释未实现
+		return nullptr;
 	if( isEndNode( node_shared ) )
 		return converXDirSptr( node_shared->startNode );
 	auto startHtmlCharPtr = htmlWCStr->c_str( ) + node_shared->ptrOffset + 1; // 跳过 < 符号
@@ -312,48 +313,111 @@ XDir_Shared HtmlDoc::converXDirSptr( const HtmlNode_Shared &node_shared ) {
 	for( ; nameIndex < newLen; ++nameIndex )
 		if( !HtmlStringTools::isSpace( startHtmlCharPtr[ nameIndex ] ) )
 			break;
-	Vector_XDirAttributeSPtr_Shared xDirAttributes = converNodeAttributeToXDirAttributes( startHtmlCharPtr + nameIndex, newLen - nameIndex );
-	return std::make_shared< XDir >( xdirName, xDirAttributes );
+	auto attritLen = newLen - nameIndex;
+	if( attritLen > 0 ) {
+		Vector_XDirAttributeSPtr_Shared xDirAttributes = converNodeAttributeToXDirAttributes( startHtmlCharPtr + nameIndex, attritLen );
+		return std::make_shared< XDir >( xdirName, xDirAttributes );
+	}
+	return std::make_shared< XDir >( xdirName );
+
 }
 Vector_XDirAttributeSPtr_Shared HtmlDoc::converNodeAttributeToXDirAttributes(
 	const HtmlChar *conver_buff
 	, const size_t conver_buff_len ) {
 	Vector_XDirAttributeSPtr_Shared result( std::make_shared< Vector_XDirAttributeSPtr >( ) );
+	if( conver_buff_len == 0 )
+		return nullptr;
 	size_t index = 0;
 	size_t buffIndex = 0;
+	size_t quotationIndex = 0;
+	HtmlChar currentChar;
+	HtmlChar *saveBuff = new HtmlChar[ conver_buff_len ];
+	size_t saveBuffIndex = 0;
+
 	do {
-		if( HtmlStringTools::findNextHtmlCharPotion( conver_buff, conver_buff_len, charValue::equ, index ) ) { // 找到
-			auto attributeName = XDirAttribute::converXDirAttributeName( conver_buff + buffIndex, index );
-			++index;
-			buffIndex = index;
-			if( HtmlStringTools::findNextHtmlCharPotion( conver_buff, conver_buff_len, charValue::equ, buffIndex ) ) { // 再次查找
-				--buffIndex;
-				// 检测 = 前的空格
-				for( ; buffIndex > index; --buffIndex )
-					if( !HtmlStringTools::isSpace( conver_buff[ buffIndex ] ) )
-						break;
-				--buffIndex;
-				// 找到空格
-				for( ; buffIndex > index; --buffIndex )
-					if( HtmlStringTools::isSpace( conver_buff[ buffIndex ] ) )
-						break;
-				auto attributeValue = XDirAttribute::converXDirAttributeValues( conver_buff + index, buffIndex - index, attributeName );
-				result->emplace_back( std::make_shared< XDirAttribute >( attributeName, attributeValue ) );
-				index = buffIndex + 1;
-			} else { // 没有等号，则往后的全是值
-				auto attributeValue = XDirAttribute::converXDirAttributeValues( conver_buff + index, conver_buff_len - index, attributeName );
-				result->emplace_back( std::make_shared< XDirAttribute >( attributeName, attributeValue ) );
+		// 找到 = 符号
+		for( ; index < conver_buff_len; ++index ) {
+			currentChar = conver_buff[ index ];
+			if( currentChar == charValue::equ || HtmlStringTools::isSpace( currentChar ) ) // 找到等号
+				break;
+			if( currentChar == charValue::forwardSlash ) {
+				index = conver_buff_len;
 				break;
 			}
-
-			if( index > conver_buff_len )
-				break;
-		} else {
-			auto attributeName = XDirAttribute::converXDirAttributeName( conver_buff + index, conver_buff_len - index );
-			result->emplace_back( std::make_shared< XDirAttribute >( attributeName ) );
-			break;
+			if( HtmlStringTools::isQuotation( currentChar ) )
+				if( !HtmlStringTools::jumpQuotation( conver_buff, conver_buff_len, index, buffIndex ) ) {
+					// 没有匹配的引号
+					index = conver_buff_len;
+					break;
+				} else {
+					quotationIndex = index;
+					for( ; index < buffIndex; ++index, ++saveBuffIndex )
+						saveBuff[ saveBuffIndex ] = conver_buff[ index ];
+					// "a""b" => 判定 "ab" ，不是作为两个元素
+					// "a"b => 判定 "ab" ，不是作为两个元素
+					currentChar = conver_buff[ index ];
+				}
+			saveBuff[ saveBuffIndex ] = currentChar;
+			++saveBuffIndex;
 		}
-	} while( true );
+		if( saveBuffIndex == 0 )
+			break;
+		auto attributeName = XDirAttribute::converXDirAttributeName( saveBuff, saveBuffIndex );
+		auto attribute = std::make_shared< XDirAttribute >( attributeName );
+		result->emplace_back( attribute );
+		if( index < conver_buff_len ) {
+			saveBuffIndex = 0;  // 缓冲使用完毕，即可重置
+			// 下标必须指向等号
+			if( currentChar != charValue::equ ) {
+				++index; // 跳过等号位置
+				for( ; index < conver_buff_len; ++index )
+					if( conver_buff[ index ] == charValue::equ )
+						break;
+			}
+			// 跳过空格
+			for( ++index; index < conver_buff_len; ++index )
+				if( !HtmlStringTools::isSpace( conver_buff[ index ] ) )
+					break;
+
+			// 找到 = 符号, 如果存在，表示存在下一个键值对，如果不存在，说明后续全是值
+			for( ; index < conver_buff_len; ++index ) {
+				currentChar = conver_buff[ index ];
+				// 空格，/ 和 >
+				if( HtmlStringTools::isSpace( currentChar ) )
+					break;
+				if( currentChar == charValue::nodeEndChar || currentChar == charValue::forwardSlash ) {
+					index = conver_buff_len;
+					break;
+				}
+				if( HtmlStringTools::isQuotation( currentChar ) )
+					if( !HtmlStringTools::jumpQuotation( conver_buff, conver_buff_len, index, buffIndex ) ) {
+						// 没有匹配的引号
+						index = conver_buff_len;
+						break;
+					} else {
+						for( ; index < buffIndex; ++index, ++saveBuffIndex )
+							saveBuff[ saveBuffIndex ] = conver_buff[ index ];
+						currentChar = conver_buff[ index ];
+					}
+				saveBuff[ saveBuffIndex ] = currentChar;
+				++saveBuffIndex;
+			}
+			auto xdirAttributeValues = XDirAttribute::htmlCharBuffConverToValues( saveBuff, saveBuffIndex );
+			saveBuffIndex = 0; // 使用过后需要重置
+			if( xdirAttributeValues )
+				for( auto &xdirAttributeValue : *xdirAttributeValues )
+					attribute->getValues( )->emplace_back( xdirAttributeValue );
+			if( index != conver_buff_len ) {
+				// 查找第一个有效字符
+				for( ++index; index < conver_buff_len; ++index )
+					if( !HtmlStringTools::isSpace( conver_buff[ index ] ) )
+						break;
+			} else
+				break;// 超出范围，则退出循环
+		} else
+			break;// 超出范围，则退出循环
+	} while( index < conver_buff_len );
+	delete[] saveBuff;
 	if( result->size( ) == 0 )
 		return nullptr;
 	return result;

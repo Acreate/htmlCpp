@@ -96,6 +96,7 @@ int32_t XDirAttribute::appendAttribute( Vector_XDirAttributeSPtr_Shared &save_ve
 	}
 	return 1;
 }
+
 int32_t XDirAttribute::appendAttribute( Vector_XDirAttributeSPtr_Shared &save_vector_xdirattribute_s, const HtmlString_Shared &name_shared, const Vector_HtmlStringSPtr_Shared &values_vector_shared ) {
 	if( values_vector_shared ) {
 		auto &name = *name_shared;
@@ -191,7 +192,7 @@ Vector_HtmlStringSPtr_Shared XDirAttribute::htmlCharBuffConverToValues( const Ht
 			}
 			// 处理引号
 			size_t endIndex;
-			if( HtmlStringTools::jumpQuotation( conver_buff, conver_buff_size, index, endIndex) )
+			if( HtmlStringTools::jumpQuotation( conver_buff, conver_buff_size, index, endIndex ) )
 				result->emplace_back( std::make_shared< HtmlString >( conver_buff + index + 1, endIndex - index - 1 ) );
 			else
 				break;

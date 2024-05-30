@@ -43,6 +43,8 @@ int test_www_yingsx_com( std::locale locak ) {
 	if( len == 0 )
 		return 2;
 	size_t fileAllWString = cylHtmlTools::HtmlDocTools::setFileAllWString( path, *wstringstream );
+
+	*wstringstream = LR"(<input name="page" type="text" size="4" maxlength="6" onkeydown="if(event.keyCode==13){window.location='https://www.yingsx.com/xuanhuan/1_<{$page}>.html'.replace('<{$page|subdirectory}>', '/' + Math.floor(this.value / 1000)).replace('<{$page}>', this.value); return false;}" />)";
 	auto htmlDoc = cylHtmlTools::HtmlDoc::parse( wstringstream );
 	if( !htmlDoc )
 		return 3;
@@ -53,11 +55,11 @@ int test_www_yingsx_com( std::locale locak ) {
 		buff.append( std::to_wstring( ++index ) );
 		buff.append( L"\n" );
 		buff.append( *html_node_shared->getIncludeNodeContent( ) );
+		buff.append( L"\n========================\n" );
+		std::wcout << buff << std::endl;
 		auto dir = html_node_shared->converXDirSptr( );
 		if( dir )
 			testXDir( *dir );
-		buff.append( L"\n========================\n" );
-		std::wcout << buff << std::endl;
 		wstringstream->append( buff );
 		return false;
 	} );
