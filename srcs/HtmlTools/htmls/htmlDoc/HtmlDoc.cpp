@@ -296,6 +296,11 @@ XDir_Shared HtmlDoc::converXDirSptr( const HtmlNode_Shared &node_shared ) {
 		return converXDirSptr( node_shared->startNode );
 	auto startHtmlCharPtr = htmlWCStr->c_str( ) + node_shared->ptrOffset + 1; // 跳过 < 符号
 	auto newLen = node_shared->ptrCWtrLen - 2; // 不包含 > 符号
+	// 如果是单节点，去掉 /
+	if( node_shared->nodeType == Html_Node_Type::SingleNode )
+		for( ; newLen > 0; --newLen )
+			if( startHtmlCharPtr[ newLen ] == charValue::forwardSlash )
+				break;
 	size_t nameIndex = 0;
 	// 过滤空格
 	for( ; nameIndex < newLen; ++nameIndex )
@@ -319,7 +324,6 @@ XDir_Shared HtmlDoc::converXDirSptr( const HtmlNode_Shared &node_shared ) {
 		return std::make_shared< XDir >( xdirName, xDirAttributes );
 	}
 	return std::make_shared< XDir >( xdirName );
-
 }
 Vector_XDirAttributeSPtr_Shared HtmlDoc::converNodeAttributeToXDirAttributes(
 	const HtmlChar *conver_buff

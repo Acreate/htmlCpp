@@ -42,8 +42,7 @@ XPath::XPath( const HtmlString &wstr ) : XPath( ) {
 	delete[] buff;
 }
 XPath::XPath( const List_HtmlStringSptr &std_w_string_list_shared, const HtmlString &separator )
-: separator( separator )
-, dirListSPtr( std::make_shared< Vector_XDirSPtr >( ) ) {
+	: separator( separator ), dirListSPtr( std::make_shared< Vector_XDirSPtr >( ) ) {
 	for( auto &stdWString : std_w_string_list_shared )
 		dirListSPtr->emplace_back( std::make_shared< XDir >( *stdWString ) );
 }
@@ -170,7 +169,23 @@ Vector_HtmlNodeSPtr XPath::matchesHtmlDocAllNodes( const Vector_HtmlNodeSPtr &cu
 		auto findNodes = currentFindNodesBegin->get( )->htmldocShared->findNodes( [&]( HtmlNode_Shared &node ) ->bool {
 			if( node->isEndNode( ) ) // 跳过尾节点
 				return false;
-			auto nodeName = *node->getNodeName( );
+			/*auto name = node->getNodeName( );
+			if( HtmlStringTools::equRemoveSpaceOverHtmlString( L"div", *name ) ) {
+				auto unorderedMap = node->findAttribute( []( const HtmlString &attributeName, const HtmlString &attributeValue ) {
+					size_t index = 0;
+					HtmlString fin = L"sitebox";
+					if( HtmlStringTools::findNextHtmlStringPotion( &attributeValue, 0, &fin, index, &index ) )
+						return true;
+					return false;
+				} );
+				if( unorderedMap ) {
+					auto content = node->getIncludeNodeContent( );
+					std::wcout << "\n===================\t" << *name << '\n';
+					std::wcout << *content;
+					std::wcout << "\n===================\t" << *name << '\n' << std::endl;
+				}
+
+			}*/
 			auto analysisAttribute = node->converXDirSptr( );
 			if( analysisAttribute && x_dir->isOtherXDirIncludeThisXDir( analysisAttribute ) )
 				return true;

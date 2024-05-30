@@ -41,10 +41,10 @@ namespace cylHtmlTools {
 		Finish_Thread_Run finishThreadRun; // 线程完成之后调用
 		std::thread *thread; // 线程对象
 		Html_Work_Status workStatus; // 记录线程状态
-		time_t *startTime; // 记录线程开始的运行时间
-		time_t *endTime; // 记录线程结束的运行时间
-		std::mutex *mutexHtmlWorkThread; // 对象线程锁
-		std::mutex *mutexStdThread; // 线程锁
+		std::shared_ptr< std::time_t > startTime; // 记录线程开始的运行时间
+		std::shared_ptr< std::time_t > endTime; // 记录线程结束的运行时间
+		std::shared_ptr< std::mutex > mutexHtmlWorkThread; // 对象线程锁
+		std::shared_ptr< std::mutex > mutexStdThread; // 线程锁
 		TDataType *data; // 数据指针
 	public:
 		/// <summary>
@@ -158,10 +158,10 @@ namespace cylHtmlTools {
 		Finish_Thread_Run finishThreadRun; // 线程完成之后调用
 		std::thread *thread; // 线程对象
 		Html_Work_Status workStatus; // 记录线程状态
-		time_t *startTime; // 记录线程开始的运行时间
-		time_t *endTime; // 记录线程结束的运行时间
-		std::mutex *mutexHtmlWorkThread; // 对象线程锁
-		std::mutex *mutexStdThread; // 线程锁
+		std::shared_ptr< std::time_t > startTime; // 记录线程开始的运行时间
+		std::shared_ptr< std::time_t > endTime; // 记录线程结束的运行时间
+		std::shared_ptr< std::mutex > mutexHtmlWorkThread; // 对象线程锁
+		std::shared_ptr< std::mutex > mutexStdThread; // 线程锁
 		std::shared_ptr< TDataType > data; // 数据指针
 	public:
 		/// <summary>

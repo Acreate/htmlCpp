@@ -52,13 +52,11 @@ bool HtmlDocTools::findNextNodeEndChar( const HtmlChar *std_c_w_string, const si
 	return false;
 }
 bool HtmlDocTools::findNextNodeStartChar( const HtmlChar *std_c_w_string, size_t max_index, size_t &start_index ) {
-	size_t get_quoation_position_end;
 	for( ; start_index < max_index; ++start_index ) {
 		auto currenChar = std_c_w_string[ start_index ];
 		if( HtmlStringTools::isQuotation( currenChar ) ) {
-			if( !HtmlStringTools::jumpQuotation( std_c_w_string, max_index, start_index, get_quoation_position_end ) )
+			if( !HtmlStringTools::jumpQuotation( std_c_w_string, max_index, start_index, start_index ) )
 				break;
-			start_index = get_quoation_position_end + 1;
 		} else if( currenChar == charValue::exclamation ) {
 			++start_index;
 			for( ; start_index < max_index; ++start_index ) {

@@ -8,8 +8,8 @@
 template< class TDataType >
 cylHtmlTools::HtmlWorkThread< TDataType * >::HtmlWorkThread( const Start_Thread_Run &start_thread_run, const Current_Thread_Run &current_thread_run, const Finish_Thread_Run &finish_thread_run, TDataType *data ) {
 	this->workStatus = Init;
-	mutexHtmlWorkThread = new std::mutex( );
-	mutexStdThread = new std::mutex( );
+	mutexHtmlWorkThread = std::make_shared< std::mutex >( );
+	mutexStdThread = std::make_shared< std::mutex >( );
 	this->endTime = nullptr;
 	this->startTime = nullptr;
 	if( start_thread_run )
@@ -33,8 +33,8 @@ cylHtmlTools::HtmlWorkThread< TDataType * >::HtmlWorkThread( const Start_Thread_
 template< class TDataType >
 cylHtmlTools::HtmlWorkThread< TDataType * >::HtmlWorkThread( ) {
 	this->workStatus = Init;
-	mutexHtmlWorkThread = new std::mutex( );
-	mutexStdThread = new std::mutex( );
+	mutexHtmlWorkThread = std::make_shared< std::mutex >( );
+	mutexStdThread = std::make_shared< std::mutex >( );
 	this->endTime = nullptr;
 	this->startTime = nullptr;
 	this->data = nullptr;
@@ -49,8 +49,6 @@ cylHtmlTools::HtmlWorkThread< TDataType * >::HtmlWorkThread( ) {
 }
 template< class TDataType >
 cylHtmlTools::HtmlWorkThread< TDataType * >::~HtmlWorkThread( ) {
-	delete mutexHtmlWorkThread;
-	delete mutexStdThread;
 	if( thread ) {
 		thread->join( );
 		delete thread;
@@ -86,11 +84,11 @@ void cylHtmlTools::HtmlWorkThread< TDataType * >::start( ) {
 	this->mutexHtmlWorkThread->lock( );
 	this->workStatus = Run;
 	this->thread = new std::thread( [this]( ) {
-		this->startTime = new time_t( std::time( nullptr ) );
-		this->startThreadRun( this, this->thread, this->mutexHtmlWorkThread, this->mutexStdThread, this->data );
-		this->currentThreadRun( this, this->thread, this->mutexHtmlWorkThread, this->mutexStdThread, this->data, this->startTime );
-		this->finishThreadRun( this, this->thread, this->mutexHtmlWorkThread, this->mutexStdThread, this->data );
-		this->endTime = new time_t( std::time( nullptr ) );
+		this->startTime = std::make_shared< time_t >( std::time( nullptr ) );
+		this->startThreadRun( this, this->thread, this->mutexHtmlWorkThread.get( ), this->mutexStdThread.get( ), this->data );
+		this->currentThreadRun( this, this->thread, this->mutexHtmlWorkThread.get( ), this->mutexStdThread.get( ), this->data, this->startTime.get( ) );
+		this->finishThreadRun( this, this->thread, this->mutexHtmlWorkThread.get( ), this->mutexStdThread.get( ), this->data );
+		this->endTime = std::make_shared< time_t >( std::time( nullptr ) );
 		this->workStatus = Finish;
 	} );
 	this->mutexHtmlWorkThread->unlock( );
@@ -128,8 +126,8 @@ time_t cylHtmlTools::HtmlWorkThread< TDataType * >::wait( ) {
 template< class TDataType >
 cylHtmlTools::HtmlWorkThread< std::shared_ptr< TDataType > >::HtmlWorkThread( const Start_Thread_Run &start_thread_run, const Current_Thread_Run &current_thread_run, const Finish_Thread_Run &finish_thread_run, std::shared_ptr< TDataType > &data ) {
 	this->workStatus = Init;
-	mutexHtmlWorkThread = new std::mutex( );
-	mutexStdThread = new std::mutex( );
+	mutexHtmlWorkThread = std::make_shared< std::mutex >( );
+	mutexStdThread = std::make_shared< std::mutex >( );
 	this->endTime = nullptr;
 	this->startTime = nullptr;
 
@@ -155,8 +153,8 @@ template< class TDataType >
 cylHtmlTools::HtmlWorkThread< std::shared_ptr< TDataType > >::HtmlWorkThread( ) {
 
 	this->workStatus = Init;
-	mutexHtmlWorkThread = new std::mutex( );
-	mutexStdThread = new std::mutex( );
+	mutexHtmlWorkThread = std::make_shared< std::mutex >( );
+	mutexStdThread = std::make_shared< std::mutex >( );
 	this->endTime = nullptr;
 	this->startTime = nullptr;
 	this->startThreadRun = [=]( const cylHtmlTools::HtmlWorkThread< std::shared_ptr< TDataType > > *html_work_thread, const std::thread *run_std_cpp_thread, std::mutex *html_work_thread_mutex, std::mutex *std_cpp_thread_mutex, std::shared_ptr< TDataType > &data ) {
@@ -170,8 +168,6 @@ cylHtmlTools::HtmlWorkThread< std::shared_ptr< TDataType > >::HtmlWorkThread( ) 
 }
 template< class TDataType >
 cylHtmlTools::HtmlWorkThread< std::shared_ptr< TDataType > >::~HtmlWorkThread( ) {
-	delete mutexHtmlWorkThread;
-	delete mutexStdThread;
 	if( thread ) {
 		thread->join( );
 		delete thread;
@@ -208,11 +204,11 @@ void cylHtmlTools::HtmlWorkThread< std::shared_ptr< TDataType > >::start( ) {
 	this->mutexHtmlWorkThread->lock( );
 	this->workStatus = Run;
 	this->thread = new std::thread( [this]( ) {
-		this->startTime = new time_t( std::time( nullptr ) );
-		this->startThreadRun( this, this->thread, this->mutexHtmlWorkThread, this->mutexStdThread, this->data );
-		this->currentThreadRun( this, this->thread, this->mutexHtmlWorkThread, this->mutexStdThread, this->data, this->startTime );
-		this->finishThreadRun( this, this->thread, this->mutexHtmlWorkThread, this->mutexStdThread, this->data );
-		this->endTime = new time_t( std::time( nullptr ) );
+		this->startTime = std::make_shared< time_t >( std::time( nullptr ) );
+		this->startThreadRun( this, this->thread, this->mutexHtmlWorkThread.get( ), this->mutexStdThread.get( ), this->data );
+		this->currentThreadRun( this, this->thread, this->mutexHtmlWorkThread.get( ), this->mutexStdThread.get( ), this->data, this->startTime.get( ) );
+		this->finishThreadRun( this, this->thread, this->mutexHtmlWorkThread.get( ), this->mutexStdThread.get( ), this->data );
+		this->endTime = std::make_shared< time_t >( std::time( nullptr ) );
 		this->workStatus = Finish;
 	} );
 	this->mutexHtmlWorkThread->unlock( );
