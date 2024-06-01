@@ -3,8 +3,9 @@
 #include "../HtmlDoc.h"
 #include "../../htmlNode/HtmlNode.h"
 #include <sstream>
+#include <iostream>
 using namespace cylHtmlTools;
-
+#define out_buff_debug
 bool HtmlDocTools::findNodeName( const HtmlChar *std_c_w_string, size_t start_index, size_t end_index, HtmlString *result ) {
 	HtmlChar currentChar = std_c_w_string[ end_index ];
 	if( currentChar != charValue::nodeEndChar )
@@ -54,17 +55,7 @@ bool HtmlDocTools::findNextNodeEndChar( const HtmlChar *std_c_w_string, const si
 bool HtmlDocTools::findNextNodeStartChar( const HtmlChar *std_c_w_string, size_t max_index, size_t &start_index ) {
 	for( ; start_index < max_index; ++start_index ) {
 		auto currenChar = std_c_w_string[ start_index ];
-		if( HtmlStringTools::isQuotation( currenChar ) ) {
-			if( !HtmlStringTools::jumpQuotation( std_c_w_string, max_index, start_index, start_index ) )
-				break;
-		} else if( currenChar == charValue::exclamation ) {
-			++start_index;
-			for( ; start_index < max_index; ++start_index ) {
-				currenChar = std_c_w_string[ start_index ];
-				if( currenChar == charValue::nodeStartChar )
-					break;
-			}
-		} else if( currenChar == charValue::nodeStartChar )
+		if( currenChar == charValue::nodeStartChar )
 			return true;
 	}
 	return false;
@@ -72,17 +63,7 @@ bool HtmlDocTools::findNextNodeStartChar( const HtmlChar *std_c_w_string, size_t
 bool HtmlDocTools::findNextNodeForwardSlash( const HtmlChar *std_c_w_string, const size_t max_index, size_t &start_index ) {
 	for( ; start_index < max_index; ++start_index ) {
 		auto currenChar = std_c_w_string[ start_index ];
-		if( HtmlStringTools::isQuotation( currenChar ) ) {
-			if( !HtmlStringTools::jumpQuotation( std_c_w_string, max_index, start_index, start_index ) )
-				return false; // 不匹配
-		} else if( currenChar == charValue::exclamation ) {
-			++start_index;
-			for( ; start_index < max_index; ++start_index ) {
-				currenChar = std_c_w_string[ start_index ];
-				if( currenChar == charValue::nodeEndChar )
-					break;
-			}
-		} else if( currenChar == charValue::forwardSlash )
+		if( currenChar == charValue::forwardSlash )
 			return true;
 	}
 	return false;
@@ -214,6 +195,19 @@ bool HtmlDocTools::isAnnotation( const HtmlString_Shared &std_c_w_string, size_t
 	return false;
 }
 
+void out_node_info( cylHtmlTools::HtmlNode_Shared &htmlNode, const cylHtmlTools::HtmlString &comp_name, const cylHtmlTools::HtmlString &title ) {
+
+#ifdef  out_buff_debug
+	auto nodeName = *htmlNode->getNodeName( );
+	if( !comp_name.empty( ) && !HtmlStringTools::equRemoveSpaceOverHtmlString( comp_name, nodeName ) )
+		return;
+	std::wcout << L"============ " << title << "================" << std::endl;
+	std::wcout << L"============================\t" << nodeName << std::endl;
+	std::wcout << *htmlNode->getIncludeNodeContent( ) << std::endl;
+	std::wcout << L"============================" << std::endl;
+#endif
+}
+
 Vector_HtmlNodeSPtr_Shared HtmlDocTools::analysisDoubleNode( const HtmlDoc_Shared &html_doc_shared, HtmlNode_Shared html_start_node, Vector_HtmlNodeSPtr_Shared &html_node_char_pairs, size_t &start_index, size_t &end_index ) {
 
 	Vector_HtmlNodeSPtr_Shared result( new Vector_HtmlNodeSPtr );
@@ -291,8 +285,8 @@ Vector_HtmlNodeSPtr_Shared HtmlDocTools::analysisDoubleNode( const HtmlDoc_Share
 
 		htmlNode->startNode = startNode;
 		startNode->startNode = startNode;
-
 		htmlNodeSharedTack.pop_back( );
+		result->emplace_back( startNode );
 		if( htmlNodeSharedTack.size( ) > 0 ) {
 			auto topParent = htmlNodeSharedTack.back( );
 			auto topParentPrr = topParent.get( );

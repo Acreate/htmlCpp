@@ -33,7 +33,8 @@ else()
 	set( project_type_property_is_exe false )
 endif()
 
-copy_dir_path( ${PROJECT_NAME} "${CMAKE_CURRENT_LIST_DIR}/res/writeFile" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/writeFile/" )
+set(Project_Restources_Dir "${CMAKE_CURRENT_LIST_DIR}/res/writeFile")
+copy_dir_path( ${PROJECT_NAME} "${Project_Restources_Dir}" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/writeFile/" )
 
 
 # 设置变量

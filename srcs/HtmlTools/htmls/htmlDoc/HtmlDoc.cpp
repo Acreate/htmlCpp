@@ -457,13 +457,16 @@ Vector_HtmlNodeSPtr_Shared HtmlDoc::getHtmlNodeRoots( ) {
 	return htmlNodeSPtrRoots;
 }
 UMap_HtmlStringK_HtmlStringV_Shared HtmlDoc::findAttribute( const HtmlNode_Shared &node_shared, const std::function< bool( const HtmlString &, const HtmlString & ) > &callFunction ) const {
-	UMap_HtmlStringK_HtmlStringV_Shared result( std::make_shared< UMap_HtmlStringK_HtmlString >( ) );
-	auto iterator = node_shared->refNodeAttributes->begin( );
-	auto end = node_shared->refNodeAttributes->end( );
-	for( ; iterator != end; ++iterator )
-		if( callFunction( iterator->first, iterator->second ) )
-			result->emplace( iterator->first, iterator->second );
-	if( result->size( ) == 0 )
-		return nullptr;
-	return result;
+	if( node_shared->refNodeAttributes ) {
+		UMap_HtmlStringK_HtmlStringV_Shared result( std::make_shared< UMap_HtmlStringK_HtmlString >( ) );
+		auto iterator = node_shared->refNodeAttributes->begin( );
+		auto end = node_shared->refNodeAttributes->end( );
+		for( ; iterator != end; ++iterator )
+			if( callFunction( iterator->first, iterator->second ) )
+				result->emplace( iterator->first, iterator->second );
+		if( result->size( ) == 0 )
+			return nullptr;
+		return result;
+	}
+	return nullptr;
 }

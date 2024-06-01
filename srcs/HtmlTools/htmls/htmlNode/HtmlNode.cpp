@@ -6,13 +6,12 @@
 #include "../../htmlString/HtmlStringTools.h"
 #include "../htmlDoc/Tools/HtmlDocTools.h"
 #include <sstream>
+#include <iostream>
 
 using namespace cylHtmlTools;
 using namespace cylHtmlTools::charValue;
 
-HtmlNode::HtmlNode( ) : parent( nullptr )
-, subChildren( new Vector_HtmlNodeSPtr )
-, brother( new Vector_HtmlNodeSPtr ) {
+HtmlNode::HtmlNode( ) : parent( nullptr ), subChildren( new Vector_HtmlNodeSPtr ), brother( new Vector_HtmlNodeSPtr ) {
 }
 HtmlNode::~HtmlNode( ) {
 }
@@ -190,7 +189,7 @@ HtmlString_Shared HtmlNode::getPath( ) const {
 HtmlString_Shared HtmlNode::getNodeIncludeContentText( ) const {
 	return htmldocShared->getNodeContentText( thisSharedPtr );
 }
-UMap_HtmlStringK_HtmlStringV_Shared HtmlNode::findAttribute( const std::function< bool( const HtmlString & attributeName, const HtmlString & attributeValue) > &callFunction ) const {
+UMap_HtmlStringK_HtmlStringV_Shared HtmlNode::findAttribute( const std::function< bool( const HtmlString &attributeName, const HtmlString &attributeValue ) > &callFunction ) const {
 	return htmldocShared->findAttribute( thisSharedPtr, callFunction );
 }
 Vector_HtmlNodeSPtr_Shared HtmlNode::xpath( const HtmlString &xpath ) {
@@ -219,15 +218,19 @@ Vector_HtmlNodeSPtr_Shared HtmlNode::parseHtmlNodeCharPair( const HtmlDoc_Shared
 	auto stdCWString = html_doc_shared->htmlWCStr;
 	for( ; start_index < max_index; ++start_index ) {
 		auto maxIndex = max_index;
-		findCharResut = HtmlDocTools::findNextNodeStartChar( stdCWString, maxIndex, start_index );
+		auto startIndex = start_index;
+		findCharResut = HtmlDocTools::findNextNodeStartChar( stdCWString, maxIndex, startIndex );
 		if( !findCharResut )
 			break;
+		start_index = startIndex;
 		auto ptr = new HtmlNode;
 		HtmlNode_Shared currentHtmlNodeCharPairSharedPtr( ptr );
 		ptr->ptrOffset = start_index;
-		findCharResut = HtmlDocTools::findNextNodeEndChar( stdCWString, maxIndex, start_index );
+		startIndex = start_index;
+		findCharResut = HtmlDocTools::findNextNodeEndChar( stdCWString, maxIndex, startIndex );
 		if( !findCharResut )
 			break;
+		start_index = startIndex;
 		ptr->ptrCWtrLen = start_index + 1 - ptr->ptrOffset;
 		ptr->czWStr = stdCWString;
 		ptr->htmldocShared = html_doc_shared;

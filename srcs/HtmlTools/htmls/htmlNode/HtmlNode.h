@@ -108,7 +108,7 @@ namespace cylHtmlTools {
 		/// </summary>
 		size_t getPtrCWtrLen( ) const;
 		/// <summary>
-		/// 获取的内容
+		/// 获取的内容-节点本色与包含内容（未转换）
 		/// </summary>
 		HtmlString_Shared getIncludeNodeContent( ) const;
 		/// <summary>
