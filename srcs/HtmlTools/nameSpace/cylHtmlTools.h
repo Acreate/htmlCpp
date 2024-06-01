@@ -35,6 +35,10 @@ namespace cylHtmlTools {
 
 	// 工具目录属性
 	class HTMLTOOLS_EXPORT XDirAttribute;
+	/// <summary>
+	/// 路径工具
+	/// </summary>
+	class HTMLTOOLS_EXPORT PathTools;
 
 	// 工作线程
 	template< class TDataType >

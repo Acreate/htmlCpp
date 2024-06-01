@@ -53,12 +53,24 @@ HtmlString XDirAttribute::serializeToHtmlString( ) const {
 	result.append( doubleQuoation );
 	return result;
 }
+Vector_HtmlStringSPtr_Shared XDirAttribute::normalValues( const HtmlString_Shared &attribute_name, const Vector_HtmlStringSPtr_Shared &xdir_attribute_values ) {
+	Vector_HtmlStringSPtr_Shared result( std::make_shared< Vector_HtmlStringSPtr >( ) );
+	for( auto &htmlSPtr : *xdir_attribute_values ) {
+		Vector_HtmlStringSPtr_Shared attributeValues = converXDirAttributeValues( htmlSPtr->c_str( ), htmlSPtr->size( ), attribute_name );
+		if( attributeValues )
+			for( auto &valueSPtr : *attributeValues )
+				result->emplace_back( valueSPtr );
+	}
+	if( result->size( ) == 0 )
+		return nullptr;
+	return result;
+}
 
 HtmlString_Shared XDirAttribute::converXDirAttributeName( const HtmlChar *buff, const size_t buff_size ) {
 	return htmlCharBuffConverToName( buff, buff_size );
 }
 
-Vector_HtmlStringSPtr_Shared XDirAttribute::converXDirAttributeValues( const HtmlChar *buff, const size_t buff_size, HtmlString_Shared &name ) {
+Vector_HtmlStringSPtr_Shared XDirAttribute::converXDirAttributeValues( const HtmlChar *buff, const size_t buff_size, const HtmlString_Shared &name ) {
 	// 检测是否存在等号
 	size_t index = 0;
 	if( HtmlStringTools::findNextHtmlCharPotion( buff, buff_size, charValue::equ, index ) ) {

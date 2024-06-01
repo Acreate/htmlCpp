@@ -406,7 +406,7 @@ Vector_XDirAttributeSPtr_Shared HtmlDoc::converNodeAttributeToXDirAttributes(
 				saveBuff[ saveBuffIndex ] = currentChar;
 				++saveBuffIndex;
 			}
-			auto xdirAttributeValues = XDirAttribute::htmlCharBuffConverToValues( saveBuff, saveBuffIndex );
+			auto xdirAttributeValues = XDirAttribute::converXDirAttributeValues( saveBuff, saveBuffIndex, attributeName );
 			saveBuffIndex = 0; // 使用过后需要重置
 			if( xdirAttributeValues )
 				for( auto &xdirAttributeValue : *xdirAttributeValues )

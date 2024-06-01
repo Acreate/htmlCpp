@@ -76,6 +76,13 @@ namespace cylHtmlTools {
 			} while( true );
 			return true;
 		}
+		/// <summary>
+		/// 重新调整值列表
+		/// </summary>
+		/// <param name="attribute_name">调整的键方案</param>
+		/// <param name="xdir_attribute_values">需要被调整的值列表</param>
+		/// <returns>完成调整方案的列表</returns>
+		static Vector_HtmlStringSPtr_Shared normalValues( const HtmlString_Shared &attribute_name, const Vector_HtmlStringSPtr_Shared &xdir_attribute_values );
 	public:
 		/// <summary>
 		/// 该对象是否完全包含列表参数中的所有值
@@ -160,7 +167,7 @@ namespace cylHtmlTools {
 		/// <param name="buff_size">缓冲大小</param>
 		/// <param name="name">属性名称</param>
 		/// <returns>值列表对象指针，失败返回 nullptr</returns>
-		static Vector_HtmlStringSPtr_Shared converXDirAttributeValues( const HtmlChar *buff, const size_t buff_size, HtmlString_Shared &name );
+		static Vector_HtmlStringSPtr_Shared converXDirAttributeValues( const HtmlChar *buff, const size_t buff_size, const HtmlString_Shared &name );
 		/// <summary>
 		/// 追加一个属性
 		/// </summary>
