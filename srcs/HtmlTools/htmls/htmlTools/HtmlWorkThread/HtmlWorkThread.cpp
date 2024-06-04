@@ -1,73 +1,119 @@
-﻿//#include "HtmlWorkThread.h"
-//#include <mutex>
-//#include <thread>
-//template<>
-//cylHtmlTools::HtmlWorkThread::HtmlWorkThread( const Start_Thread_Run &start_thread_run, const Current_Thread_Run &current_thread_run, const Finish_Thread_Run &finish_thread_run, std::shared_ptr< TDataType > &data ): startThreadRun( start_thread_run )
-//, finishThreadRun( finish_thread_run )
-//, data( data )
-//, currentThreadRun( current_thread_run ) {
-//	this->workStatus = Init;
-//	mutexHtmlWorkThread = new std::mutex( );
-//	mutexStdThread = new std::mutex( );
-//	this->endTime = nullptr;
-//	this->startTime = nullptr;
-//}
-//cylHtmlTools::HtmlWorkThread::~HtmlWorkThread( ) {
-//	delete mutexHtmlWorkThread;
-//	delete mutexStdThread;
-//	if( thread ) {
-//		thread->join( );
-//		delete thread;
-//	}
-//}
-//bool cylHtmlTools::HtmlWorkThread::reInit(
-//	const Start_Thread_Run &start_thread_run, const Current_Thread_Run &current_thread_run, const Finish_Thread_Run &finish_thread_run
-//	, void *data ) {
-//	if( isRun( ) || this->workStatus == None )
-//		return false;
-//	this->mutexHtmlWorkThread->lock( );
-//	this->startThreadRun = start_thread_run;
-//	this->currentThreadRun = current_thread_run;
-//	this->finishThreadRun = finish_thread_run;
-//	this->data = data;
-//	this->mutexHtmlWorkThread->unlock( );
-//	return true;
-//}
-//void cylHtmlTools::HtmlWorkThread::start( ) {
-//	this->mutexHtmlWorkThread->lock( );
-//	this->workStatus = Run;
-//	this->thread = new std::thread( [this]( ) {
-//		this->startTime = new time_t( std::time( nullptr ) );
-//		this->startThreadRun( this, this->thread, this->mutexHtmlWorkThread, this->mutexStdThread, this->data );
-//		this->currentThreadRun( this, this->thread, this->mutexHtmlWorkThread, this->mutexStdThread, this->data, this->startTime );
-//		this->finishThreadRun( this, this->thread, this->mutexHtmlWorkThread, this->mutexStdThread, this->data );
-//		this->endTime = new time_t( std::time( nullptr ) );
-//		this->workStatus = Finish;
-//	} );
-//	this->mutexHtmlWorkThread->unlock( );
-//}
-//bool cylHtmlTools::HtmlWorkThread::isRun( ) const {
-//	this->mutexHtmlWorkThread->lock( );
-//	bool cond = this->workStatus == Run;
-//	this->mutexHtmlWorkThread->unlock( );
-//	return cond;
-//}
-//bool cylHtmlTools::HtmlWorkThread::isFinish( ) const {
-//	this->mutexHtmlWorkThread->lock( );
-//	bool cond = this->workStatus == Finish;
-//	this->mutexHtmlWorkThread->unlock( );
-//	return cond;
-//}
-//time_t cylHtmlTools::HtmlWorkThread::wait( ) {
-//	if( isFinish( ) ) {
-//		this->mutexHtmlWorkThread->lock( );
-//		auto result = *this->endTime - *this->startTime;
-//		this->mutexHtmlWorkThread->unlock( );
-//		return result;
-//	}
-//	this->mutexHtmlWorkThread->lock( );
-//	thread->join( );
-//	auto result = *this->endTime - *this->startTime;
-//	this->mutexHtmlWorkThread->unlock( );
-//	return result;
-//}
+﻿#include "HtmlWorkThread.h"
+
+
+cylHtmlTools::HtmlWorkThread::HtmlWorkThread( const std::function< void( ) > &start_thread_run, const std::function< void( ) > &current_thread_run, const std::function< void( ) > &finish_thread_run ) {
+	this->workStatus = Init;
+	mutexHtmlWorkThread = std::make_shared< std::mutex >( );
+	this->thread = nullptr;
+	if( start_thread_run )
+		this->startThreadRun = start_thread_run;
+	else
+		this->startThreadRun = []( ) {
+		};
+	if( current_thread_run )
+		this->currentThreadRun = current_thread_run;
+	else
+		this->currentThreadRun = []( ) {
+		};
+	if( finish_thread_run )
+		this->finishThreadRun = finish_thread_run;
+	else
+		this->finishThreadRun = []( ) {
+		};
+
+}
+cylHtmlTools::HtmlWorkThread::HtmlWorkThread( ) {
+	this->workStatus = Init;
+	mutexHtmlWorkThread = std::make_shared< std::mutex >( );
+	this->thread = nullptr;
+	this->startThreadRun = []( ) {
+	};
+	this->currentThreadRun = []( ) {
+	};
+	this->finishThreadRun = []( ) {
+	};
+}
+cylHtmlTools::HtmlWorkThread::~HtmlWorkThread( ) {
+}
+bool cylHtmlTools::HtmlWorkThread::reInit( const std::function< void( ) > &start_thread_run, const std::function< void( ) > &current_thread_run, const std::function< void( ) > &finish_thread_run ) {
+	if( isRun( ) )
+		return false;
+	this->workStatus = Init;
+	if( start_thread_run )
+		this->startThreadRun = start_thread_run;
+	else
+		this->startThreadRun = []( ) {
+		};
+	if( current_thread_run )
+		this->currentThreadRun = current_thread_run;
+	else
+		this->currentThreadRun = []( ) {
+		};
+	if( finish_thread_run )
+		this->finishThreadRun = finish_thread_run;
+	else
+		this->finishThreadRun = []( ) {
+		};
+	return true;
+}
+bool cylHtmlTools::HtmlWorkThread::isRun( ) const {
+	mutexHtmlWorkThread->lock( );
+	bool result = workStatus == Run;
+	mutexHtmlWorkThread->unlock( );
+	return result;
+}
+bool cylHtmlTools::HtmlWorkThread::isFinish( ) const {
+	mutexHtmlWorkThread->lock( );
+	bool result = workStatus == Finish;
+	mutexHtmlWorkThread->unlock( );
+	return result;
+}
+bool cylHtmlTools::HtmlWorkThread::isInit( ) const {
+	mutexHtmlWorkThread->lock( );
+	bool result = workStatus == Init;
+	mutexHtmlWorkThread->unlock( );
+	return result;
+}
+bool cylHtmlTools::HtmlWorkThread::isNone( ) const {
+	mutexHtmlWorkThread->lock( );
+	bool result = workStatus == None;
+	mutexHtmlWorkThread->unlock( );
+	return result;
+}
+void cylHtmlTools::HtmlWorkThread::start( ) {
+	this->mutexHtmlWorkThread->lock( );
+	if( this->thread )
+		delete this->thread;
+	this->mutexHtmlWorkThread->unlock( );
+
+	this->mutexHtmlWorkThread->lock( );
+	this->workStatus = Run;
+	this->thread = new std::thread( [this]( ) {
+		if( this->startThreadRun )
+			this->startThreadRun( );
+		if( this->currentThreadRun )
+			this->currentThreadRun( );
+		if( this->finishThreadRun )
+			this->finishThreadRun( );
+		this->mutexHtmlWorkThread->lock( );
+		this->workStatus = Finish;
+		this->mutexHtmlWorkThread->unlock( );
+	} );
+	this->mutexHtmlWorkThread->unlock( );
+}
+void cylHtmlTools::HtmlWorkThread::wait( ) const {
+	if( isRun( ) )
+		thread->join( );
+}
+std::function< void( ) > cylHtmlTools::HtmlWorkThread::getStartThreadRun( ) const { return startThreadRun; }
+void cylHtmlTools::HtmlWorkThread::setStartThreadRun( const std::function< void( ) > &start_thread_run ) {
+	startThreadRun = start_thread_run;
+}
+std::function< void( ) > cylHtmlTools::HtmlWorkThread::getCurrentThreadRun( ) const { return currentThreadRun; }
+void cylHtmlTools::HtmlWorkThread::setCurrentThreadRun( const std::function< void( ) > &current_thread_run ) {
+	currentThreadRun = current_thread_run;
+}
+std::function< void( ) > cylHtmlTools::HtmlWorkThread::getFinishThreadRun( ) const { return finishThreadRun; }
+void cylHtmlTools::HtmlWorkThread::setFinishThreadRun( const std::function< void( ) > &finish_thread_run ) {
+	finishThreadRun = finish_thread_run;
+}

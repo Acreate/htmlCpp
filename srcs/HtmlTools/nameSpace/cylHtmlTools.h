@@ -41,7 +41,6 @@ namespace cylHtmlTools {
 	class HTMLTOOLS_EXPORT PathTools;
 
 	// 工作线程
-	template< class TDataType >
 	class HTMLTOOLS_EXPORT HtmlWorkThread;
 
 	// std::shared_ptr< XDir > 封装
