@@ -89,15 +89,15 @@ namespace cylHtmlTools {
 		/// </summary>
 		/// <param name="others">列表值</param>
 		/// <returns>包含列表当中所有的值时，返回 true</returns>
-		bool XDirAttribute::isThisXDirAttributeValuesIncludeOtherXDirAttributeValues( const Vector_HtmlStringSPtr &others ) const {
-			return isLeftXDirAttributeValuesIncludeRightXDirAttributeValues( this->values.get( ), &others );
+		bool isThisXDirAttributeValuesIncludeOtherXDirAttributeValues( const Vector_HtmlStringSPtr &others ) const {
+			return this->isLeftXDirAttributeValuesIncludeRightXDirAttributeValues( this->values.get( ), &others );
 		}
 		/// <summary>
 		/// 该对象是否完全包含列表参数中的所有值 values ⊇ others
 		/// </summary>
 		/// <param name="others">列表值</param>
 		/// <returns>包含列表当中所有的值时，返回 true</returns>
-		bool XDirAttribute::isThisXDirAttributeValuesIncludeOtherXDirAttributeValues( const std::vector< HtmlString > &others ) const {
+		bool isThisXDirAttributeValuesIncludeOtherXDirAttributeValues( const std::vector< HtmlString > &others ) const {
 			auto buffRight = std::make_shared< Vector_HtmlStringSPtr >( );
 			for( auto &subStr : others )
 				buffRight->emplace_back( std::make_shared< HtmlString >( subStr ) );
@@ -108,7 +108,7 @@ namespace cylHtmlTools {
 		/// </summary>
 		/// <param name="other">被包含的值</param>
 		/// <returns>存在返回 true</returns>
-		bool XDirAttribute::isIncludeOtherXDirAttributeValue( const HtmlString &other ) const {
+		bool isIncludeOtherXDirAttributeValue( const HtmlString &other ) const {
 			size_t thisSize = values->size( );
 			if( thisSize == 0 ) // 空集
 				return true;

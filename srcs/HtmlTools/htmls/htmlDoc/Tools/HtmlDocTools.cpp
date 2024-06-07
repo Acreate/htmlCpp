@@ -4,6 +4,10 @@
 #include "../../htmlNode/HtmlNode.h"
 #include <sstream>
 #include <iostream>
+
+#include <string>
+#include <codecvt>
+#include <locale>
 using namespace cylHtmlTools;
 #define out_buff_debug
 bool HtmlDocTools::findNodeName( const HtmlChar *std_c_w_string, size_t start_index, size_t end_index, HtmlString *result ) {
@@ -333,9 +337,13 @@ HtmlString_Shared HtmlDocTools::htmlStringContentTextConverToHtmlString( const H
 	return result;
 
 }
-size_t HtmlDocTools::setFileAllWString( const cylHtmlTools::HtmlString &path, const cylHtmlTools::HtmlString &stringstream, std::ios_base::openmode open_mode, int open_prot ) {
+std::string  HtmlDocTools::converToStdString(const HtmlString& txt){
+	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+	return converter.to_bytes(txt);
+}
+size_t HtmlDocTools::setFileAllWString( const cylHtmlTools::HtmlString &path, const cylHtmlTools::HtmlString &stringstream, std::ios_base::openmode open_mode) {
 	std::wofstream ofstream;
-	ofstream.open( path, open_mode, open_prot );
+	ofstream.open( converToStdString( path), open_mode );
 	if( !ofstream.is_open( ) )
 		return 0;
 	auto &&write = ofstream.write( stringstream.c_str( ), stringstream.size( ) );
@@ -343,9 +351,9 @@ size_t HtmlDocTools::setFileAllWString( const cylHtmlTools::HtmlString &path, co
 	ofstream.close( );
 	return tellp;
 }
-HtmlString_Shared HtmlDocTools::getFileAllWString( const cylHtmlTools::HtmlString &path, std::ios_base::openmode open_mode, int open_prot ) {
+HtmlString_Shared HtmlDocTools::getFileAllWString( const cylHtmlTools::HtmlString &path, std::ios_base::openmode open_mode) {
 	std::wstringstream stringstream;
-	std::wifstream ifstream( path, open_mode, open_prot );
+	std::wifstream ifstream(  converToStdString( path), open_mode);
 	if( !ifstream.is_open( ) )
 		return nullptr;
 	auto result = std::make_shared< HtmlString >( );
@@ -363,9 +371,9 @@ HtmlString_Shared HtmlDocTools::getFileAllWString( const cylHtmlTools::HtmlStrin
 	return result;
 
 }
-size_t HtmlDocTools::setFileAllWString( const std::string &path, const HtmlString &stringstream, std::ios_base::openmode open_mode, int open_prot ) {
+size_t HtmlDocTools::setFileAllWString( const std::string &path, const HtmlString &stringstream, std::ios_base::openmode open_mode ) {
 	std::wofstream ofstream;
-	ofstream.open( path, open_mode, open_prot );
+	ofstream.open( path, open_mode );
 	if( !ofstream.is_open( ) || stringstream.empty( ) )
 		return 0;
 	auto &&write = ofstream.write( stringstream.c_str( ), stringstream.size( ) );
@@ -374,8 +382,8 @@ size_t HtmlDocTools::setFileAllWString( const std::string &path, const HtmlStrin
 	ofstream.close( );
 	return tellp;
 }
-HtmlString_Shared HtmlDocTools::getFileAllWString( const std::string &path, std::ios_base::openmode open_mode, int open_prot ) {
-	std::wifstream ifstream( path, open_mode, open_prot );
+HtmlString_Shared HtmlDocTools::getFileAllWString( const std::string &path, std::ios_base::openmode open_mode) {
+	std::wifstream ifstream( path, open_mode );
 	if( !ifstream.is_open( ) )
 		return nullptr;
 	std::wstringstream stringstream;

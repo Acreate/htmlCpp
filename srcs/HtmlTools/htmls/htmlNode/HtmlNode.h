@@ -153,17 +153,17 @@ namespace cylHtmlTools {
 		/// 是否是开始节点
 		/// </summary>
 		/// <returns>开始节点为 true</returns>
-		inline bool isStartNode( ) const;
+		 bool isStartNode( ) const;
 		/// <summary>
 		/// 是否是结束节点
 		/// </summary>
 		/// <returns>结束节点为true</returns>
-		inline bool isEndNode( ) const;
+		 bool isEndNode( ) const;
 		/// <summary>
 		/// 是否是双节点
 		/// </summary>
 		/// <returns>双节点返回 true</returns>
-		inline bool isDoubleNodeType( ) const;
+		 bool isDoubleNodeType( ) const;
 	private:
 		/// <summary>
 		/// 生成 < 与 > 的配对

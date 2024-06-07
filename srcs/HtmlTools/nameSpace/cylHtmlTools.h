@@ -6,7 +6,7 @@
 #include <unordered_map>
 #include <vector>
 #include <string>
-
+#include <list>
 #include "../auto_generate_files/export/HtmlTools_export.h" // 导出导入声明
 namespace cylHtmlTools {
 	/// <summary>

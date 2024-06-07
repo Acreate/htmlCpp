@@ -1,6 +1,7 @@
 ﻿#ifndef HTMLDOCTOOLS_H_H_HEAD__FILE__
 #define HTMLDOCTOOLS_H_H_HEAD__FILE__
 #pragma once
+#include <ios>
 #include <fstream>
 #include "../../../nameSpace/cylHtmlTools.h"
 
@@ -195,7 +196,7 @@ namespace cylHtmlTools {
 		/// <param name="open_mode">打开模式</param>
 		/// <param name="open_prot">属性</param>
 		/// <returns>写入数量</returns>
-		static size_t setFileAllWString( const HtmlString &path, const HtmlString &stringstream, std::ios_base::openmode open_mode = std::ios::binary | std::ios::out | std::ios::trunc, int open_prot = std::ios_base::_Default_open_prot );
+		static size_t setFileAllWString( const HtmlString &path, const HtmlString &stringstream, std::ios_base::openmode open_mode = std::ios::binary | std::ios::out | std::ios::trunc );
 
 		/// <summary>
 		/// 读取文件
@@ -204,7 +205,7 @@ namespace cylHtmlTools {
 		/// <param name="open_mode">打开模式</param>
 		/// <param name="open_prot">属性</param>
 		/// <returns>文件内容</returns>
-		static HtmlString_Shared getFileAllWString( const HtmlString &path, std::ios_base::openmode open_mode = std::ios::binary | std::ios::in, int open_prot = std::ios_base::_Default_open_prot );
+		static HtmlString_Shared getFileAllWString( const HtmlString &path, std::ios_base::openmode open_mode = std::ios::binary | std::ios::in );
 		/// <summary>
 		/// 写入文件
 		/// </summary>
@@ -213,7 +214,7 @@ namespace cylHtmlTools {
 		/// <param name="open_mode">打开模式</param>
 		/// <param name="open_prot">属性</param>
 		/// <returns>写入数量</returns>
-		static size_t setFileAllWString( const std::string &path, const HtmlString &stringstream, std::ios_base::openmode open_mode = std::ios::binary | std::ios::out | std::ios::trunc, int open_prot = std::ios_base::_Default_open_prot );
+		static size_t setFileAllWString( const std::string &path, const HtmlString &stringstream, std::ios_base::openmode open_mode = std::ios::binary | std::ios::out | std::ios::trunc );
 
 		/// <summary>
 		/// 读取文件
@@ -222,7 +223,14 @@ namespace cylHtmlTools {
 		/// <param name="open_mode">打开模式</param>
 		/// <param name="open_prot">属性</param>
 		/// <returns>文件内容</returns>
-		static HtmlString_Shared getFileAllWString( const std::string &path, std::ios_base::openmode open_mode = std::ios::binary | std::ios::in, int open_prot = std::ios_base::_Default_open_prot );
+		static HtmlString_Shared getFileAllWString( const std::string &path, std::ios_base::openmode open_mode = std::ios::binary | std::ios::in);
+		
+		/// <summary>
+		/// 转码，从 HtmlString 转到 std::string
+		/// </summary>
+		/// <param name="txt">被转换的字符串</param>
+		/// <param name="open_prot">转换完成的字符串</p
+		static std::string converToStdString(const HtmlString& txt);
 	};
 }
 

@@ -33,7 +33,12 @@ file( MAKE_DIRECTORY  ${Cache_Path_Dir} )
 
 m_set_env( "${Project_Run_bin}" "${Project_Install_bin}" )
 
-add_compile_options( /utf-8 )
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    add_compile_options( -finput-charset=UTF-8  )
+    add_compile_options( -fexec-charset=UTF-8  )
+else()
+    add_compile_options( /utf-8 )
+endif()
 
 get_path_cmake_dir_path( out_path_list ${CMAKE_CURRENT_SOURCE_DIR}/srcs/HtmlTools/ "CMakeLists.txt" )
 

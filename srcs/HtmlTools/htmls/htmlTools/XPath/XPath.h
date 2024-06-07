@@ -70,7 +70,7 @@ namespace cylHtmlTools {
 		/// <summary>
 		/// 获取字符串系列(包含属性)
 		/// </summary>
-		inline HtmlString getHtmlString( ) const;
+		 HtmlString getHtmlString( ) const;
 
 	};
 
