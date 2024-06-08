@@ -4,7 +4,7 @@
 
 #include "../../../nameSpace/cylHtmlTools.h"
 namespace cylHtmlTools {
-	enum class HTMLTOOLS_EXPORT Html_Node_Type {
+	enum class Html_Node_Type {
 		None,
 		DoubleNode,
 		SingleNode,

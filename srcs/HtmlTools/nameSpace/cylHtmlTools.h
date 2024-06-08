@@ -50,7 +50,7 @@ namespace cylHtmlTools {
 	//  std::shared_ptr< std::vector< std::shared_ptr< XDir >> > 封装
 	using Vector_XDirSPtr_Shared = std::shared_ptr< Vector_XDirSPtr >;
 	// 类型
-	enum class HTMLTOOLS_EXPORT Html_Node_Type;
+	enum class Html_Node_Type;
 	// std::shared_ptr< HtmlDoc > 封装
 	using HtmlDoc_Shared = std::shared_ptr< HtmlDoc >;
 	// std::shared_ptr< HtmlNode > 封装
