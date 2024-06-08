@@ -42,6 +42,10 @@ namespace cylHtmlTools {
 
 	// 工作线程
 	class HTMLTOOLS_EXPORT HtmlWorkThread;
+	/// <summary>
+	/// 线程池
+	/// </summary>
+	class HTMLTOOLS_EXPORT HtmlWorkThreadPool;
 
 	// std::shared_ptr< XDir > 封装
 	using XDir_Shared = std::shared_ptr< XDir >;

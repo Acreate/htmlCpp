@@ -18,10 +18,11 @@ namespace cylHtmlTools {
 			, Finish // 已经完成任务
 			, Run // 正在运行
 		};
+		using TThreadCall = std::function< void( HtmlWorkThread * ) >;
 	private:
-		std::function< void( ) > startThreadRun; // 线程开始之后调用
-		std::function< void( ) > currentThreadRun; // 正式工作
-		std::function< void( ) > finishThreadRun; // 线程完成之后调用
+		TThreadCall startThreadRun; // 线程开始之后调用
+		TThreadCall currentThreadRun; // 正式工作
+		TThreadCall finishThreadRun; // 线程完成之后调用
 		std::thread *thread; // 线程对象
 		Html_Work_Status workStatus; // 记录线程状态
 		std::shared_ptr< std::mutex > mutexHtmlWorkThread; // 对象线程锁
@@ -32,7 +33,7 @@ namespace cylHtmlTools {
 		/// <param name="start_thread_run">线程开始回调函数</param>
 		/// <param name="finish_thread_run">线程结束回调函数</param>
 		/// <param name="current_thread_run">线程正式工作的回调函数</param>
-		HtmlWorkThread( const std::function< void( ) > &start_thread_run, const std::function< void( ) > &current_thread_run, const std::function< void( ) > &finish_thread_run );
+		HtmlWorkThread( const TThreadCall &start_thread_run, const TThreadCall &current_thread_run, const TThreadCall &finish_thread_run );
 		/// <summary>
 		/// 初始化一个对象
 		/// </summary>
@@ -46,37 +47,37 @@ namespace cylHtmlTools {
 		/// <param name="finish_thread_run">线程结束回调函数</param>
 		/// <param name="current_thread_run">线程正式工作的回调函数</param>
 		/// <returns>成功返回 true</returns>
-		bool reInit( const std::function< void( ) > &start_thread_run, const std::function< void( ) > &current_thread_run, const std::function< void( ) > &finish_thread_run );
+		bool reInit( const cylHtmlTools::HtmlWorkThread::TThreadCall &start_thread_run, const cylHtmlTools::HtmlWorkThread::TThreadCall &current_thread_run, const cylHtmlTools::HtmlWorkThread::TThreadCall &finish_thread_run );
 		/// <summary>
 		/// 获取开始回调
 		/// </summary>
 		/// <returns>开始回调</returns>
-		std::function< void( ) > getStartThreadRun( ) const;
+		cylHtmlTools::HtmlWorkThread::TThreadCall getStartThreadRun( ) const;
 		/// <summary>
 		/// 设置开始回调
 		/// </summary>
 		/// <param name="start_thread_run">开始回调</param>
-		void setStartThreadRun( const std::function< void( ) > &start_thread_run );
+		void setStartThreadRun( const cylHtmlTools::HtmlWorkThread::TThreadCall &start_thread_run );
 		/// <summary>
 		/// 获取运行回调
 		/// </summary>
 		/// <returns>运行回调</returns>
-		std::function< void( ) > getCurrentThreadRun( ) const;
+		cylHtmlTools::HtmlWorkThread::TThreadCall getCurrentThreadRun( ) const;
 		/// <summary>
 		/// 设置运行回调
 		/// </summary>
 		/// <param name="current_thread_run">运行回调</param>
-		void setCurrentThreadRun( const std::function< void( ) > &current_thread_run );
+		void setCurrentThreadRun( const cylHtmlTools::HtmlWorkThread::TThreadCall &current_thread_run );
 		/// <summary>
 		/// 获取完成回调
 		/// </summary>
 		/// <returns>完成回调</returns>
-		std::function< void( ) > getFinishThreadRun( ) const;
+		TThreadCall getFinishThreadRun( ) const;
 		/// <summary>
 		/// 设置完成回调
 		/// </summary>
 		/// <param name="finish_thread_run">完成回调</param>
-		void setFinishThreadRun( const std::function< void( ) > &finish_thread_run );
+		void setFinishThreadRun( const TThreadCall &finish_thread_run );
 	public: // - 状态
 		/// <summary>
 		/// 是否正在运行
