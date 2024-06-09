@@ -35,7 +35,8 @@ cylHtmlTools::HtmlWorkThread::HtmlWorkThread( ) {
 }
 cylHtmlTools::HtmlWorkThread::~HtmlWorkThread( ) {
 	if( this->thread ) {
-		this->thread->join( );
+		if( this->thread->joinable( ) )
+			this->thread->join( );
 		delete this->thread;
 	}
 }

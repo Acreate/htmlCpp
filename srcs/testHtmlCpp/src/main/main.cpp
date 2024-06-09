@@ -17,9 +17,10 @@ int main( int argc, char *argv[ ] ) {
 				std::cout << index << '\t';
 			std::cout << index << '\t' << std::endl;
 		} );
-	threadPool.start( []( cylHtmlTools::HtmlWorkThread * ) {
-		std::this_thread::sleep_for( std::chrono::seconds( 2 ) );
-	} );
+	threadPool.start( 8
+		, []( cylHtmlTools::HtmlWorkThreadPool *, const size_t &, const size_t & ) {
+			std::this_thread::sleep_for( std::chrono::seconds( 2 ) );
+		} );
 	threadPool.waiteOverJob( );
 	return 0;
 

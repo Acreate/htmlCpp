@@ -21,31 +21,31 @@ namespace cylHtmlTools {
 	/// <summary>
 	/// html 工具类
 	/// </summary>
-	class HTMLTOOLS_EXPORT HtmlDocTools;
+	class HtmlDocTools;
 	// html 文档
-	class HTMLTOOLS_EXPORT HtmlDoc;
+	class HtmlDoc;
 	// 宽字符工具
-	class HTMLTOOLS_EXPORT HtmlStringTools;
+	class HtmlStringTools;
 	// 节点
-	class HTMLTOOLS_EXPORT HtmlNode;
+	class HtmlNode;
 	// 工具
-	class HTMLTOOLS_EXPORT XPath;
+	class XPath;
 	// 工具目录
-	class HTMLTOOLS_EXPORT XDir;
+	class XDir;
 
 	// 工具目录属性
-	class HTMLTOOLS_EXPORT XDirAttribute;
+	class XDirAttribute;
 	/// <summary>
 	/// 路径工具
 	/// </summary>
-	class HTMLTOOLS_EXPORT PathTools;
+	class PathTools;
 
 	// 工作线程
-	class HTMLTOOLS_EXPORT HtmlWorkThread;
+	class HtmlWorkThread;
 	/// <summary>
 	/// 线程池
 	/// </summary>
-	class HTMLTOOLS_EXPORT HtmlWorkThreadPool;
+	class HtmlWorkThreadPool;
 
 	// std::shared_ptr< XDir > 封装
 	using XDir_Shared = std::shared_ptr< XDir >;
