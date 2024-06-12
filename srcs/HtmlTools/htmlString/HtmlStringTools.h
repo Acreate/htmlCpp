@@ -17,6 +17,13 @@ namespace cylHtmlTools {
 		/// <returns>true 表示空字符</returns>
 		static bool isSpace( HtmlChar currentChar );
 		/// <summary>
+		/// 是否为一个跳过的空字符 <br/>
+		/// 其中包含控制字符等
+		/// </summary>
+		/// <param name="currentChar">检测的字符</param>
+		/// <returns>true 表示空字符</returns>
+		static bool isSpace(const std::string::value_type& currentChar );
+		/// <summary>
 		/// 获取匹配单引号的结束位置<br/>
 		/// buff[start_index] 必须等于 charValue::singleQuotation
 		/// </summary>
@@ -176,17 +183,27 @@ namespace cylHtmlTools {
 		/// 删除左侧空白字符
 		/// </summary>
 		/// <param name="str">操作字符串</param>
-		static void removeLeftSpace( HtmlString &str );
+		static HtmlString&  removeLeftSpace( HtmlString &str );
+		/// <summary>
+		/// 删除左侧空白字符
+		/// </summary>
+		/// <param name="str">操作字符串</param>
+		static HtmlString&  removeAllSpace( HtmlString &str );
+		/// <summary>
+		/// 删除左侧空白字符
+		/// </summary>
+		/// <param name="str">操作字符串</param>
+		static  std::string &  removeAllSpace( std::string &str );
 		/// <summary>
 		/// 删除右侧空白字符
 		/// </summary>
 		/// <param name="str">操作字符串</param>
-		static void removeRightSpace( HtmlString &str );
+		static  HtmlString & removeRightSpace( HtmlString &str );
 		/// <summary>
 		/// 删除两侧空白字符
 		/// </summary>
 		/// <param name="str">操作字符串</param>
-		static void removeBothSpace( HtmlString &str );
+		static  HtmlString & removeBothSpace( HtmlString &str );
 
 		enum RemoveSpaceStatus {
 			none = 0x00

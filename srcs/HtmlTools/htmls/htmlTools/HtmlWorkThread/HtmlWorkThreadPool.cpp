@@ -42,17 +42,32 @@ bool cylHtmlTools::HtmlWorkThreadPool::appendWork( const HtmlWorkThread::TThread
 	mutexHtmlWorkThread->unlock( );
 	return true;
 }
-void cylHtmlTools::HtmlWorkThreadPool::start( const cylHtmlTools::HtmlWorkThreadPool::TThreadCall &function_call ) {
-	if( workCount == 0 )
-		start( 8, function_call );
-	else
-		start( workCount, function_call );
+
+inline void overThreas( std::vector< cylHtmlTools::HtmlWorkThread * > &workThreads, const std::chrono::milliseconds &mis ) {
+	do {
+		auto threadsIterator = workThreads.begin( );
+		auto threadsEnd = workThreads.end( );
+		if( threadsIterator == threadsEnd )
+			break;
+		do {
+			cylHtmlTools::HtmlWorkThread *htmlWorkThread = *threadsIterator;
+			if( htmlWorkThread->isFinish( ) ) {
+				workThreads.erase( threadsIterator );
+				htmlWorkThread->wait( );
+				delete htmlWorkThread;
+				break;
+			}
+			++threadsIterator;
+		} while( threadsIterator != threadsEnd );
+		std::this_thread::sleep_for( mis );
+	} while( true );
 }
-void cylHtmlTools::HtmlWorkThreadPool::start( const size_t work_count, const cylHtmlTools::HtmlWorkThreadPool::TThreadCall &function_call ) {
+
+void cylHtmlTools::HtmlWorkThreadPool::start( const size_t work_count, const cylHtmlTools::HtmlWorkThreadPool::TThreadCall &function_call, const std::chrono::milliseconds &mis ) {
 	if( this->workStatus == HtmlWorkThread::Run )
 		return;
 	workCount = work_count;
-	taskDistributeThread.setCurrentThreadRun( [this]( HtmlWorkThread * ) {
+	taskDistributeThread.setCurrentThreadRun( [this,mis]( HtmlWorkThread * ) {
 
 		this->mutexHtmlWorkThread->lock( );
 		// 清理任务
@@ -68,7 +83,7 @@ void cylHtmlTools::HtmlWorkThreadPool::start( const size_t work_count, const cyl
 		this->mutexHtmlWorkThread->unlock( );
 		size_t size = works.size( ); // 统计待工作队列大小
 		// 初始化工作线程
-		for( ; currentWorkThread < size; ) {
+		while( currentWorkThread < size ) {
 			if( currentWorkThread == workCount )
 				break;
 			auto currentCheckThread = new HtmlWorkThread;
@@ -90,7 +105,7 @@ void cylHtmlTools::HtmlWorkThreadPool::start( const size_t work_count, const cyl
 			size = works.size( ); // 统计待工作队列大小
 			if( size == 0 )
 				break;
-			std::vector< HtmlWorkThread * > workBuffThreads; // 当前工作线程
+			std::vector< HtmlWorkThread * > workBuffThreads; // 临时存储指针，然后统一开始
 			if( currentWorkThread < workCount && size != 0 ) { // 数量不足时，需要填充任务
 				auto threadsIterator = workThreads.begin( );
 				auto threadsEnd = workThreads.end( );
@@ -115,14 +130,7 @@ void cylHtmlTools::HtmlWorkThreadPool::start( const size_t work_count, const cyl
 			for( auto thread : workBuffThreads )
 				thread->start( );
 		} while( true );
-		auto threadsIterator = workThreads.begin( );
-		auto threadsEnd = workThreads.end( );
-		for( ; threadsIterator != threadsEnd; ++threadsIterator ) {
-			HtmlWorkThread *htmlWorkThread = *threadsIterator;
-			htmlWorkThread->wait( );
-			delete htmlWorkThread;
-		}
-		workThreads.clear( );
+		overThreas( workThreads, mis );
 	} );
 
 	userCallThread.setCurrentThreadRun( [function_call,this]( HtmlWorkThread * ) {
@@ -132,7 +140,7 @@ void cylHtmlTools::HtmlWorkThreadPool::start( const size_t work_count, const cyl
 			this->mutexHtmlWorkThread->unlock( );
 			if( function_call )
 				function_call( this, size, currentWorkThread );
-			if( size == 0 )
+			if( size == 0 && currentWorkThread == 0 )
 				break;
 		}
 	} );

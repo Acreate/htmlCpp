@@ -9,6 +9,9 @@ using namespace cylHtmlTools;
 bool HtmlStringTools::isSpace( HtmlChar currentChar ) {
 	return iswspace( currentChar ) || iswcntrl( currentChar );
 }
+bool HtmlStringTools::isSpace( const std::string::value_type &currentChar ) {
+	return isspace( currentChar ) || iscntrl( currentChar );
+}
 
 bool HtmlStringTools::jumpSingleQuotation( const HtmlChar *buff, const size_t buff_size, size_t start_index, size_t &get_quoation_position_end, std::vector< std::pair< size_t, size_t > > &get_quotation_position_s ) {
 	if( buff[ start_index ] != charValue::singleQuotation )
@@ -181,7 +184,7 @@ bool HtmlStringTools::equHtmlString( const HtmlString &left, const HtmlString &r
 	return true;
 }
 
-void HtmlStringTools::removeLeftSpace( HtmlString &str ) {
+HtmlString & HtmlStringTools::removeLeftSpace( HtmlString &str ) {
 	size_t index = 0, leftLen = str.length( );
 	for( ; index < leftLen; ++index )
 		if( !isSpace( str[ index ] ) )
@@ -190,8 +193,26 @@ void HtmlStringTools::removeLeftSpace( HtmlString &str ) {
 		str = HtmlString( );
 	else
 		str = str.substr( index );
+	return str;
 }
-void HtmlStringTools::removeRightSpace( HtmlString &str ) {
+HtmlString & HtmlStringTools::removeAllSpace( HtmlString &str ) {
+
+	// 删除 left 字符串
+	size_t leftLen = str.length( );
+	HtmlChar *buff = new HtmlChar[ leftLen ];
+	size_t index = 0, buffIndex = 0;
+	for( ; index < leftLen; ++index ) {
+		auto value = str.at( index );
+		if( HtmlStringTools::isSpace( value ) )
+			continue;
+		buff[ buffIndex ] = value;
+		++buffIndex;
+	}
+	str = HtmlString( buff, buffIndex );
+	delete[] buff;
+	return str;
+}
+HtmlString & HtmlStringTools::removeRightSpace( HtmlString &str ) {
 	// 删除 left 字符串
 	size_t leftLen = str.length( );
 	while( 0 < leftLen ) {
@@ -205,9 +226,10 @@ void HtmlStringTools::removeRightSpace( HtmlString &str ) {
 		}
 		--leftLen;
 	}
+	return str;
 }
 
-void HtmlStringTools::removeBothSpace( HtmlString &str ) {
+HtmlString & HtmlStringTools::removeBothSpace( HtmlString &str ) {
 	// 删除 str 字符串
 	size_t index = 0, leftLen = str.length( );
 	for( ; index < leftLen; ++index )
@@ -225,6 +247,7 @@ void HtmlStringTools::removeBothSpace( HtmlString &str ) {
 			}
 			break;
 		}
+	return str;
 }
 bool HtmlStringTools::equRemoveSpaceOverHtmlString( HtmlString leftStr, HtmlString rightStr, RemoveSpaceStatus removeSpaceStatus ) {
 	switch( removeSpaceStatus ) {
@@ -271,4 +294,19 @@ std::vector< HtmlString > HtmlStringTools::split( const HtmlString &src_html_str
 	}
 
 	return result;
+}
+std::string & HtmlStringTools::removeAllSpace( std::string &str ) {
+	size_t leftLen = str.length( );
+	std::string::value_type *buff = new std::string::value_type [ leftLen ];
+	size_t index = 0, buffIndex = 0;
+	for( ; index < leftLen; ++index ) {
+		auto value = str.at( index );
+		if( HtmlStringTools::isSpace( value ) )
+			continue;
+		buff[ buffIndex ] = value;
+		++buffIndex;
+	}
+	str = std::string( buff, buffIndex );
+	delete[] buff;
+	return str;
 }
