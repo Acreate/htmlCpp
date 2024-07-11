@@ -147,8 +147,8 @@ bool HtmlStringTools::findNextHtmlStringPotion( const HtmlChar *w_c_ptr, size_t 
 		return false;
 	if( maxIndex == 0 )
 		maxIndex = src_w_c_str_len;
-	if( find_w_c_str_len > 1 )
-		find_w_c_str_len -= 1;
+	if( find_w_c_str_len == 0 )
+		find_w_c_str_len = std::wcslen( find_w_c_string );
 	size_t leftIndex = startIndex;
 	size_t rightIndex = 0;
 	wchar_t leftChar, rightChar;
