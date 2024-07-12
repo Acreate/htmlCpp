@@ -143,28 +143,33 @@ bool HtmlStringTools::findNextHtmlCharPotion( const HtmlChar *w_c_ptr, size_t ma
 
 bool HtmlStringTools::findNextHtmlStringPotion( const HtmlChar *w_c_ptr, size_t src_w_c_str_len, size_t startIndex, const HtmlChar *find_w_c_string, size_t find_w_c_str_len, size_t maxIndex, size_t *result ) {
 
-	if( src_w_c_str_len < find_w_c_str_len )
-		return false;
-	if( maxIndex == 0 )
+	if( src_w_c_str_len == 0 )
+		maxIndex = std::wcslen( w_c_ptr );
+	else if( maxIndex == 0 )
 		maxIndex = src_w_c_str_len;
 	if( find_w_c_str_len == 0 )
 		find_w_c_str_len = std::wcslen( find_w_c_string );
+
+	if( src_w_c_str_len < find_w_c_str_len )
+		return false;
 	size_t leftIndex = startIndex;
 	size_t rightIndex = 0;
 	wchar_t leftChar, rightChar;
 	for( ; leftIndex < maxIndex; ++leftIndex ) {
 		leftChar = w_c_ptr[ leftIndex ];
 		rightChar = find_w_c_string[ rightIndex ];
-		do {
-			if( leftChar != rightChar ) {
-				rightIndex = 0;
-				break;
-			} else if( rightChar == '\0' || rightIndex == find_w_c_str_len )
-				break;
-			rightIndex++;
-			leftChar = w_c_ptr[ leftIndex + rightIndex ];
-			rightChar = find_w_c_string[ rightIndex ];
-		} while( true );
+		if( leftChar == rightChar )
+			do {
+				rightIndex++;
+				leftChar = w_c_ptr[ leftIndex + rightIndex ];
+				rightChar = find_w_c_string[ rightIndex ];
+				if( rightChar == '\0' || rightIndex == find_w_c_str_len )
+					break;
+				else if( leftChar != rightChar ) {
+					rightIndex = 0;
+					break;
+				}
+			} while( true );
 		if( rightIndex ) {
 			if( result )
 				*result = leftIndex - startIndex;
