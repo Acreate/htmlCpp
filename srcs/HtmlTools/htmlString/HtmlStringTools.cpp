@@ -144,11 +144,11 @@ bool HtmlStringTools::findNextHtmlCharPotion( const HtmlChar *w_c_ptr, size_t ma
 bool HtmlStringTools::findNextHtmlStringPotion( const HtmlChar *w_c_ptr, size_t src_w_c_str_len, size_t startIndex, const HtmlChar *find_w_c_string, size_t find_w_c_str_len, size_t maxIndex, size_t *result ) {
 
 	if( src_w_c_str_len == 0 )
-		maxIndex = std::wcslen( w_c_ptr );
+		maxIndex = HtmlStringLen( w_c_ptr );
 	else if( maxIndex == 0 )
 		maxIndex = src_w_c_str_len;
 	if( find_w_c_str_len == 0 )
-		find_w_c_str_len = std::wcslen( find_w_c_string );
+		find_w_c_str_len = HtmlStringLen( find_w_c_string );
 
 	if( src_w_c_str_len < find_w_c_str_len )
 		return false;

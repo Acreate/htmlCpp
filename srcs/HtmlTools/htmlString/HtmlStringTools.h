@@ -5,6 +5,7 @@
 #include <locale>
 
 
+#include "../../../../../libs/ShaderModel/shaders/NovelInfo/nameSpace/interfacePlugsType.h"
 #include "../nameSpace/cylHtmlTools.h"
 namespace cylHtmlTools {
 	class HTMLTOOLS_EXPORT HtmlStringTools {
@@ -22,7 +23,7 @@ namespace cylHtmlTools {
 		/// </summary>
 		/// <param name="currentChar">检测的字符</param>
 		/// <returns>true 表示空字符</returns>
-		static bool isSpace(const std::string::value_type& currentChar );
+		static bool isSpace( const std::string::value_type &currentChar );
 		/// <summary>
 		/// 获取匹配单引号的结束位置<br/>
 		/// buff[start_index] 必须等于 charValue::singleQuotation
@@ -63,7 +64,7 @@ namespace cylHtmlTools {
 		/// <returns>不存在返回 faluse</returns>
 		static bool jumpQuotation( const HtmlChar *buff, const size_t buff_size, size_t start_index, size_t &get_quoation_position_end, std::vector< std::pair< size_t, size_t > > &get_quotation_position_s );
 
-		
+
 		/// <summary>
 		/// 获取匹配单引号的结束位置<br/>
 		/// buff[start_index] 必须等于 charValue::singleQuotation
@@ -73,7 +74,7 @@ namespace cylHtmlTools {
 		/// <param name="start_index">开始位置</param>
 		/// <param name="get_quoation_position_end">返回的单引号结束位置</param>
 		/// <returns>成功返回 true</returns>
-		static bool jumpSingleQuotation( const HtmlChar *buff, size_t buff_size, size_t start_index, size_t &get_quoation_position_end);
+		static bool jumpSingleQuotation( const HtmlChar *buff, size_t buff_size, size_t start_index, size_t &get_quoation_position_end );
 		/// <summary>
 		/// 获取匹配双引号的结束位置<br/>
 		/// buff[start_index] 必须等于 charValue::doubleQuotation
@@ -83,7 +84,7 @@ namespace cylHtmlTools {
 		/// <param name="start_index">开始位置</param>
 		/// <param name="get_quoation_position_end">返回的双引号结束位置</param>
 		/// <returns>成功返回 true</returns>
-		static bool jumpDoubleQuotation( const HtmlChar *buff, size_t buff_size, size_t start_index, size_t &get_quoation_position_end);
+		static bool jumpDoubleQuotation( const HtmlChar *buff, size_t buff_size, size_t start_index, size_t &get_quoation_position_end );
 		/// <summary>
 		/// 获取缓冲的的匹配引号位置<br/>
 		/// buff[start_index] 必须等于 charValue::doubleQuotation 或者 charValue::singleQuotation，否则返回 false
@@ -121,6 +122,70 @@ namespace cylHtmlTools {
 		/// <param name="startIndex">字符串开始检查的下标，存储最后的下标位置</param>
 		/// <returns>成功返回 true</returns>
 		static bool findNextHtmlCharPotion( const HtmlChar *w_c_ptr, size_t maxIndex, const HtmlChar find_w_c_char, size_t &startIndex );
+		/// <summary>
+		/// 返回长度，忽略 \0
+		/// </summary>
+		/// <param name="find_org_html_string">检测长度的字符串</param>
+		/// <returns>长度</returns>
+		static size_t HtmlStringLen( const HtmlChar *find_org_html_string ) {
+			size_t strLen = 0;
+			if( find_org_html_string )
+				while( *( find_org_html_string + strLen ) != cylHtmlTools::charValue::zero )
+					++strLen;
+			return strLen;
+		}
+		/// <summary>
+		/// 返回长度，忽略 \0
+		/// </summary>
+		/// <param name="find_org_html_string">检测长度的字符串</param>
+		/// <returns>长度</returns>
+		static size_t HtmlStringLen( const HtmlString *find_org_html_string ) {
+			size_t strLen = 0;
+			if( find_org_html_string )
+				while( find_org_html_string->at( strLen ) != cylHtmlTools::charValue::zero )
+					++strLen;
+			return strLen;
+		}
+		/// <summary>
+		/// 返回长度，忽略 \0
+		/// </summary>
+		/// <param name="find_org_html_string">检测长度的字符串</param>
+		/// <returns>长度</returns>
+		static size_t HtmlStringLen( const HtmlString &find_org_html_string ) {
+			return HtmlStringLen( &find_org_html_string );
+		}
+		/// <summary>
+		/// 查找匹配的字符串
+		/// 如果 maxIndex 等于 0， 则使用 find_org_html_string 的长度 的值
+		/// </summary>
+		/// <param name="find_org_html_string">源字符串</param>
+		/// <param name="find_target_html_string">查找的目标字符串</param>
+		/// <param name="result">相对位置，如果为 nullptr，则不会辅助</param>
+		/// <returns>成功返回 true</returns>
+		static bool findNextHtmlStringPotion( const HtmlString *find_org_html_string, const HtmlString *find_target_html_string, size_t *result = nullptr ) {
+			if( result ) {
+				*result = find_org_html_string->find( *find_target_html_string );
+				return *result != HtmlString::npos;
+			} else
+				return find_org_html_string->find( *find_target_html_string ) != HtmlString::npos;
+		}
+		/// <summary>
+		/// 查找匹配的字符串
+		/// 如果 maxIndex 等于 0， 则使用 find_org_html_string 的长度 的值
+		/// </summary>
+		/// <param name="find_org_html_string">源字符串</param>
+		/// <param name="find_target_html_string">查找的目标字符串</param>
+		/// <param name="maxIndex">查找最大的长度(startIndex >= maxIndex 返回)</param>
+		/// <param name="result">相对位置，如果为 nullptr，则不会辅助</param>
+		/// <returns>成功返回 true</returns>
+		static bool findNextHtmlStringPotion( const HtmlString *find_org_html_string, const HtmlString *find_target_html_string, size_t maxIndex, size_t *result = nullptr ) {
+			if( result )
+				*result = find_org_html_string->find( find_target_html_string->c_str( ) + maxIndex );
+			else
+				return find_org_html_string->find( find_target_html_string->c_str( ) + maxIndex ) != HtmlString::npos;
+			return *result != HtmlString::npos;
+		}
+
 		/// <summary>
 		/// 查找匹配的字符串
 		/// 如果 maxIndex 等于 0， 则使用 find_org_html_string 的长度 的值
@@ -183,27 +248,27 @@ namespace cylHtmlTools {
 		/// 删除左侧空白字符
 		/// </summary>
 		/// <param name="str">操作字符串</param>
-		static HtmlString&  removeLeftSpace( HtmlString &str );
+		static HtmlString & removeLeftSpace( HtmlString &str );
 		/// <summary>
 		/// 删除左侧空白字符
 		/// </summary>
 		/// <param name="str">操作字符串</param>
-		static HtmlString&  removeAllSpace( HtmlString &str );
+		static HtmlString & removeAllSpace( HtmlString &str );
 		/// <summary>
 		/// 删除左侧空白字符
 		/// </summary>
 		/// <param name="str">操作字符串</param>
-		static  std::string &  removeAllSpace( std::string &str );
+		static std::string & removeAllSpace( std::string &str );
 		/// <summary>
 		/// 删除右侧空白字符
 		/// </summary>
 		/// <param name="str">操作字符串</param>
-		static  HtmlString & removeRightSpace( HtmlString &str );
+		static HtmlString & removeRightSpace( HtmlString &str );
 		/// <summary>
 		/// 删除两侧空白字符
 		/// </summary>
 		/// <param name="str">操作字符串</param>
-		static  HtmlString & removeBothSpace( HtmlString &str );
+		static HtmlString & removeBothSpace( HtmlString &str );
 
 		enum RemoveSpaceStatus {
 			none = 0x00
