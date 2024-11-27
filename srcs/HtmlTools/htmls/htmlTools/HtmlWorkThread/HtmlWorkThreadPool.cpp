@@ -144,16 +144,21 @@ void cylHtmlTools::HtmlWorkThreadPool::start( const size_t work_count, const cyl
 				break;
 		}
 	} );
-
+	this->workStatus = HtmlWorkThread::Run;
 	taskDistributeThread.start( );
 	userCallThread.start( );
 }
 void cylHtmlTools::HtmlWorkThreadPool::waiteOverJob( ) {
+	while( !isOverJob( ) );
+}
+
+bool cylHtmlTools::HtmlWorkThreadPool::isOverJob( ) {
 	if( taskDistributeThread.isInit( ) ) // 处理线程还没开始工作，则返回
-		return;
-	while( !taskDistributeThread.isFinish( ) ); // 处理线程正在工作，则停留
-	while( !userCallThread.isFinish( ) ); // 用户线程正在工作，则停留
+		return false;
+	if( !taskDistributeThread.isFinish( ) )return false; // 处理线程正在工作，则停留
+	if( !userCallThread.isFinish( ) )return false; // 用户线程正在工作，则停留
 	mutexHtmlWorkThread->lock( );
 	workStatus = HtmlWorkThread::Finish; // 任务完成
 	mutexHtmlWorkThread->unlock( );
+	return true;
 }

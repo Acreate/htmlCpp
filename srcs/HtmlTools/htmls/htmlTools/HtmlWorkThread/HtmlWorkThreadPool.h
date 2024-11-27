@@ -16,7 +16,7 @@ namespace cylHtmlTools {
 		/// 2。剩余工作数
 		///	3。正在工作数
 		/// </summary>
-		using TThreadCall = std::function< void( cylHtmlTools::HtmlWorkThreadPool *html_work_thread_pool, const unsigned long long &workCount, const unsigned long long &crrentWorkCount ) >;
+		using TThreadCall = std::function< void( cylHtmlTools::HtmlWorkThreadPool *html_work_thread_pool, const unsigned long long &workCount, const unsigned long long &currentWorkCount ) >;
 	private:
 		/// <summary>
 		/// 工作对象
@@ -69,6 +69,29 @@ namespace cylHtmlTools {
 
 		}
 		/// <summary>
+		/// 开始任务，每次轮询都会调用一次 function_call
+		/// </summary>
+		/// <param name="work_count">任务数量</param>
+		inline void start( const size_t work_count ) {
+			auto fun = []( HtmlWorkThreadPool *html_work_thread_pool, const unsigned long long &, const unsigned long long & ) { };
+			if( workCount == 0 )
+				start( 8, fun, std::chrono::milliseconds( 200 ) );
+			else
+				start( workCount, fun, std::chrono::milliseconds( 200 ) );
+
+		}
+		/// <summary>
+		/// 开始任务，每次轮询都会调用一次 function_call
+		/// </summary>
+		inline void start(  ) {
+			auto fun = []( HtmlWorkThreadPool *html_work_thread_pool, const unsigned long long &, const unsigned long long & ) { };
+			if( workCount == 0 )
+				start( 8, fun, std::chrono::milliseconds( 200 ) );
+			else
+				start( workCount, fun, std::chrono::milliseconds( 200 ) );
+
+		}
+		/// <summary>
 		/// 设置任务数量，并且开始任务，每次轮询都会调用一次 function_call
 		/// </summary>
 		/// <param name="work_count">任务数量</param>
@@ -84,9 +107,23 @@ namespace cylHtmlTools {
 		/// <param name="mis">睡眠时间，毫秒</param>
 		void start( const size_t work_count, const cylHtmlTools::HtmlWorkThreadPool::TThreadCall &function_call, const std::chrono::milliseconds &mis );
 		/// <summary>
-		/// 等待任务总结
+		/// 设置任务数量，并且开始任务，每次轮询都会调用一次 function_call
+		/// </summary>
+		/// <param name="work_count">任务数量</param>
+		/// <param name="function_call">轮训回调函数</param>
+		/// <param name="mis">睡眠时间，毫秒</param>
+		void start( const size_t work_count, const cylHtmlTools::HtmlWorkThreadPool::TThreadCall &function_call, const int64_t &mis ) {
+			start( work_count, function_call, std::chrono::milliseconds( mis ) );
+		}
+		/// <summary>
+		/// 等待任务总结-阻塞型
 		/// </summary>
 		void waiteOverJob( );
+		/// <summary>
+		/// 是否完成任务-非阻塞型
+		/// </summary>
+		/// <returns>正在任务完成时返回 true，未进行任务，或者任务未结束返回 false</returns>
+		bool isOverJob( );
 	};
 }
 

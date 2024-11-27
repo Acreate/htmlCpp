@@ -250,12 +250,12 @@ namespace cylHtmlTools {
 		/// <param name="str">操作字符串</param>
 		static HtmlString & removeLeftSpace( HtmlString &str );
 		/// <summary>
-		/// 删除左侧空白字符
+		/// 删除全部空白字符
 		/// </summary>
 		/// <param name="str">操作字符串</param>
 		static HtmlString & removeAllSpace( HtmlString &str );
 		/// <summary>
-		/// 删除左侧空白字符
+		/// 删除全部空白字符
 		/// </summary>
 		/// <param name="str">操作字符串</param>
 		static std::string & removeAllSpace( std::string &str );
