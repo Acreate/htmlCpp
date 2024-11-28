@@ -23,10 +23,6 @@ SET( Project_Run_bin "${CMAKE_HOME_DIRECTORY}/builder/${CMAKE_BUILD_TYPE}_${CMAK
 SET( Project_Install_bin "${Project_Run_bin}" )
 get_current_dir_name( current_dir_name ${CMAKE_CURRENT_SOURCE_DIR} )
 
-# # 根部定义的模板位置
-set( cmake_definitions_tmp ${CMAKE_HOME_DIRECTORY}/srcs/cmake/temp )
-set( cmake_auto_sub_dir_name auto_generate_files )
-
 # 创建测试写入目录
 set( Cache_Path_Dir "${Project_Run_bin}write_cache/" )
 file( MAKE_DIRECTORY  ${Cache_Path_Dir} )

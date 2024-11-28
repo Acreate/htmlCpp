@@ -2,7 +2,6 @@
 
 #include <algorithm>
 
-#include "../../auto_generate_files/macro/cmake_to_c_cpp_header_env.h"
 #include "../../htmlString/HtmlStringTools.h"
 #include "../HtmlNode/HtmlNode.h"
 #include "../htmlTools/XPath/XPath.h"
