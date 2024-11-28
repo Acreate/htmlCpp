@@ -24,6 +24,8 @@ namespace cylHtmlTools {
 		std::vector< HtmlWorkThread::TThreadCall > works;
 		// 当前工作线程
 		std::vector< HtmlWorkThread * > workThreads;
+		// 闲置调用，与参数 function_call 同效(function_call 不存在时，使用该调用)
+		std::shared_ptr< TThreadCall > idleTimeCall;
 		/// <summary>
 		/// 工作锁
 		/// </summary>
@@ -43,6 +45,7 @@ namespace cylHtmlTools {
 		// 工作数量
 		size_t workCount;
 		size_t currentWorkThread;  // 当前工作线程数量
+
 	public:
 		HtmlWorkThreadPool( );
 		virtual ~HtmlWorkThreadPool( );
@@ -52,6 +55,11 @@ namespace cylHtmlTools {
 		bool isFinish( ) const;
 		bool isInit( ) const;
 		bool isNone( ) const;
+		void setIdleTimeCall( const TThreadCall &idle_time_call ) {
+			if( !idleTimeCall )
+				idleTimeCall = std::make_shared< TThreadCall >( );
+			*idleTimeCall = idle_time_call;
+		}
 		/// <summary>
 		/// 追加一个任务
 		/// </summary>
@@ -73,22 +81,20 @@ namespace cylHtmlTools {
 		/// </summary>
 		/// <param name="work_count">任务数量</param>
 		inline void start( const size_t work_count ) {
-			auto fun = []( HtmlWorkThreadPool *html_work_thread_pool, const unsigned long long &, const unsigned long long & ) { };
 			if( workCount == 0 )
-				start( 8, fun, std::chrono::milliseconds( 200 ) );
+				start( 8, nullptr, std::chrono::milliseconds( 200 ) );
 			else
-				start( workCount, fun, std::chrono::milliseconds( 200 ) );
+				start( workCount, nullptr, std::chrono::milliseconds( 200 ) );
 
 		}
 		/// <summary>
 		/// 开始任务，每次轮询都会调用一次 function_call
 		/// </summary>
-		inline void start(  ) {
-			auto fun = []( HtmlWorkThreadPool *html_work_thread_pool, const unsigned long long &, const unsigned long long & ) { };
+		inline void start( ) {
 			if( workCount == 0 )
-				start( 8, fun, std::chrono::milliseconds( 200 ) );
+				start( 8, nullptr, std::chrono::milliseconds( 200 ) );
 			else
-				start( workCount, fun, std::chrono::milliseconds( 200 ) );
+				start( workCount, nullptr, std::chrono::milliseconds( 200 ) );
 
 		}
 		/// <summary>

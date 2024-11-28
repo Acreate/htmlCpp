@@ -6,6 +6,7 @@ cylHtmlTools::HtmlWorkThreadPool::HtmlWorkThreadPool( ) {
 	mutexHtmlWorkThread = new std::mutex;
 	workCount = 0;
 	currentWorkThread = 0;
+	idleTimeCall = nullptr;
 }
 cylHtmlTools::HtmlWorkThreadPool::~HtmlWorkThreadPool( ) {
 	delete mutexHtmlWorkThread;
@@ -68,7 +69,6 @@ void cylHtmlTools::HtmlWorkThreadPool::start( const size_t work_count, const cyl
 		return;
 	workCount = work_count;
 	taskDistributeThread.setCurrentThreadRun( [this,mis]( HtmlWorkThread * ) {
-
 		this->mutexHtmlWorkThread->lock( );
 		// 清理任务
 		if( workThreads.size( ) > 0 ) {
@@ -132,18 +132,39 @@ void cylHtmlTools::HtmlWorkThreadPool::start( const size_t work_count, const cyl
 		} while( true );
 		overThreas( workThreads, mis );
 	} );
-
-	userCallThread.setCurrentThreadRun( [function_call,this]( HtmlWorkThread * ) {
-		while( true ) {
-			this->mutexHtmlWorkThread->lock( );
-			size_t size = works.size( );
-			this->mutexHtmlWorkThread->unlock( );
-			if( function_call )
-				function_call( this, size, currentWorkThread );
-			if( size == 0 && currentWorkThread == 0 )
-				break;
-		}
-	} );
+	if( function_call )
+		userCallThread.setCurrentThreadRun( [function_call,this]( HtmlWorkThread * ) {
+			while( true ) {
+				this->mutexHtmlWorkThread->lock( );
+				size_t size = works.size( );
+				this->mutexHtmlWorkThread->unlock( );
+				if( function_call )
+					function_call( this, size, currentWorkThread );
+				if( size == 0 && currentWorkThread == 0 )
+					break;
+			}
+		} );
+	else if( this->idleTimeCall )
+		userCallThread.setCurrentThreadRun( [this]( HtmlWorkThread * ) {
+			while( true ) {
+				this->mutexHtmlWorkThread->lock( );
+				size_t size = works.size( );
+				this->mutexHtmlWorkThread->unlock( );
+				( *idleTimeCall )( this, size, currentWorkThread );
+				if( size == 0 && currentWorkThread == 0 )
+					break;
+			}
+		} );
+	else
+		userCallThread.setCurrentThreadRun( [this]( HtmlWorkThread * ) {
+			while( true ) {
+				this->mutexHtmlWorkThread->lock( );
+				size_t size = works.size( );
+				this->mutexHtmlWorkThread->unlock( );
+				if( size == 0 && currentWorkThread == 0 )
+					break;
+			}
+		} );
 	this->workStatus = HtmlWorkThread::Run;
 	taskDistributeThread.start( );
 	userCallThread.start( );
