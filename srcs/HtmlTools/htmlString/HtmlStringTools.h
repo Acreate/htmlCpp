@@ -271,10 +271,7 @@ namespace cylHtmlTools {
 		static HtmlString & removeBothSpace( HtmlString &str );
 
 		enum RemoveSpaceStatus {
-			none = 0x00
-			, left = 0x01
-			, right = 0x02
-			, both = 0x03
+			none = 0x00, left = 0x01, right = 0x02, both = 0x03
 		};
 
 		/// <summary>
@@ -316,6 +313,12 @@ namespace cylHtmlTools {
 		/// <param name="split_char">切分字符</param>
 		/// <returns>切分完成后的字符串</returns>
 		static std::vector< HtmlString > split( const HtmlString &src_html_string, const HtmlChar split_char );
+		/// <summary>
+		/// 调整关键字，存在子字符串则不需要源字符串(a -> aa / 其中只保留 a，不保留 aa)
+		/// </summary>
+		/// <param name="str_vector">匹配的字符串</param>
+		/// <returns>完成匹配的字符串</returns>
+		static std::vector< HtmlString > vectorStrAdjustSubStr( std::vector< HtmlString > &str_vector );
 	};
 
 }

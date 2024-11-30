@@ -301,6 +301,34 @@ std::vector< HtmlString > HtmlStringTools::split( const HtmlString &src_html_str
 
 	return result;
 }
+std::vector< HtmlString > HtmlStringTools::vectorStrAdjustSubStr( std::vector< HtmlString > &str_vector ) {
+	if( str_vector.size( ) < 2 )
+		return str_vector;
+	// 长度排序
+	std::list< HtmlString > lenSort;
+	for( auto &str : str_vector ) {
+		auto iterator = lenSort.begin( ), end = lenSort.end( );
+		for( ; iterator != end; ++iterator )
+			if( iterator->length( ) < str.length( ) )
+				break;
+		lenSort.insert( iterator, str );
+	}
+	std::vector< HtmlString > clone( lenSort.begin( ), lenSort.end( ) );
+	lenSort.clear( );
+	size_t listCount = clone.size( );
+	size_t index = 0;
+	size_t subIndex = 0;
+	for( ; index < listCount; ++index ) {
+		HtmlString &currentStr = clone[ index ];
+		subIndex = index + 1;
+		for( ; subIndex < listCount; ++subIndex )
+			if( findNextHtmlStringPotion( &currentStr, &clone[ subIndex ] ) )
+				break;
+		if( subIndex == listCount )
+			lenSort.insert( lenSort.begin( ), currentStr );
+	}
+	return std::vector< HtmlString >( lenSort.begin( ), lenSort.end( ) );
+}
 std::string & HtmlStringTools::removeAllSpace( std::string &str ) {
 	size_t leftLen = str.length( );
 	std::string::value_type *buff = new std::string::value_type [ leftLen ];
