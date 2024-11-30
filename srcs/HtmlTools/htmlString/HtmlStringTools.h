@@ -319,6 +319,29 @@ namespace cylHtmlTools {
 		/// <param name="str_vector">匹配的字符串</param>
 		/// <returns>完成匹配的字符串</returns>
 		static std::vector< HtmlString > vectorStrAdjustSubStr( std::vector< HtmlString > &str_vector );
+		/// <summary>
+		/// 从末端开始查找
+		/// </summary>
+		/// <param name="find_string">查找的源对象</param>
+		/// <param name="find_target_char">查找的目标</param>
+		/// <param name="index">存储下标</param>
+		/// <returns>成功返回 true</returns>
+		static bool lastFindChar(const HtmlString& find_string,const HtmlString::value_type & find_target_char, size_t* index);
+		/// <summary>
+		/// 截取字符串
+		/// </summary>
+		/// <param name="mid_string">被截取的字符串</param>
+		/// <param name="start_index">开始截取下标</param>
+		/// <param name="n_len">截取长度</param>
+		/// <returns>截取完成的字符串</returns>
+		static HtmlString mid(const HtmlString& mid_string,const size_t start_index, const size_t n_len);
+		/// <summary>
+		/// 截取字符串
+		/// </summary>
+		/// <param name="mid_string">被截取的字符串</param>
+		/// <param name="start_index">开始截取下标</param>
+		/// <returns>截取完成的字符串</returns>
+		static HtmlString mid(const HtmlString& mid_string,const size_t start_index);
 	};
 
 }

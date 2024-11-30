@@ -329,6 +329,48 @@ std::vector< HtmlString > HtmlStringTools::vectorStrAdjustSubStr( std::vector< H
 	}
 	return std::vector< HtmlString >( lenSort.begin( ), lenSort.end( ) );
 }
+bool HtmlStringTools::lastFindChar( const HtmlString &find_string, const HtmlString::value_type &find_target_char, size_t *index ) {
+	size_t length = find_string.length( );
+	while( true ) {
+		wchar_t value = find_string[ length ];
+		if( value == find_target_char ) {
+			*index = length;
+			return true;
+		}
+		if( length == 0 )
+			return false;
+		--length;
+	}
+	return false;
+}
+HtmlString HtmlStringTools::mid( const HtmlString &mid_string, const size_t start_index, const size_t n_len ) {
+	size_t length = mid_string.length( );
+	if( length < start_index )
+		return mid_string;
+	auto iterator = mid_string.begin( ) + start_index;
+	auto end = mid_string.end( );
+	HtmlString::value_type *buff = new HtmlString::value_type[ n_len + 1 ];
+	length = 0;
+	do {
+		auto value = *iterator;
+		buff[ length ] = value;
+		if( value == 0 || length == n_len )
+			break;
+
+		++length;
+		++iterator;
+		if( iterator == end ) {
+			buff[ length ] = 0;
+			break;
+		}
+	} while( true );
+	HtmlString result( buff, length );
+	delete buff;
+	return result;
+}
+HtmlString HtmlStringTools::mid( const HtmlString &mid_string, const size_t start_index ) {
+	return HtmlStringTools::mid( mid_string, start_index, mid_string.length( ) );
+}
 std::string & HtmlStringTools::removeAllSpace( std::string &str ) {
 	size_t leftLen = str.length( );
 	std::string::value_type *buff = new std::string::value_type [ leftLen ];
