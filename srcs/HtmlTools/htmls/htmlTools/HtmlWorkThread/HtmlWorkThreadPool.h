@@ -7,8 +7,26 @@
 #include <random>
 #include "HtmlWorkThread.h"
 
+#if WIN32
+		#include "windows.h"
+#elif __linux__
+		#include "unistd.h"
+#endif
+
 namespace cylHtmlTools {
 	class HTMLTOOLS_EXPORT HtmlWorkThreadPool {
+	public:
+#if WIN32
+		inline static size_t getSystemCupCount( ) {
+			SYSTEM_INFO sysInfo;
+			GetSystemInfo( &sysInfo );
+			return sysInfo.dwNumberOfProcessors;
+		}
+#elif __linux__
+		inline static size_t getSystemCupCount( ) {
+			return sysconf( _SC_NPROCESSORS_CONF);
+		}
+#endif
 	public:
 		/// <summary>
 		///	轮询回调函数
@@ -45,6 +63,7 @@ namespace cylHtmlTools {
 		// 工作数量
 		size_t workCount;
 		size_t currentWorkThread;  // 当前工作线程数量
+		std::chrono::milliseconds callSepMilliseconds = std::chrono::milliseconds( 1000 ); // 调用间隔-毫秒
 
 	public:
 		HtmlWorkThreadPool( );
@@ -60,6 +79,9 @@ namespace cylHtmlTools {
 				idleTimeCall = std::make_shared< TThreadCall >( );
 			*idleTimeCall = idle_time_call;
 		}
+		std::chrono::milliseconds getCallSepMilliseconds( ) const { return callSepMilliseconds; }
+		void setCallSepMilliseconds( const std::chrono::milliseconds &call_sep_milliseconds ) { callSepMilliseconds = call_sep_milliseconds; }
+		void setCallSepMilliseconds( const size_t &call_sep_milliseconds ) { callSepMilliseconds = std::chrono::milliseconds( call_sep_milliseconds ); }
 		/// <summary>
 		/// 追加一个任务
 		/// </summary>
@@ -71,9 +93,9 @@ namespace cylHtmlTools {
 		/// <param name="function_call">轮询调用函数</param>
 		inline void start( const cylHtmlTools::HtmlWorkThreadPool::TThreadCall &function_call ) {
 			if( workCount == 0 )
-				start( 8, function_call, std::chrono::milliseconds( 200 ) );
+				start( HtmlWorkThreadPool::getSystemCupCount( ), function_call);
 			else
-				start( workCount, function_call, std::chrono::milliseconds( 200 ) );
+				start( workCount, function_call);
 
 		}
 		/// <summary>
@@ -82,9 +104,9 @@ namespace cylHtmlTools {
 		/// <param name="work_count">任务数量</param>
 		inline void start( const size_t work_count ) {
 			if( workCount == 0 )
-				start( 8, nullptr, std::chrono::milliseconds( 200 ) );
+				start( HtmlWorkThreadPool::getSystemCupCount( ), nullptr);
 			else
-				start( workCount, nullptr, std::chrono::milliseconds( 200 ) );
+				start( workCount, nullptr );
 
 		}
 		/// <summary>
@@ -92,35 +114,18 @@ namespace cylHtmlTools {
 		/// </summary>
 		inline void start( ) {
 			if( workCount == 0 )
-				start( 8, nullptr, std::chrono::milliseconds( 200 ) );
+				start( HtmlWorkThreadPool::getSystemCupCount( ), nullptr );
 			else
-				start( workCount, nullptr, std::chrono::milliseconds( 200 ) );
+				start( workCount, nullptr );
 
 		}
+
 		/// <summary>
 		/// 设置任务数量，并且开始任务，每次轮询都会调用一次 function_call
 		/// </summary>
 		/// <param name="work_count">任务数量</param>
 		/// <param name="function_call">轮训回调函数</param>
-		inline void start( const size_t work_count, const cylHtmlTools::HtmlWorkThreadPool::TThreadCall &function_call ) {
-			start( work_count, function_call, std::chrono::milliseconds( 200 ) );
-		}
-		/// <summary>
-		/// 设置任务数量，并且开始任务，每次轮询都会调用一次 function_call
-		/// </summary>
-		/// <param name="work_count">任务数量</param>
-		/// <param name="function_call">轮训回调函数</param>
-		/// <param name="mis">睡眠时间，毫秒</param>
-		void start( const size_t work_count, const cylHtmlTools::HtmlWorkThreadPool::TThreadCall &function_call, const std::chrono::milliseconds &mis );
-		/// <summary>
-		/// 设置任务数量，并且开始任务，每次轮询都会调用一次 function_call
-		/// </summary>
-		/// <param name="work_count">任务数量</param>
-		/// <param name="function_call">轮训回调函数</param>
-		/// <param name="mis">睡眠时间，毫秒</param>
-		void start( const size_t work_count, const cylHtmlTools::HtmlWorkThreadPool::TThreadCall &function_call, const int64_t &mis ) {
-			start( work_count, function_call, std::chrono::milliseconds( mis ) );
-		}
+		inline void start( const size_t work_count, const cylHtmlTools::HtmlWorkThreadPool::TThreadCall &function_call );
 		/// <summary>
 		/// 等待任务总结-阻塞型
 		/// </summary>

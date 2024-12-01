@@ -180,6 +180,8 @@ bool HtmlStringTools::findNextHtmlStringPotion( const HtmlChar *w_c_ptr, size_t 
 }
 
 bool HtmlStringTools::equHtmlString( const HtmlString &left, const HtmlString &right ) {
+	if( &left == &right )
+		return true;
 	size_t leftLen = left.length( );
 	size_t rightLen = right.length( );
 	if( leftLen != rightLen )

@@ -44,31 +44,30 @@ bool cylHtmlTools::HtmlWorkThreadPool::appendWork( const HtmlWorkThread::TThread
 	return true;
 }
 
-inline void overThreas( std::vector< cylHtmlTools::HtmlWorkThread * > &workThreads, const std::chrono::milliseconds &mis ) {
+inline void overThreas( std::vector< cylHtmlTools::HtmlWorkThread * > &workThreads ) {
 	do {
 		auto threadsIterator = workThreads.begin( );
 		auto threadsEnd = workThreads.end( );
 		if( threadsIterator == threadsEnd )
-			break;
+			break; // 没有元素，则跳出最外套循环
 		do {
 			cylHtmlTools::HtmlWorkThread *htmlWorkThread = *threadsIterator;
 			if( htmlWorkThread->isFinish( ) ) {
 				workThreads.erase( threadsIterator );
 				htmlWorkThread->wait( );
 				delete htmlWorkThread;
-				break;
+				break; // 重新遍历
 			}
 			++threadsIterator;
 		} while( threadsIterator != threadsEnd );
-		std::this_thread::sleep_for( mis );
 	} while( true );
 }
 
-void cylHtmlTools::HtmlWorkThreadPool::start( const size_t work_count, const cylHtmlTools::HtmlWorkThreadPool::TThreadCall &function_call, const std::chrono::milliseconds &mis ) {
+void cylHtmlTools::HtmlWorkThreadPool::start( const size_t work_count, const cylHtmlTools::HtmlWorkThreadPool::TThreadCall &function_call ) {
 	if( this->workStatus == HtmlWorkThread::Run )
 		return;
 	workCount = work_count;
-	taskDistributeThread.setCurrentThreadRun( [this,mis]( HtmlWorkThread * ) {
+	taskDistributeThread.setCurrentThreadRun( [this]( HtmlWorkThread * ) {
 		this->mutexHtmlWorkThread->lock( );
 		// 清理任务
 		if( workThreads.size( ) > 0 ) {
@@ -130,39 +129,64 @@ void cylHtmlTools::HtmlWorkThreadPool::start( const size_t work_count, const cyl
 			for( auto thread : workBuffThreads )
 				thread->start( );
 		} while( true );
-		overThreas( workThreads, mis );
+		overThreas( workThreads );
 	} );
 	if( function_call )
 		userCallThread.setCurrentThreadRun( [function_call,this]( HtmlWorkThread * ) {
-			while( true ) {
-				this->mutexHtmlWorkThread->lock( );
-				size_t size = works.size( );
-				this->mutexHtmlWorkThread->unlock( );
-				if( function_call )
+			auto makeTimePoint = std::chrono::system_clock::now( );
+
+			this->mutexHtmlWorkThread->lock( );
+			size_t size = works.size( );
+			this->mutexHtmlWorkThread->unlock( );
+			function_call( this, size, currentWorkThread );
+			while( size != 0 || currentWorkThread != 0 ) {
+				auto newTimePoint = std::chrono::system_clock::now( );
+				auto sepMill = std::chrono::duration_cast< std::chrono::milliseconds >( newTimePoint - makeTimePoint );
+				if( sepMill > callSepMilliseconds ) {
+					makeTimePoint = newTimePoint;
+					this->mutexHtmlWorkThread->lock( );
+					size = works.size( );
+					this->mutexHtmlWorkThread->unlock( );
 					function_call( this, size, currentWorkThread );
-				if( size == 0 && currentWorkThread == 0 )
-					break;
+				}
 			}
 		} );
 	else if( this->idleTimeCall )
 		userCallThread.setCurrentThreadRun( [this]( HtmlWorkThread * ) {
-			while( true ) {
-				this->mutexHtmlWorkThread->lock( );
-				size_t size = works.size( );
-				this->mutexHtmlWorkThread->unlock( );
-				( *idleTimeCall )( this, size, currentWorkThread );
-				if( size == 0 && currentWorkThread == 0 )
-					break;
+			auto makeTimePoint = std::chrono::system_clock::now( );
+			this->mutexHtmlWorkThread->lock( );
+			size_t size = works.size( );
+			this->mutexHtmlWorkThread->unlock( );
+			( *idleTimeCall )( this, size, currentWorkThread );
+			while( size != 0 || currentWorkThread != 0 ) {
+				auto newTimePoint = std::chrono::system_clock::now( );
+				auto sepMill = std::chrono::duration_cast< std::chrono::milliseconds >( newTimePoint - makeTimePoint );
+				if( sepMill > callSepMilliseconds ) {
+					makeTimePoint = newTimePoint;
+					this->mutexHtmlWorkThread->lock( );
+					size = works.size( );
+					this->mutexHtmlWorkThread->unlock( );
+					( *idleTimeCall )( this, size, currentWorkThread );
+
+				}
 			}
 		} );
 	else
 		userCallThread.setCurrentThreadRun( [this]( HtmlWorkThread * ) {
-			while( true ) {
-				this->mutexHtmlWorkThread->lock( );
-				size_t size = works.size( );
-				this->mutexHtmlWorkThread->unlock( );
-				if( size == 0 && currentWorkThread == 0 )
-					break;
+
+			auto makeTimePoint = std::chrono::system_clock::now( );
+			this->mutexHtmlWorkThread->lock( );
+			size_t size = works.size( );
+			this->mutexHtmlWorkThread->unlock( );
+			while( size != 0 || currentWorkThread != 0 ) {
+				auto newTimePoint = std::chrono::system_clock::now( );
+				auto sepMill = std::chrono::duration_cast< std::chrono::milliseconds >( newTimePoint - makeTimePoint );
+				if( sepMill > callSepMilliseconds ) {
+					makeTimePoint = newTimePoint;
+					this->mutexHtmlWorkThread->lock( );
+					size = works.size( );
+					this->mutexHtmlWorkThread->unlock( );
+				}
 			}
 		} );
 	this->workStatus = HtmlWorkThread::Run;

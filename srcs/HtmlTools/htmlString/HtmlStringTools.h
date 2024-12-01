@@ -142,8 +142,7 @@ namespace cylHtmlTools {
 		static size_t HtmlStringLen( const HtmlString *find_org_html_string ) {
 			size_t strLen = 0;
 			if( find_org_html_string )
-				while( find_org_html_string->at( strLen ) != cylHtmlTools::charValue::zero )
-					++strLen;
+				for( auto cStr = find_org_html_string->c_str( ); cStr[ strLen ] != cylHtmlTools::charValue::zero; ++strLen );
 			return strLen;
 		}
 		/// <summary>
@@ -163,11 +162,14 @@ namespace cylHtmlTools {
 		/// <param name="result">相对位置，如果为 nullptr，则不会辅助</param>
 		/// <returns>成功返回 true</returns>
 		static bool findNextHtmlStringPotion( const HtmlString *find_org_html_string, const HtmlString *find_target_html_string, size_t *result = nullptr ) {
-			if( result ) {
-				*result = find_org_html_string->find( *find_target_html_string );
-				return *result != HtmlString::npos;
-			} else
-				return find_org_html_string->find( *find_target_html_string ) != HtmlString::npos;
+			size_t leftLen = HtmlStringLen( find_org_html_string );
+			size_t rightLen = HtmlStringLen( find_target_html_string );
+			return findNextHtmlStringPotion( find_org_html_string->c_str( ), leftLen, 0, find_target_html_string->c_str( ), rightLen, 0, result );
+			//if( result ) {
+			//	*result = find_org_html_string->find( *find_target_html_string );
+			//	return *result != HtmlString::npos;
+			//} else
+			//	return find_org_html_string->find( *find_target_html_string ) != HtmlString::npos;
 		}
 		/// <summary>
 		/// 查找匹配的字符串
@@ -326,7 +328,7 @@ namespace cylHtmlTools {
 		/// <param name="find_target_char">查找的目标</param>
 		/// <param name="index">存储下标</param>
 		/// <returns>成功返回 true</returns>
-		static bool lastFindChar(const HtmlString& find_string,const HtmlString::value_type & find_target_char, size_t* index);
+		static bool lastFindChar( const HtmlString &find_string, const HtmlString::value_type &find_target_char, size_t *index );
 		/// <summary>
 		/// 截取字符串
 		/// </summary>
@@ -334,14 +336,14 @@ namespace cylHtmlTools {
 		/// <param name="start_index">开始截取下标</param>
 		/// <param name="n_len">截取长度</param>
 		/// <returns>截取完成的字符串</returns>
-		static HtmlString mid(const HtmlString& mid_string,const size_t start_index, const size_t n_len);
+		static HtmlString mid( const HtmlString &mid_string, const size_t start_index, const size_t n_len );
 		/// <summary>
 		/// 截取字符串
 		/// </summary>
 		/// <param name="mid_string">被截取的字符串</param>
 		/// <param name="start_index">开始截取下标</param>
 		/// <returns>截取完成的字符串</returns>
-		static HtmlString mid(const HtmlString& mid_string,const size_t start_index);
+		static HtmlString mid( const HtmlString &mid_string, const size_t start_index );
 	};
 
 }
