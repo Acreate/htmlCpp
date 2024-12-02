@@ -68,6 +68,7 @@ namespace cylHtmlTools {
 	public:
 		HtmlWorkThreadPool( );
 		virtual ~HtmlWorkThreadPool( );
+		size_t getThreadCount( ) const { return works.size( ); };
 		size_t getWorkCount( ) const { return workCount; }
 		void setWorkCount( const size_t work_count ) { workCount = work_count; }
 		bool isRun( ) const;
@@ -93,9 +94,9 @@ namespace cylHtmlTools {
 		/// <param name="function_call">轮询调用函数</param>
 		inline void start( const cylHtmlTools::HtmlWorkThreadPool::TThreadCall &function_call ) {
 			if( workCount == 0 )
-				start( HtmlWorkThreadPool::getSystemCupCount( ), function_call);
+				start( HtmlWorkThreadPool::getSystemCupCount( ), function_call );
 			else
-				start( workCount, function_call);
+				start( workCount, function_call );
 
 		}
 		/// <summary>
@@ -104,7 +105,7 @@ namespace cylHtmlTools {
 		/// <param name="work_count">任务数量</param>
 		inline void start( const size_t work_count ) {
 			if( workCount == 0 )
-				start( HtmlWorkThreadPool::getSystemCupCount( ), nullptr);
+				start( HtmlWorkThreadPool::getSystemCupCount( ), nullptr );
 			else
 				start( workCount, nullptr );
 

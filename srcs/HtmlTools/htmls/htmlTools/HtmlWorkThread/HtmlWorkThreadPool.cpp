@@ -79,14 +79,16 @@ void cylHtmlTools::HtmlWorkThreadPool::start( const size_t work_count, const cyl
 			workThreads.clear( );
 		}
 		currentWorkThread = 0;
-		this->mutexHtmlWorkThread->unlock( );
 		size_t size = works.size( ); // 统计待工作队列大小
+		this->mutexHtmlWorkThread->unlock( );
 		// 初始化工作线程
 		while( currentWorkThread < size ) {
 			if( currentWorkThread == workCount )
 				break;
 			auto currentCheckThread = new HtmlWorkThread;
+			this->mutexHtmlWorkThread->lock( );
 			currentCheckThread->setCurrentThreadRun( works.at( 0 ) );
+			this->mutexHtmlWorkThread->unlock( );
 			currentCheckThread->setFinishThreadRun( [&]( HtmlWorkThread * ) {
 				this->mutexHtmlWorkThread->lock( );
 				--currentWorkThread;
@@ -95,13 +97,15 @@ void cylHtmlTools::HtmlWorkThreadPool::start( const size_t work_count, const cyl
 			workThreads.emplace_back( currentCheckThread );
 			this->mutexHtmlWorkThread->lock( );
 			++currentWorkThread;
-			this->mutexHtmlWorkThread->unlock( );
 			works.erase( works.begin( ) );
+			this->mutexHtmlWorkThread->unlock( );
 		}
 		for( auto thread : workThreads )
 			thread->start( );
 		do {
+			this->mutexHtmlWorkThread->lock( );
 			size = works.size( ); // 统计待工作队列大小
+			this->mutexHtmlWorkThread->unlock( );
 			if( size == 0 )
 				break;
 			std::vector< HtmlWorkThread * > workBuffThreads; // 临时存储指针，然后统一开始
@@ -111,13 +115,13 @@ void cylHtmlTools::HtmlWorkThreadPool::start( const size_t work_count, const cyl
 				for( ; threadsIterator != threadsEnd && size != 0; ++threadsIterator ) { // 找一个空闲线程进行工作
 					auto currentCheckThread = *threadsIterator;
 					if( currentCheckThread->isFinish( ) ) {
+						this->mutexHtmlWorkThread->lock( );
 						currentCheckThread->setCurrentThreadRun( works.at( 0 ) );
 						currentCheckThread->setFinishThreadRun( [&]( HtmlWorkThread * ) {
 							this->mutexHtmlWorkThread->lock( );
 							--currentWorkThread;
 							this->mutexHtmlWorkThread->unlock( );
 						} );
-						this->mutexHtmlWorkThread->lock( );
 						works.erase( works.begin( ) );
 						--size;
 						++currentWorkThread;
