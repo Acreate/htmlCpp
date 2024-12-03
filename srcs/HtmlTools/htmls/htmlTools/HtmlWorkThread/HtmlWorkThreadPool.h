@@ -17,12 +17,20 @@ namespace cylHtmlTools {
 	class HTMLTOOLS_EXPORT HtmlWorkThreadPool {
 	public:
 #if WIN32
+		/// <summary>
+		/// 获取 cpu 核心数量
+		/// </summary>
+		/// <returns>核心数量</returns>
 		inline static size_t getSystemCupCount( ) {
 			SYSTEM_INFO sysInfo;
 			GetSystemInfo( &sysInfo );
 			return sysInfo.dwNumberOfProcessors;
 		}
 #elif __linux__
+		/// <summary>
+		/// 获取 cpu 核心数量
+		/// </summary>
+		/// <returns>核心数量</returns>
 		inline static size_t getSystemCupCount( ) {
 			return sysconf( _SC_NPROCESSORS_CONF);
 		}
