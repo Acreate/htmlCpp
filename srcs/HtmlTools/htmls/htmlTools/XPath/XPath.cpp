@@ -123,8 +123,9 @@ Vector_HtmlNodeSPtr XPath::pathControlDirName( const Vector_HtmlNodeSPtr &curren
 								break;
 						if( iterator == end ) {
 							auto converXDirSptr = subNode->converXDirSptr( );
-							if( converXDirSptr->isLeftXDirIncludeRightXDir( converXDirSptr.get( ), xdirInfo ) )
-								result.emplace_back( subNode );
+							if( converXDirSptr )
+								if( converXDirSptr->isLeftXDirIncludeRightXDir( converXDirSptr.get( ), xdirInfo ) )
+									result.emplace_back( subNode );
 						}
 					}
 				}
