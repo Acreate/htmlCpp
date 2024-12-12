@@ -3,7 +3,6 @@
 #include <iostream>
 #include <codecvt>
 
-#include "../auto_generate_files/macro/cmake_to_c_cpp_header_env.h"
 #include <fstream>
 #include <htmls/HtmlNode/HtmlNode.h>
 #include <htmls/htmlDoc/HtmlDoc.h>
@@ -23,7 +22,7 @@
 #include "htmls/htmlDoc/HtmlDoc.h"
 void outHtmlDoc( const cylHtmlTools::HtmlDoc_Shared &shared ) {
 	std::string path;
-	path.append( Cache_Path_Dir ).append( "outHtmlDoc.txt" );
+	path.append( "Cache_Path_Dir" ).append( "outHtmlDoc.txt" );
 	shared->findNodes( [&]( cylHtmlTools::HtmlNode_Shared &node )->bool {
 		auto includeNodeContent = *node->getIncludeNodeContent( );
 		cylHtmlTools::HtmlDocTools::setFileAllWString( path, includeNodeContent );
@@ -61,11 +60,11 @@ int testHtml( std::locale locale ) {
 	testIncludeXDir( LR"(div[@"id"="sitebox sd" @class="cf ds"])", LR"(div[@"id"="sitebox sd" @class="cf ds  es"])" );
 	std::string fString( u8"%s/%s/%s" );
 	char path[ 4096 ]{ 0 };
-	int len = snprintf( path, sizeof( path ), fString.c_str( ), std::string( Project_Run_bin ).c_str( ), u8"writeFile", u8"www.121ds.cc.html" );
+	int len = snprintf( path, sizeof( path ), fString.c_str( ), std::string( "Project_Run_bin" ).c_str( ), u8"writeFile", u8"www.121ds.cc.html" );
 	if( len == 0 )
 		return 1;
 	auto wstringstream = cylHtmlTools::HtmlDocTools::getFileAllWString( path );
-	len = snprintf( path, sizeof( path ), fString.c_str( ), std::string( Cache_Path_Dir ).c_str( ), u8"", u8"wuxia.html" );
+	len = snprintf( path, sizeof( path ), fString.c_str( ), std::string( "Cache_Path_Dir" ).c_str( ), u8"", u8"wuxia.html" );
 	if( len == 0 )
 		return 2;
 	size_t fileAllWString = cylHtmlTools::HtmlDocTools::setFileAllWString( path, *wstringstream );
@@ -171,7 +170,7 @@ bool getValue( std::wstringstream &stringstream, cylHtmlTools::Vector_HtmlNodeSP
 int testHtmlDoc( std::locale locale ) {
 	std::string fString( u8"%s/%s/%s" );
 	char path[ 4096 ]{ 0 };
-	int len = snprintf( path, sizeof( path ), fString.c_str( ), std::string( Project_Run_bin ).c_str( ), u8"writeFile", u8"www.121ds.cc.html" );
+	int len = snprintf( path, sizeof( path ), fString.c_str( ), std::string( "Project_Run_bin" ).c_str( ), u8"writeFile", u8"www.121ds.cc.html" );
 	if( len == 0 )
 		return -1;
 	std::wifstream ifstream( path, std::ios::binary | std::ios::in );
@@ -191,7 +190,7 @@ int testHtmlDoc( std::locale locale ) {
 	std::shared_ptr< std::wstring > htmlContent( new std::wstring( stringstream.str( ) ) );
 	ifstream.close( );
 	// 写入文件
-	len = snprintf( path, sizeof( path ), fString.c_str( ), std::string( Cache_Path_Dir ).c_str( ), u8"", u8"www.121ds.cc.txt" );
+	len = snprintf( path, sizeof( path ), fString.c_str( ), std::string( "Cache_Path_Dir" ).c_str( ), u8"", u8"www.121ds.cc.txt" );
 	if( len == 0 )
 		return -1;
 	std::wofstream ofstream( path, std::ios::binary | std::ios::out | std::ios::trunc );
@@ -228,7 +227,7 @@ int testHtmlDoc( std::locale locale ) {
 		return false;
 	} );
 
-	len = snprintf( path, sizeof( path ), fString.c_str( ), std::string( Cache_Path_Dir ).c_str( ), u8"", u8"www.121ds.cc.allNode.txt" );
+	len = snprintf( path, sizeof( path ), fString.c_str( ), std::string( "Cache_Path_Dir" ).c_str( ), u8"", u8"www.121ds.cc.allNode.txt" );
 	ofstream.open( path, std::ios::binary | std::ios::out | std::ios::trunc );
 	if( !ofstream.is_open( ) )
 		return -2;
@@ -386,7 +385,7 @@ int testHtmlDoc( std::locale locale ) {
 	std::cout << topstr << std::endl;
 
 	// 写入文件
-	len = snprintf( path, sizeof( path ), fString.c_str( ), std::string( Cache_Path_Dir ).c_str( ), u8"", u8"www.121ds.cc.xpath.txt" );
+	len = snprintf( path, sizeof( path ), fString.c_str( ), std::string( "Cache_Path_Dir" ).c_str( ), u8"", u8"www.121ds.cc.xpath.txt" );
 	if( len == 0 )
 		return -1;
 	ofstream.open( path, std::ios::binary | std::ios::out | std::ios::trunc );
