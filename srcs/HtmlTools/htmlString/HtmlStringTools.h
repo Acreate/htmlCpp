@@ -16,7 +16,14 @@ namespace cylHtmlTools {
 		/// </summary>
 		/// <param name="currentChar">检测的字符</param>
 		/// <returns>true 表示空字符</returns>
-		static bool isSpace( HtmlChar currentChar );
+		static bool isSpace( const HtmlChar currentChar );
+		/// <summary>
+		/// 是否为一个跳过的空字符 <br/>
+		/// 其中包含控制字符等
+		/// </summary>
+		/// <param name="currentChar">检测的字符</param>
+		/// <returns>true 表示空字符</returns>
+		static bool isSpace( const interfacePlugsType::HtmlDocString &currentChar );
 		/// <summary>
 		/// 是否为一个跳过的空字符 <br/>
 		/// 其中包含控制字符等
@@ -152,6 +159,18 @@ namespace cylHtmlTools {
 		/// <returns>长度</returns>
 		static size_t HtmlStringLen( const HtmlString &find_org_html_string ) {
 			return HtmlStringLen( &find_org_html_string );
+		}
+
+		/// <summary>
+		/// 查找匹配的字符串
+		/// 如果 maxIndex 等于 0， 则使用 find_org_html_string 的长度 的值
+		/// </summary>
+		/// <param name="find_org_html_string">源字符串</param>
+		/// <param name="find_target_html_string">查找的目标字符串</param>
+		/// <param name="result">相对位置，如果为 nullptr，则不会辅助</param>
+		/// <returns>成功返回 true</returns>
+		static bool findNextHtmlStringPotion( const HtmlString &find_org_html_string, const HtmlString &find_target_html_string, size_t *result = nullptr ) {
+			return findNextHtmlStringPotion( &find_org_html_string, &find_target_html_string, result );
 		}
 		/// <summary>
 		/// 查找匹配的字符串

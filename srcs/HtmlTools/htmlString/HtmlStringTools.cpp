@@ -6,8 +6,14 @@
 #include <locale>
 
 using namespace cylHtmlTools;
-bool HtmlStringTools::isSpace( HtmlChar currentChar ) {
+bool HtmlStringTools::isSpace( const HtmlChar currentChar ) {
 	return iswspace( currentChar ) || iswcntrl( currentChar );
+}
+bool HtmlStringTools::isSpace( const HtmlString &currentChar ) {
+	for( auto &htmlChar : currentChar )
+		if( !isSpace( htmlChar ) )
+			return false;
+	return true;
 }
 bool HtmlStringTools::isSpace( const std::string::value_type &currentChar ) {
 	return isspace( currentChar ) || iscntrl( currentChar );
