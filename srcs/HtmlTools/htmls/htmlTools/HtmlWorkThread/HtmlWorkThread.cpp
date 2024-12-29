@@ -88,6 +88,8 @@ bool cylHtmlTools::HtmlWorkThread::isNone( ) const {
 	return result;
 }
 void cylHtmlTools::HtmlWorkThread::start( ) {
+	if( isRun( ) )
+		return;
 	this->mutexHtmlWorkThread->lock( );
 	if( this->thread ) {
 		if( this->thread->joinable( ) )
