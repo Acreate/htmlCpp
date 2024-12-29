@@ -146,13 +146,14 @@ void cylHtmlTools::HtmlWorkThreadPool::start( const size_t work_count, const cyl
 			while( size != 0 || currentWorkThread != 0 ) {
 				auto newTimePoint = std::chrono::system_clock::now( );
 				auto sepMill = std::chrono::duration_cast< std::chrono::milliseconds >( newTimePoint - makeTimePoint );
-				if( sepMill > callSepMilliseconds ) {
-					makeTimePoint = newTimePoint;
-					this->mutexHtmlWorkThread->lock( );
-					size = works.size( );
-					this->mutexHtmlWorkThread->unlock( );
-					function_call( this, size, currentWorkThread );
-				}
+				if( sepMill < callSepMilliseconds )
+					std::this_thread::sleep_for( callSepMilliseconds - sepMill );
+				makeTimePoint = newTimePoint;
+				this->mutexHtmlWorkThread->lock( );
+				size = works.size( );
+				this->mutexHtmlWorkThread->unlock( );
+				function_call( this, size, currentWorkThread );
+
 			}
 		} );
 	else if( this->idleTimeCall )
@@ -165,19 +166,18 @@ void cylHtmlTools::HtmlWorkThreadPool::start( const size_t work_count, const cyl
 			while( size != 0 || currentWorkThread != 0 ) {
 				auto newTimePoint = std::chrono::system_clock::now( );
 				auto sepMill = std::chrono::duration_cast< std::chrono::milliseconds >( newTimePoint - makeTimePoint );
-				if( sepMill > callSepMilliseconds ) {
-					makeTimePoint = newTimePoint;
-					this->mutexHtmlWorkThread->lock( );
-					size = works.size( );
-					this->mutexHtmlWorkThread->unlock( );
-					( *idleTimeCall )( this, size, currentWorkThread );
+				if( sepMill < callSepMilliseconds )
+					std::this_thread::sleep_for( callSepMilliseconds - sepMill );
+				makeTimePoint = newTimePoint;
+				this->mutexHtmlWorkThread->lock( );
+				size = works.size( );
+				this->mutexHtmlWorkThread->unlock( );
+				( *idleTimeCall )( this, size, currentWorkThread );
 
-				}
 			}
 		} );
 	else
 		userCallThread.setCurrentThreadRun( [this]( HtmlWorkThread * ) {
-
 			auto makeTimePoint = std::chrono::system_clock::now( );
 			this->mutexHtmlWorkThread->lock( );
 			size_t size = works.size( );
@@ -185,12 +185,12 @@ void cylHtmlTools::HtmlWorkThreadPool::start( const size_t work_count, const cyl
 			while( size != 0 || currentWorkThread != 0 ) {
 				auto newTimePoint = std::chrono::system_clock::now( );
 				auto sepMill = std::chrono::duration_cast< std::chrono::milliseconds >( newTimePoint - makeTimePoint );
-				if( sepMill > callSepMilliseconds ) {
-					makeTimePoint = newTimePoint;
-					this->mutexHtmlWorkThread->lock( );
-					size = works.size( );
-					this->mutexHtmlWorkThread->unlock( );
-				}
+				if( sepMill < callSepMilliseconds )
+					std::this_thread::sleep_for( callSepMilliseconds - sepMill );
+				makeTimePoint = newTimePoint;
+				this->mutexHtmlWorkThread->lock( );
+				size = works.size( );
+				this->mutexHtmlWorkThread->unlock( );
 			}
 		} );
 	this->workStatus = HtmlWorkThread::Run;
