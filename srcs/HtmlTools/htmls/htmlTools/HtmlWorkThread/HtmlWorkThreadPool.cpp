@@ -146,8 +146,13 @@ void cylHtmlTools::HtmlWorkThreadPool::start( const size_t work_count, const cyl
 			while( size != 0 || currentWorkThread != 0 ) {
 				auto newTimePoint = std::chrono::system_clock::now( );
 				auto sepMill = std::chrono::duration_cast< std::chrono::milliseconds >( newTimePoint - makeTimePoint );
-				if( sepMill < callSepMilliseconds )
-					std::this_thread::sleep_for( callSepMilliseconds - sepMill );
+				if( sepMill < callSepMilliseconds ) {
+					std::this_thread::sleep_for( idleTimeCallWaiteSec );
+					this->mutexHtmlWorkThread->lock( );
+					size = works.size( );
+					this->mutexHtmlWorkThread->unlock( );
+					continue;
+				}
 				makeTimePoint = newTimePoint;
 				this->mutexHtmlWorkThread->lock( );
 				size = works.size( );
@@ -166,8 +171,13 @@ void cylHtmlTools::HtmlWorkThreadPool::start( const size_t work_count, const cyl
 			while( size != 0 || currentWorkThread != 0 ) {
 				auto newTimePoint = std::chrono::system_clock::now( );
 				auto sepMill = std::chrono::duration_cast< std::chrono::milliseconds >( newTimePoint - makeTimePoint );
-				if( sepMill < callSepMilliseconds )
-					std::this_thread::sleep_for( callSepMilliseconds - sepMill );
+				if( sepMill < callSepMilliseconds ) {
+					std::this_thread::sleep_for( idleTimeCallWaiteSec );
+					this->mutexHtmlWorkThread->lock( );
+					size = works.size( );
+					this->mutexHtmlWorkThread->unlock( );
+					continue;
+				}
 				makeTimePoint = newTimePoint;
 				this->mutexHtmlWorkThread->lock( );
 				size = works.size( );
@@ -185,8 +195,13 @@ void cylHtmlTools::HtmlWorkThreadPool::start( const size_t work_count, const cyl
 			while( size != 0 || currentWorkThread != 0 ) {
 				auto newTimePoint = std::chrono::system_clock::now( );
 				auto sepMill = std::chrono::duration_cast< std::chrono::milliseconds >( newTimePoint - makeTimePoint );
-				if( sepMill < callSepMilliseconds )
-					std::this_thread::sleep_for( callSepMilliseconds - sepMill );
+				if( sepMill < callSepMilliseconds ) {
+					std::this_thread::sleep_for( idleTimeCallWaiteSec );
+					this->mutexHtmlWorkThread->lock( );
+					size = works.size( );
+					this->mutexHtmlWorkThread->unlock( );
+					continue;
+				}
 				makeTimePoint = newTimePoint;
 				this->mutexHtmlWorkThread->lock( );
 				size = works.size( );

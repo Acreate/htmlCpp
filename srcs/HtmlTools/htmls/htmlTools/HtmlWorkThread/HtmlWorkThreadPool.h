@@ -72,10 +72,13 @@ namespace cylHtmlTools {
 		size_t workCount;
 		size_t currentWorkThread;  // 当前工作线程数量
 		std::chrono::milliseconds callSepMilliseconds = std::chrono::milliseconds( 1000 ); // 调用间隔-毫秒
-
+		std::chrono::seconds idleTimeCallWaiteSec = std::chrono::seconds( 1 ); // 等待时校验秒
 	public:
 		HtmlWorkThreadPool( );
 		virtual ~HtmlWorkThreadPool( );
+		std::chrono::seconds getIdleTimeCallWaiteSec( ) const { return idleTimeCallWaiteSec; }
+		void setIdleTimeCallWaiteSec( const std::chrono::seconds &waite_sec ) { if( waite_sec.count( ) > 0 ) idleTimeCallWaiteSec = waite_sec; }
+		void setIdleTimeCallWaiteSec( const long long &waite_sec ) { if( waite_sec > 0 ) idleTimeCallWaiteSec = std::chrono::seconds( waite_sec ); }
 		size_t getThreadCount( ) const { return works.size( ); };
 		size_t getWorkCount( ) const { return workCount; }
 		void setWorkCount( const size_t work_count ) { workCount = work_count; }
