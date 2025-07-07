@@ -1,5 +1,6 @@
 ﻿#include "HtmlWorkThreadPool.h"
 
+#include <chrono>
 
 cylHtmlTools::HtmlWorkThreadPool::HtmlWorkThreadPool( ) {
 	this->workStatus = HtmlWorkThread::Init;
