@@ -153,17 +153,17 @@ namespace cylHtmlTools {
 		/// 是否是开始节点
 		/// </summary>
 		/// <returns>开始节点为 true</returns>
-		 bool isStartNode( ) const;
+		bool isStartNode( ) const;
 		/// <summary>
 		/// 是否是结束节点
 		/// </summary>
 		/// <returns>结束节点为true</returns>
-		 bool isEndNode( ) const;
+		bool isEndNode( ) const;
 		/// <summary>
 		/// 是否是双节点
 		/// </summary>
 		/// <returns>双节点返回 true</returns>
-		 bool isDoubleNodeType( ) const;
+		bool isDoubleNodeType( ) const;
 	private:
 		/// <summary>
 		/// 生成 < 与 > 的配对
@@ -174,6 +174,17 @@ namespace cylHtmlTools {
 		/// <param name="index_count">遍历的个数</param>
 		/// <returns>配对列表</returns>
 		static Vector_HtmlNodeSPtr_Shared parseHtmlNodeCharPair( const HtmlDoc_Shared &html_doc_shared, size_t start_index, const size_t max_index, size_t &index_count );
+	public:
+		/// @brief 查找合法的属性 = 分隔符
+		/// @param str_w_char_data_ptr 匹配字符串
+		/// @param count 字符串中合法字符的个数
+		/// @return 下标列表
+		static std::vector< size_t > converStringToHtmlNodeAttributeEqu( const HtmlString::value_type *str_w_char_data_ptr, const size_t count );
+		/// @brief 查找合法的属性键值对
+		/// @param str_w_char_data_ptr 匹配字符串
+		/// @param count 字符串中合法字符的个数
+		/// @return 合法的属性键值对
+		static std::vector< std::pair< HtmlString, HtmlString > > converStringToHtmlNodeAttributePair( const wchar_t *str_w_char_data_ptr, const size_t &count );
 	public: // 比较
 		bool operator==( const HtmlNode &rightNode ) const {
 			if( this == &rightNode || thisSharedPtr == rightNode.thisSharedPtr )

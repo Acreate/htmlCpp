@@ -1,6 +1,5 @@
 ﻿#include "HtmlNode.h"
 
-
 #include "../htmlDoc/HtmlDoc.h"
 #include "../htmlTools/XPath/XPath.h"
 #include "../../htmlString/HtmlStringTools.h"
@@ -14,6 +13,99 @@ using namespace cylHtmlTools::charValue;
 HtmlNode::HtmlNode( ) : parent( nullptr ), subChildren( new Vector_HtmlNodeSPtr ), brother( new Vector_HtmlNodeSPtr ) {
 }
 HtmlNode::~HtmlNode( ) {
+}
+
+std::vector< size_t > HtmlNode::converStringToHtmlNodeAttributeEqu( const wchar_t *str_w_char_data_ptr, const size_t count ) {
+
+	std::vector< size_t > result;
+	for( size_t index = 0; index < count; ++index )
+		if( str_w_char_data_ptr[ index ] == singleQuotation ) {
+			for( ; index < count; ++index )
+				if( str_w_char_data_ptr[ index ] == singleQuotation )
+					break;
+		} else if( str_w_char_data_ptr[ index ] == doubleQuotation ) {
+			for( ; index < count; ++index )
+				if( str_w_char_data_ptr[ index ] == doubleQuotation )
+					break;
+		} else if( str_w_char_data_ptr[ index ] == equ )
+			result.emplace_back( index );
+	return result;
+}
+
+std::vector< std::pair< HtmlString, HtmlString > > HtmlNode::converStringToHtmlNodeAttributePair( const wchar_t *str_w_char_data_ptr, const size_t &count ) {
+	std::vector< std::pair< HtmlString, HtmlString > > result;
+	size_t index = 0;
+	HtmlChar currentChar = str_w_char_data_ptr[ index ];
+	// 缩小范围
+	for( ; index < count; ++index )
+		if( HtmlStringTools::isSpace( str_w_char_data_ptr[ index ] ) == false )
+			break;
+	size_t buffMaxCount = count - 1;
+	for( ; index < buffMaxCount; --buffMaxCount )
+		if( str_w_char_data_ptr[ buffMaxCount ] == nodeEndChar )
+			break;
+
+	// 属性名称
+	std::vector< HtmlString::value_type > key;
+	// 属性值
+	std::vector< HtmlString::value_type > value;
+	// 操作指针
+	std::vector< HtmlString::value_type > *buff = &key;
+	// 当前操作属性类型，0 表示关键字，1 表示值，2 表示存储
+	size_t currentType = 0;
+	// 当前引号，0 表示不存在，1 表示单引号，2 表示双引号
+	size_t currentQuotationType = 0;
+	// 拷贝字符串的起始地址
+	while( index < buffMaxCount ) {
+		currentChar = str_w_char_data_ptr[ index ];
+		if( currentChar == singleQuotation ) {
+			if( currentQuotationType == 0 )
+				currentQuotationType = 1; // 激活单引号标识
+			else if( currentQuotationType == 1 ) {
+				currentQuotationType = 0; // 已经匹配单引号标识
+				if( currentType == 0 ) {
+					currentType = 1; // 切换到值
+					buff = &value;
+				} else if( currentType == 1 )
+					currentType = 2; // 切换到存储
+			}
+		} else if( currentChar == doubleQuotation ) {
+			if( currentQuotationType == 0 )
+				currentQuotationType = 2; // 激活双引号标识
+			else if( currentQuotationType == 2 ) {
+				currentQuotationType = 0; // 已经匹配双单引号标识
+				if( currentType == 0 ) {
+					currentType = 1; // 切换到值
+					buff = &value;
+				} else if( currentType == 1 )
+					currentType = 2; // 切换到存储
+			}
+		} else if( currentChar == equ ) {
+			value.clear( );
+			buff = &value;
+			currentType = 1; // 切换到值
+			++index;
+			continue;
+		}
+		if( currentType == 2 ) {
+			buff->emplace_back( currentChar );
+			HtmlString keyHtmlString( key.data( ), key.size( ) );
+			HtmlString valueHtmlString( value.data( ), value.size( ) );
+			result.emplace_back( keyHtmlString, valueHtmlString );
+			key.clear( );
+			value.clear( );
+			buff = &key;
+			currentType = 0; // 切换到关键字
+			for( ++index; index < buffMaxCount; ++index )
+				if( HtmlStringTools::isSpace( str_w_char_data_ptr[ index ] ) == false )
+					break;
+		}
+		buff->emplace_back( str_w_char_data_ptr[ index ] );
+		++index;
+	}
+	if( currentType != 0 )
+		result.emplace_back( HtmlString( key.data( ), key.size( ) ), HtmlString( value.data( ), value.size( ) ) );
+	return result;
 }
 
 UMap_HtmlStringK_HtmlStringV_Shared HtmlNode::analysisAttribute( ) {
@@ -59,95 +151,16 @@ UMap_HtmlStringK_HtmlStringV_Shared HtmlNode::analysisAttribute( ) {
 		}
 
 	}
-	std::pair< HtmlString, HtmlString > pairUnity;
-	// index 的下标类型
-	// 0 未定义下标，循环首次开始
-	// 1 定义 key 的开始下标
-	// 2 定义 value 的开始下标
-	// 3 未定义 key 的开始下标（已经实现 key/value 的配对）
-	int currentType = 0;
+	// todo : 解析属性列表
 	auto node = htmldocShared->getNodeContent( thisSharedPtr );
-	std::vector< wchar_t > key, value;
-	for( ; equIndex < endIndex; ++equIndex ) {
-		currentChar = startWStrPtr[ equIndex ];
-		// 找到等号位置
-		if( currentType == 2 ) {
-			HtmlString keyval( key.data( ), key.size( ) );
-			HtmlString mapval( value.data( ), value.size( ) );
-			key.clear( );
-			value.clear( );
-			refNodeAttributes->insert_or_assign( keyval, mapval );
-			if( currentChar == nodeEndChar )
-				break;
-			if( HtmlStringTools::isSpace( currentChar ) )// 找到下一个非空
-				for( ++equIndex; equIndex < endIndex; ++equIndex )
-					if( HtmlStringTools::isSpace( startWStrPtr[ equIndex ] ) )
-						break;
-			currentType = 1;
-		} else {
-			if( currentType == 0 )
-				currentType = 1;
-			if( currentChar == equ ) {
-				if( currentType == 1 )
-					currentType = 2;
-				++equIndex;
-				for( ; equIndex < endIndex; ++equIndex ) { // 找到 = 的下一个非空
-					currentChar = startWStrPtr[ equIndex ];
-					if( !HtmlStringTools::isSpace( currentChar ) ) {
-						// 找到值的末尾
-						for( ; equIndex < endIndex; ++equIndex ) {
-							currentChar = startWStrPtr[ equIndex ];
-							if( HtmlStringTools::isSpace( currentChar ) || currentChar == nodeEndChar )
-								break;
-							else if( currentChar == singleQuotation ) {
-								value.emplace_back( currentChar );
-								++equIndex;
-								for( ; equIndex < endIndex; ++equIndex ) {
-									currentChar = startWStrPtr[ equIndex ];
-									value.emplace_back( currentChar );
-									if( currentChar == singleQuotation )
-										break;
-								}
-							} else if( currentChar == doubleQuotation ) {
-								value.emplace_back( currentChar );
-								++equIndex;
-								for( ; equIndex < endIndex; ++equIndex ) {
-									currentChar = startWStrPtr[ equIndex ];
-									value.emplace_back( currentChar );
-									if( currentChar == doubleQuotation )
-										break;
-								}
-							}
-						}
-						break;
-					}
-				}
-			} else if( currentChar == singleQuotation ) {
-				++equIndex;
-				for( ; equIndex < endIndex; ++equIndex ) {
-					currentChar = startWStrPtr[ equIndex ];
-					key.emplace_back( currentChar );
-					if( currentChar == singleQuotation )
-						break;
-				}
-			} else if( currentChar == doubleQuotation ) {
-				++equIndex;
-				for( ; equIndex < endIndex; ++equIndex ) {
-					currentChar = startWStrPtr[ equIndex ];
-					key.emplace_back( currentChar );
-					if( currentChar == doubleQuotation )
-						break;
-				}
-			} else if( !HtmlStringTools::isSpace( currentChar ) )
-				key.emplace_back( currentChar );
-		}
-
-	}
-	if( key.size( ) != 0 || value.size( ) != 0 ) {
-		HtmlString keyval( key.data( ), key.size( ) );
-		HtmlString mapval( value.data( ), value.size( ) );
-		refNodeAttributes->insert_or_assign( keyval, mapval );
-	}
+	size_t count = endIndex - equIndex;
+	if( count == 0 )
+		return refNodeAttributes;
+	auto attributeString = converStringToHtmlNodeAttributePair( startWStrPtr + equIndex, count );
+	count = attributeString.size( );
+	auto data = attributeString.data( );
+	for( equIndex = 0; equIndex < count; ++equIndex )
+		refNodeAttributes->insert_or_assign( data[ equIndex ].first, data[ equIndex ].second );
 	return refNodeAttributes;
 }
 HtmlString_Shared HtmlNode::getNodeContent( ) const {
